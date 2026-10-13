@@ -517,6 +517,8 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
       <div id="briefing-conteudo">
         <div class="lbl" style="margin-bottom:2px">Briefing do negócio</div>
         <p style="font-size:12px;color:var(--td);margin-bottom:20px">Base de posicionamento e características da academia — usada como ponto de partida pra personalizar scripts, cadências e objeções específicas.</p>
+        <div id="bg-resp" style="margin:6px 0 22px"></div>
+
 
         <div class="sec-div"><div class="sec-div-line"></div><div class="sec-div-lbl">🏢 Perfil do negócio</div><div class="sec-div-line"></div></div>
         <div class="form-row">
@@ -3502,6 +3504,81 @@ function switchTab(t){TABS.forEach(x=>{document.getElementById('pan-'+x).classLi
 // BRIEFING DO NEGÓCIO
 // ══════════════════════════════════════
 const MODALIDADES_OPCOES=['Musculação/Fitness','Aulas Coletivas','Artes Marciais','Personal Trainer','Avaliação Física'];
+
+// ══ BRIEFING RESPONDIDO PELA GESTORA (link para ela responder pelo celular) ══
+let bgRow=null;
+function bgLink(){
+  const base=location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/,'');
+  return base+'briefing-gestora.html?a='+encodeURIComponent(sessao.academia_id);
+}
+function bgCopiarLink(){
+  const l=bgLink();
+  if(navigator.clipboard)navigator.clipboard.writeText(l).then(()=>toast('Link copiado!')).catch(()=>prompt('Copie o link:',l));
+  else prompt('Copie o link:',l);
+}
+async function bgCarregar(){
+  const el=document.getElementById('bg-resp'); if(!el||!sessao.academia_id)return;
+  try{const rows=await sbGet('cave_briefing_gestora',`academia_id=eq.${sessao.academia_id}`);bgRow=rows&&rows[0]||null}
+  catch(e){console.error('briefing gestora:',e);bgRow=null;el.innerHTML='<div style="font-size:12px;color:var(--td)">Para usar o briefing respondido pela gestora, rode o SQL <code>schema-briefing-gestora.sql</code> no Supabase.</div>';return}
+  bgRender();
+}
+function bgRender(){
+  const el=document.getElementById('bg-resp'); if(!el)return;
+  const resp=(bgRow&&bgRow.respostas)||{};
+  const keys=Object.keys(resp);
+  const resp_n=keys.filter(k=>(resp[k].a||'').trim()).length, ns_n=keys.filter(k=>resp[k].ns&&!(resp[k].a||'').trim()).length;
+  const st=bgRow?(bgRow.status==='enviado'?'<span style="color:var(--gr);font-weight:700">Enviado pela gestora</span>':'<span style="color:var(--am);font-weight:700">Rascunho (ainda respondendo)</span>'):'<span style="color:var(--td)">Ainda sem respostas</span>';
+  const quando=bgRow&&bgRow.updated_at?' · atualizado em '+new Date(Number(bgRow.updated_at)).toLocaleString('pt-BR'):'';
+  let corpo='';
+  if(keys.length){
+    corpo='<div style="margin-top:12px">'+BC_SCHEMA.map(bl=>{
+      const ks=bl.c.map(c=>bl.id+'.'+c[0]).filter(k=>resp[k]);
+      if(!ks.length)return '';
+      return '<details style="background:var(--s2);border-radius:10px;padding:10px 14px;margin-bottom:8px"><summary style="cursor:pointer;font-size:13.5px;font-weight:700">'+bl.t+' <span style="font-weight:500;color:var(--td);font-size:11.5px">· '+ks.filter(k=>(resp[k].a||'').trim()).length+'/'+ks.length+'</span></summary><div style="margin-top:10px">'+
+        ks.map(k=>'<div class="fg" style="margin-bottom:10px"><label class="fl" style="text-transform:none;letter-spacing:0;font-size:12.5px">'+bcEsc(resp[k].q||k)+(resp[k].ns&&!(resp[k].a||'').trim()?' <span style="color:var(--am)">· marcou "não sei agora"</span>':'')+'</label><textarea class="fi" id="bgr-'+k+'" rows="3">'+bcEsc(resp[k].a||'')+'</textarea></div>').join('')+'</div></details>';
+    }).join('')+'</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn-or btn-sm" onclick="bgSalvarEdicoes()">Salvar edições</button><button class="btn-gh btn-sm" onclick="bgAplicar()">Aplicar ao briefing completo</button></div>'+
+    '<p style="font-size:11.5px;color:var(--td);margin-top:8px">“Aplicar” copia as respostas para os campos do briefing completo que ainda estão vazios (nada é sobrescrito). Planos, personas, concorrentes e objeções ficam como texto aqui: me envie que eu organizo em lista.</p>';
+  }
+  el.innerHTML='<div style="background:var(--s1);border:1px solid var(--bdo);border-radius:12px;padding:16px">'+
+    '<div style="font-size:14px;font-weight:700;margin-bottom:4px">📲 Briefing respondido pela gestora</div>'+
+    '<p style="font-size:12.5px;color:var(--td);margin-bottom:10px">Envie este link para a gestora responder pelo celular, digitando ou ditando. As respostas aparecem aqui e podem ser editadas, complementadas e depois aplicadas ao briefing completo.</p>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px"><input class="fi" readonly style="flex:1;min-width:220px" value="'+bcEsc(bgLink())+'" onclick="this.select()"><button class="btn-or btn-sm" onclick="bgCopiarLink()">Copiar link</button><a class="btn-gh btn-sm" style="text-decoration:none" target="_blank" href="https://wa.me/?text='+encodeURIComponent('Olá! Segue o link do briefing da academia. Pode responder digitando ou falando, no seu tempo: '+bgLink())+'">Enviar por WhatsApp</a></div>'+
+    '<div style="font-size:12px;color:var(--td)">'+st+quando+(keys.length?' · '+resp_n+' respondidas · '+ns_n+' marcadas “não sei”':'')+'</div>'+corpo+'</div>';
+}
+async function bgSalvarEdicoes(){
+  if(!bgRow)return;
+  const resp=bgRow.respostas||{};
+  Object.keys(resp).forEach(k=>{const t=document.getElementById('bgr-'+k);if(t)resp[k].a=t.value.trim()});
+  try{
+    await sbUpsert('cave_briefing_gestora',{academia_id:sessao.academia_id,respostas:resp,status:bgRow.status||'rascunho',updated_at:Date.now()});
+    bgRow.respostas=resp;bgRow.updated_at=Date.now();toast('Respostas salvas!');bgRender();
+  }catch(e){console.error(e);toast('Erro ao salvar.',true)}
+}
+async function bgAplicar(){
+  if(!bgRow)return;
+  await bgSalvarEdicoes();
+  const resp=bgRow.respostas||{};
+  const b=JSON.parse(JSON.stringify(bcDados||{versao:1,blocos:{}}));
+  b.blocos=b.blocos||{};
+  let n=0,pulados=0;
+  BC_SCHEMA.forEach(bl=>bl.c.forEach(c=>{
+    const r=resp[bl.id+'.'+c[0]]; const txt=r&&(r.a||'').trim(); if(!txt)return;
+    if(c[2]==='tab'){pulados++;return}
+    b.blocos[bl.id]=b.blocos[bl.id]||{};
+    const atual=b.blocos[bl.id][c[0]];
+    if(atual!=null&&atual!==''&&!(Array.isArray(atual)&&!atual.length))return;
+    let t=txt; if(c[2]==='list'&&t.indexOf('\n')<0)t=t.split(/[;,]| e (?=[a-zà-ú])/i).join('\n');
+    const v=bcTxtToVal(c,t); if(v==null)return;
+    b.blocos[bl.id][c[0]]=v;n++;
+  }));
+  if(!b.fontes)b.fontes=[];
+  if(!b.fontes.some(f=>f.tipo==='Briefing da gestora'))b.fontes.push({tipo:'Briefing da gestora',titulo:'Formulário respondido pelo link',data:new Date().toLocaleDateString('pt-BR')});
+  bcDados=b;
+  await bcSalvar(true);
+  toast(n+' campo(s) aplicado(s)'+(pulados?'. '+pulados+' resposta(s) em lista/tabela ficam para eu organizar.':'.'));
+}
+
 function initBriefing(){
   const restrito=sessao.role==='consultor'||sessao.role==='treinador';
   document.getElementById('briefing-restrito').style.display=restrito?'block':'none';
@@ -3510,6 +3587,7 @@ function initBriefing(){
   renderModalidadesChk([]);
   carregarBriefing();
   bcCarregar();
+  bgCarregar();
   carregarTranscricoes();
 }
 function renderModalidadesChk(selecionadas){
