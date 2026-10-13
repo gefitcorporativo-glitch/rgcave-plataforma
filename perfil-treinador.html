@@ -104,8 +104,8 @@ header .logo{color:#F5B800!important}
     if(!uid||!treinadorId){app.innerHTML='<div class="locked">Link inválido — acesse pela aba Equipe do sistema.</div>';return;}
     try{
       const [viewers,treins]=await Promise.all([
-        sbGet('roi_gestores',`id=eq.${uid}`),
-        sbGet('roi_treinadores',`id=eq.${treinadorId}`)
+        sbGet('cave_gestores',`id=eq.${uid}`),
+        sbGet('cave_treinadores',`id=eq.${treinadorId}`)
       ]);
       viewer=viewers[0]; treinador=treins[0];
     }catch(e){console.error(e);}
@@ -202,7 +202,7 @@ header .logo{color:#F5B800!important}
 
   async function salvarQualificacao(){
     const sel=document.querySelector('input[name="grau"]:checked');
-    await sbPatch('roi_treinadores',treinadorId,{
+    await sbPatch('cave_treinadores',treinadorId,{
       grau_academico:sel?sel.value:null,
       cref:document.getElementById('in-cref').value||null,
       nivel_carreira:document.getElementById('in-nivel').value
@@ -210,7 +210,7 @@ header .logo{color:#F5B800!important}
     alert('Qualificação salva!');
   }
   async function salvarCargaHoraria(){
-    await sbPatch('roi_treinadores',treinadorId,{
+    await sbPatch('cave_treinadores',treinadorId,{
       carga_musculacao:parseFloat(document.getElementById('ch-musc').value)||0,
       carga_aulas_coletivas:parseFloat(document.getElementById('ch-aulas').value)||0,
       carga_piscina:parseFloat('0')||0,
@@ -223,9 +223,9 @@ header .logo{color:#F5B800!important}
 
   async function carregarKpis(){
     const [alunos,exps,kpisSalvos]=await Promise.all([
-      sbGet('roi_alunos',`treinador_id=eq.${treinadorId}`),
-      sbGet('roi_experiencias',`treinador_id=eq.${treinadorId}`),
-      sbGet('roi_treinador_kpis_mensais',`treinador_id=eq.${treinadorId}`)
+      sbGet('cave_alunos',`treinador_id=eq.${treinadorId}`),
+      sbGet('cave_experiencias',`treinador_id=eq.${treinadorId}`),
+      sbGet('cave_treinador_kpis_mensais',`treinador_id=eq.${treinadorId}`)
     ]);
     const obsMap={}; kpisSalvos.forEach(k=>obsMap[k.mes_referencia.slice(0,7)]=k.observacao||'');
     const carteiraAtual=alunos.filter(a=>a.status==='ativo').length;
@@ -248,11 +248,11 @@ header .logo{color:#F5B800!important}
     }).join('');
   }
   async function salvarObsKpi(mes,valor){
-    await sbUpsert('roi_treinador_kpis_mensais',{academia_id:treinador.academia_id,treinador_id:treinadorId,mes_referencia:mes+'-01',observacao:valor,updated_at:Date.now()});
+    await sbUpsert('cave_treinador_kpis_mensais',{academia_id:treinador.academia_id,treinador_id:treinadorId,mes_referencia:mes+'-01',observacao:valor,updated_at:Date.now()});
   }
 
   async function carregarRegistros(tipo,elId){
-    const rows=await sbGet('roi_treinador_registros',`treinador_id=eq.${treinadorId}&tipo=eq.${tipo}&order=data.desc`);
+    const rows=await sbGet('cave_treinador_registros',`treinador_id=eq.${treinadorId}&tipo=eq.${tipo}&order=data.desc`);
     const el=document.getElementById(elId);
     if(!rows.length){el.innerHTML='<div class="item" style="color:var(--td)">Nenhum registro ainda.</div>';return;}
     el.innerHTML=rows.map(r=>`<div class="item">
@@ -264,14 +264,14 @@ header .logo{color:#F5B800!important}
     const data=document.getElementById('a1a-data').value;
     const desc=document.getElementById('a1a-desc').value.trim();
     if(!data||!desc)return alert('Preencha data e anotação.');
-    await sbPost('roi_treinador_registros',{academia_id:treinador.academia_id,treinador_id:treinadorId,tipo:'1a1',data,descricao:desc,criado_por:uid,criado_em:Date.now()});
+    await sbPost('cave_treinador_registros',{academia_id:treinador.academia_id,treinador_id:treinadorId,tipo:'1a1',data,descricao:desc,criado_por:uid,criado_em:Date.now()});
     document.getElementById('a1a-desc').value='';
     carregarRegistros('1a1','a1a-lista');
   }
   async function addPlanoAcao(){
     const desc=document.getElementById('pa-desc').value.trim();
     if(!desc)return alert('Descreva o plano de ação.');
-    await sbPost('roi_treinador_registros',{
+    await sbPost('cave_treinador_registros',{
       academia_id:treinador.academia_id,treinador_id:treinadorId,tipo:'plano_acao',
       data:new Date().toISOString().slice(0,10),trimestre:document.getElementById('pa-trimestre').value,
       descricao:desc,status:document.getElementById('pa-status').value,criado_por:uid,criado_em:Date.now()

@@ -120,7 +120,7 @@ header .logo{color:#F5B800!important}
 
   async function init(){
     if(uid){
-      try{const g=await sbGet('roi_gestores',`id=eq.${uid}`);academiaId=g[0]?.academia_id;}catch(e){console.error(e);}
+      try{const g=await sbGet('cave_gestores',`id=eq.${uid}`);academiaId=g[0]?.academia_id;}catch(e){console.error(e);}
     }
     renderMetodologia();
     renderFunilPicker();
@@ -138,7 +138,7 @@ header .logo{color:#F5B800!important}
   async function renderMetodologia(){
     const el=document.getElementById('metodologia-lista');
     try{
-      const rows=await sbGet('roi_scripts_metodologia',`academia_id=eq.${academiaId}&order=ordem.asc`);
+      const rows=await sbGet('cave_scripts_metodologia',`academia_id=eq.${academiaId}&order=ordem.asc`);
       if(!rows.length){el.innerHTML='<div class="empty">Conteúdo de metodologia ainda não cadastrado.</div>';return;}
       el.innerHTML=rows.map(r=>`<div class="card"><h3>${r.titulo}</h3><div class="field-txt" style="white-space:pre-wrap">${r.conteudo}</div></div>`).join('');
     }catch(e){el.innerHTML='<div class="empty">Conteúdo de metodologia ainda não cadastrado.</div>';}
@@ -155,7 +155,7 @@ header .logo{color:#F5B800!important}
     const el=document.getElementById('funil-lista');
     el.innerHTML='<div class="empty">Carregando...</div>';
     try{
-      const rows=await sbGet('roi_scripts_cadencia',`academia_id=eq.${academiaId}&funil=eq.${funilAtivo}&order=dia.asc,ordem.asc`);
+      const rows=await sbGet('cave_scripts_cadencia',`academia_id=eq.${academiaId}&funil=eq.${funilAtivo}&order=dia.asc,ordem.asc`);
       if(!rows.length){el.innerHTML='<div class="empty">Ainda não há scripts cadastrados pra esse funil.</div>';return;}
       el.innerHTML=rows.map(r=>`<div class="card">
         <span class="dia-chip">📅 Dia ${r.dia}${r.perfil?' · '+r.perfil:''}</span>
@@ -173,7 +173,7 @@ header .logo{color:#F5B800!important}
   async function renderObjecoes(){
     const el=document.getElementById('objecoes-lista');
     if(!objecoesCache.length){
-      try{objecoesCache=await sbGet('roi_scripts_objecoes',`academia_id=eq.${academiaId}&order=ordem.asc`);}catch(e){console.error(e);}
+      try{objecoesCache=await sbGet('cave_scripts_objecoes',`academia_id=eq.${academiaId}&order=ordem.asc`);}catch(e){console.error(e);}
     }
     const busca=document.getElementById('obj-busca').value.toLowerCase();
     const lista=busca?objecoesCache.filter(o=>o.titulo.toLowerCase().includes(busca)):objecoesCache;
@@ -195,7 +195,7 @@ header .logo{color:#F5B800!important}
   async function renderAtendimento(){
     const el=document.getElementById('atendimento-lista');
     try{
-      const rows=await sbGet('roi_scripts_atendimento',`academia_id=eq.${academiaId}&order=ordem.asc`);
+      const rows=await sbGet('cave_scripts_atendimento',`academia_id=eq.${academiaId}&order=ordem.asc`);
       if(!rows.length){el.innerHTML='<div class="empty">Conteúdo de atendimento presencial ainda não cadastrado.</div>';return;}
       el.innerHTML=rows.map(r=>`<div class="card"><h3>${r.titulo}</h3><div class="field-txt" style="white-space:pre-wrap">${r.conteudo}</div></div>`).join('');
     }catch(e){el.innerHTML='<div class="empty">Conteúdo de atendimento presencial ainda não cadastrado.</div>';}

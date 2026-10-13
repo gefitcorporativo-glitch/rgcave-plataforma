@@ -100,8 +100,8 @@ header .logo{color:#F5B800!important}
     if(!uid||!consultoraId){app.innerHTML='<div class="locked">Link inválido — acesse pela aba Equipe do sistema.</div>';return;}
     try{
       const [viewers,conss]=await Promise.all([
-        sbGet('roi_gestores',`id=eq.${uid}`),
-        sbGet('roi_consultoras',`id=eq.${consultoraId}`)
+        sbGet('cave_gestores',`id=eq.${uid}`),
+        sbGet('cave_consultoras',`id=eq.${consultoraId}`)
       ]);
       viewer=viewers[0]; consultora=conss[0];
     }catch(e){console.error(e);}
@@ -172,7 +172,7 @@ header .logo{color:#F5B800!important}
   }
 
   async function carregarMetas(){
-    const rows=await sbGet('roi_consultora_metas_periodo',`consultora_id=eq.${consultoraId}&order=periodo_inicio.desc`);
+    const rows=await sbGet('cave_consultora_metas_periodo',`consultora_id=eq.${consultoraId}&order=periodo_inicio.desc`);
     const tipoLbl={planos:'Nº Planos',rs:'R$ Valor',treino:'Treinamento'};
     const el=document.getElementById('metas-lista');
     if(!rows.length){el.innerHTML='<div class="item" style="color:var(--td)">Nenhum período registrado ainda.</div>';return;}
@@ -182,7 +182,7 @@ header .logo{color:#F5B800!important}
   async function addMetaPeriodo(){
     const inicio=document.getElementById('mp-inicio').value;
     if(!inicio)return alert('Informe o início do período.');
-    await sbPost('roi_consultora_metas_periodo',{
+    await sbPost('cave_consultora_metas_periodo',{
       academia_id:consultora.academia_id, consultora_id:consultoraId,
       periodo_inicio:inicio, periodo_fim:document.getElementById('mp-fim').value||null,
       meta_tipo:document.getElementById('mp-tipo').value, meta_valor:parseFloat(document.getElementById('mp-valor').value)||null,
@@ -192,8 +192,8 @@ header .logo{color:#F5B800!important}
   }
 
   async function carregarKpis(){
-    const regs=await sbGet('roi_registros',`consultora_id=eq.${consultoraId}&order=data.desc`);
-    const kpisSalvos=await sbGet('roi_consultor_kpis_mensais',`consultora_id=eq.${consultoraId}`);
+    const regs=await sbGet('cave_registros',`consultora_id=eq.${consultoraId}&order=data.desc`);
+    const kpisSalvos=await sbGet('cave_consultor_kpis_mensais',`consultora_id=eq.${consultoraId}`);
     const obsMap={}; kpisSalvos.forEach(k=>obsMap[k.mes_referencia.slice(0,7)]=k.observacao||'');
     const porMes={};
     regs.forEach(r=>{
@@ -213,11 +213,11 @@ header .logo{color:#F5B800!important}
     }).join('');
   }
   async function salvarObsKpi(mes,valor){
-    await sbUpsert('roi_consultor_kpis_mensais',{academia_id:consultora.academia_id,consultora_id:consultoraId,mes_referencia:mes+'-01',observacao:valor,updated_at:Date.now()});
+    await sbUpsert('cave_consultor_kpis_mensais',{academia_id:consultora.academia_id,consultora_id:consultoraId,mes_referencia:mes+'-01',observacao:valor,updated_at:Date.now()});
   }
 
   async function carregarRegistros(tipo,elId){
-    const rows=await sbGet('roi_consultor_registros',`consultora_id=eq.${consultoraId}&tipo=eq.${tipo}&order=data.desc`);
+    const rows=await sbGet('cave_consultor_registros',`consultora_id=eq.${consultoraId}&tipo=eq.${tipo}&order=data.desc`);
     const el=document.getElementById(elId);
     if(!rows.length){el.innerHTML='<div class="item" style="color:var(--td)">Nenhum registro ainda.</div>';return;}
     el.innerHTML=rows.map(r=>`<div class="item">
@@ -229,14 +229,14 @@ header .logo{color:#F5B800!important}
     const data=document.getElementById('a1a-data').value;
     const desc=document.getElementById('a1a-desc').value.trim();
     if(!data||!desc)return alert('Preencha data e anotação.');
-    await sbPost('roi_consultor_registros',{academia_id:consultora.academia_id,consultora_id:consultoraId,tipo:'1a1',data,descricao:desc,criado_por:uid,criado_em:Date.now()});
+    await sbPost('cave_consultor_registros',{academia_id:consultora.academia_id,consultora_id:consultoraId,tipo:'1a1',data,descricao:desc,criado_por:uid,criado_em:Date.now()});
     document.getElementById('a1a-desc').value='';
     carregarRegistros('1a1','a1a-lista');
   }
   async function addPlanoAcao(){
     const desc=document.getElementById('pa-desc').value.trim();
     if(!desc)return alert('Descreva o plano de ação.');
-    await sbPost('roi_consultor_registros',{
+    await sbPost('cave_consultor_registros',{
       academia_id:consultora.academia_id,consultora_id:consultoraId,tipo:'plano_acao',
       data:new Date().toISOString().slice(0,10),trimestre:document.getElementById('pa-trimestre').value,
       descricao:desc,status:document.getElementById('pa-status').value,criado_por:uid,criado_em:Date.now()

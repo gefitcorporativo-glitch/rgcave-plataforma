@@ -573,7 +573,7 @@ async function doLogin(){
 
   try{
     const {data, error} = await supabaseClient
-      .from('roi_gestores')
+      .from('cave_gestores')
       .select('*')
       .eq('email', email)
       .eq('senha_hash', pass) // mesmo padrão usado no Desafio ROI / Central de Scripts (comparação direta)
@@ -638,8 +638,8 @@ async function loadEquipe(){
     const academiaId = currentUser.academia_id;
     if(!academiaId){ equipeConsultoras=[]; equipeTreinadores=[]; return; }
     const [{data:cons}, {data:trei}] = await Promise.all([
-      supabaseClient.from('roi_consultoras').select('id,nome').eq('academia_id', academiaId),
-      supabaseClient.from('roi_treinadores').select('id,nome').eq('academia_id', academiaId).eq('ativo', true)
+      supabaseClient.from('cave_consultoras').select('id,nome').eq('academia_id', academiaId),
+      supabaseClient.from('cave_treinadores').select('id,nome').eq('academia_id', academiaId).eq('ativo', true)
     ]);
     equipeConsultoras = cons || [];
     equipeTreinadores = trei || [];
@@ -661,7 +661,7 @@ async function tentarLoginAutomatico(){
 
   try{
     const {data, error} = await supabaseClient
-      .from('roi_gestores')
+      .from('cave_gestores')
       .select('*')
       .eq('id', uid)
       .eq('ativo', true)
@@ -764,7 +764,7 @@ async function loadExperiencias(){
     return;
   }
   try{
-    let query = supabaseClient.from('roi_experiencias').select('*').order('created_at',{ascending:false});
+    let query = supabaseClient.from('cave_experiencias').select('*').order('created_at',{ascending:false});
     if(currentUser.academia_id){
       query = query.eq('academia_id', currentUser.academia_id);
     }else if(currentUser.role==='admin'){
@@ -793,7 +793,7 @@ async function persist(exp){
   }
   try{
     exp.updated_at = new Date().toISOString();
-    const {error} = await supabaseClient.from('roi_experiencias').upsert(exp);
+    const {error} = await supabaseClient.from('cave_experiencias').upsert(exp);
     if(error) throw error;
   }catch(e){
     console.error(e);
@@ -1334,7 +1334,7 @@ async function syncAgendaFromCard(experienciaId, tipo, obs){
   alvo.feita_em = new Date().toISOString();
   if(obs) alvo.obs = obs;
   if(!DEMO_MODE && supabaseClient){
-    try{ await supabaseClient.from('roi_agenda_tarefas').update({feita:true, feita_em:alvo.feita_em}).eq('id', alvo.id); }
+    try{ await supabaseClient.from('cave_agenda_tarefas').update({feita:true, feita_em:alvo.feita_em}).eq('id', alvo.id); }
     catch(e){ console.error(e); }
   }
 }
@@ -1354,11 +1354,11 @@ async function sincronizarCampanhas(exp, status){
   if(!exp.campanha_card_id || DEMO_MODE || !supabaseClient) return;
   try{
     if(status==='convertida'){
-      await supabaseClient.from('roi_campanha_cards').update({etapa_atual:'convertido', status:'convertido', updated_at:Date.now()}).eq('id', exp.campanha_card_id);
+      await supabaseClient.from('cave_campanha_cards').update({etapa_atual:'convertido', status:'convertido', updated_at:Date.now()}).eq('id', exp.campanha_card_id);
     } else if(status==='nao_convertida'){
-      await supabaseClient.from('roi_campanha_cards').update({status:'perdido', updated_at:Date.now()}).eq('id', exp.campanha_card_id);
+      await supabaseClient.from('cave_campanha_cards').update({status:'perdido', updated_at:Date.now()}).eq('id', exp.campanha_card_id);
     } else if(status==='iniciada'){
-      await supabaseClient.from('roi_campanha_cards').update({etapa_atual:'exp_iniciada', updated_at:Date.now()}).eq('id', exp.campanha_card_id);
+      await supabaseClient.from('cave_campanha_cards').update({etapa_atual:'exp_iniciada', updated_at:Date.now()}).eq('id', exp.campanha_card_id);
     }
   }catch(e){
     console.error(e);
@@ -1466,7 +1466,7 @@ async function loadAgendaTarefas(){
     return;
   }
   try{
-    let query = supabaseClient.from('roi_agenda_tarefas').select('*').order('data_prevista',{ascending:true});
+    let query = supabaseClient.from('cave_agenda_tarefas').select('*').order('data_prevista',{ascending:true});
     if(currentUser.academia_id){
       query = query.eq('academia_id', currentUser.academia_id);
     }else if(currentUser.role!=='admin'){
@@ -1522,7 +1522,7 @@ async function criarTarefaAgenda(exp, tipo, titulo, responsavelId, responsavelNo
   };
   agendaTarefas.push(tarefa);
   if(!DEMO_MODE && supabaseClient){
-    try{ await supabaseClient.from('roi_agenda_tarefas').insert(tarefa); }
+    try{ await supabaseClient.from('cave_agenda_tarefas').insert(tarefa); }
     catch(e){ console.error(e); }
   }
 }

@@ -1503,7 +1503,7 @@ async function doLogin(){
   if(!email||!senha){err.textContent='Preencha e-mail e senha.';err.classList.add('show');return;}
   const btn=document.getElementById('btn-login');btn.disabled=true;btn.textContent='Verificando...';
   try{
-    const res=await sbGet('roi_gestores',`email=eq.${encodeURIComponent(email)}&senha_hash=eq.${encodeURIComponent(senha)}&ativo=eq.true&select=id,nome,email,academia_id,role`);
+    const res=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(email)}&senha_hash=eq.${encodeURIComponent(senha)}&ativo=eq.true&select=id,nome,email,academia_id,role`);
     if(!res||!res.length||!ROLES_PERMITIDOS.includes(res[0].role)){
       err.textContent='E-mail ou senha incorretos, ou acesso não autorizado.';err.classList.add('show');
       btn.disabled=false;btn.textContent='Entrar';return;
@@ -1540,7 +1540,7 @@ async function checkSession(){
 
   if(uidAuto){
     try{
-      const res=await sbGet('roi_gestores',`id=eq.${encodeURIComponent(uidAuto)}&ativo=eq.true&select=id,nome,email,academia_id,role`);
+      const res=await sbGet('cave_gestores',`id=eq.${encodeURIComponent(uidAuto)}&ativo=eq.true&select=id,nome,email,academia_id,role`);
       if(res&&res.length&&ROLES_PERMITIDOS.includes(res[0].role)){
         sessionStorage.setItem('qg90_sessao',JSON.stringify(res[0]));
         aplicarSessao(res[0]);
@@ -1557,7 +1557,7 @@ async function checkSession(){
   let s;
   try{s=JSON.parse(raw);}catch(e){mostrarTela('screen-login');return;}
   try{
-    const res=await sbGet('roi_gestores',`id=eq.${encodeURIComponent(s.id)}&ativo=eq.true&select=id,nome,email,academia_id,role`);
+    const res=await sbGet('cave_gestores',`id=eq.${encodeURIComponent(s.id)}&ativo=eq.true&select=id,nome,email,academia_id,role`);
     if(!res||!res.length||!ROLES_PERMITIDOS.includes(res[0].role)){
       sessionStorage.removeItem('qg90_sessao');
       mostrarTela('screen-login');

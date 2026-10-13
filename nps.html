@@ -116,7 +116,7 @@
     const btn=document.getElementById('btn-enviar');
     btn.disabled=true; btn.textContent='Enviando...';
     try{
-      await supabaseClient.from('roi_nps_respostas').insert({
+      await supabaseClient.from('cave_nps_respostas').insert({
         academia_id: ACADEMIA_ID,
         tipo: contexto==='geral' ? 'geral' : 'pontual',
         contexto: contexto==='geral' ? null : contexto,

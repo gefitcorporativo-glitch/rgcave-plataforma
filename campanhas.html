@@ -669,7 +669,7 @@ async function doLogin(){
   if(!email||!senha){err.textContent='Preencha e-mail e senha.';err.classList.add('show');return;}
   const btn=document.getElementById('btn-login');btn.disabled=true;btn.textContent='Verificando...';
   try{
-    const res=await sbGet('roi_gestores',`email=eq.${encodeURIComponent(email)}&senha_hash=eq.${encodeURIComponent(senha)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,treinador_id,modulos_ativos`);
+    const res=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(email)}&senha_hash=eq.${encodeURIComponent(senha)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,treinador_id,modulos_ativos`);
     if(!res||!res.length||!ROLES_PERMITIDOS.includes(res[0].role)){
       err.textContent='E-mail ou senha incorretos, ou acesso não autorizado.';err.classList.add('show');
       btn.disabled=false;btn.textContent='Entrar';return;
@@ -705,7 +705,7 @@ async function checkSession(){
   const uidAuto=params.get('uid');
   if(uidAuto){
     try{
-      const res=await sbGet('roi_gestores',`id=eq.${encodeURIComponent(uidAuto)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,treinador_id,modulos_ativos`);
+      const res=await sbGet('cave_gestores',`id=eq.${encodeURIComponent(uidAuto)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,treinador_id,modulos_ativos`);
       if(res&&res.length&&ROLES_PERMITIDOS.includes(res[0].role)&&(res[0].role==='admin'||(res[0].modulos_ativos||[]).includes('campanhas'))){
         sessionStorage.setItem('qg90_sessao',JSON.stringify(res[0]));
         iniciarApp(res[0]);return;
@@ -716,7 +716,7 @@ async function checkSession(){
   if(!raw){mostrarTela('screen-login');return;}
   let s;try{s=JSON.parse(raw);}catch(e){mostrarTela('screen-login');return;}
   try{
-    const res=await sbGet('roi_gestores',`id=eq.${encodeURIComponent(s.id)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,treinador_id,modulos_ativos`);
+    const res=await sbGet('cave_gestores',`id=eq.${encodeURIComponent(s.id)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,treinador_id,modulos_ativos`);
     if(!res||!res.length||!ROLES_PERMITIDOS.includes(res[0].role)||(res[0].role!=='admin'&&!(res[0].modulos_ativos||[]).includes('campanhas'))){sessionStorage.removeItem('qg90_sessao');mostrarTela('screen-login');return;}
     iniciarApp(res[0]);
   }catch(e){console.error(e);mostrarTela('screen-login');}
@@ -732,13 +732,13 @@ async function iniciarApp(s){
   document.getElementById('userAcademia').textContent=s.role==='admin'?'RG Cave · Master':(s.role==='consultor'?'Consultor(a)':(s.role==='treinador'?'Treinador(a)':'Gestor(a)'));
   mostrarTela('appWrap');
   try{
-    consultoras=s.academia_id?await sbGet('roi_consultoras',`academia_id=eq.${s.academia_id}&select=id,nome,meta,meta_tipo,metas`):[];
+    consultoras=s.academia_id?await sbGet('cave_consultoras',`academia_id=eq.${s.academia_id}&select=id,nome,meta,meta_tipo,metas`):[];
   }catch(e){console.error(e);consultoras=[];}
   try{
-    treinadores=s.academia_id?await sbGet('roi_treinadores',`academia_id=eq.${s.academia_id}&ativo=eq.true&select=id,nome`):[];
+    treinadores=s.academia_id?await sbGet('cave_treinadores',`academia_id=eq.${s.academia_id}&ativo=eq.true&select=id,nome`):[];
   }catch(e){console.error(e);treinadores=[];}
   try{
-    gestoresAcademia=s.academia_id?await sbGet('roi_gestores',`academia_id=eq.${s.academia_id}&role=eq.gestor&ativo=eq.true&select=id,nome`):[];
+    gestoresAcademia=s.academia_id?await sbGet('cave_gestores',`academia_id=eq.${s.academia_id}&role=eq.gestor&ativo=eq.true&select=id,nome`):[];
   }catch(e){console.error(e);gestoresAcademia=[];}
   if(s.academia_id)await carregarJornadas();
   else Object.assign(ETAPAS,JORNADAS_PADRAO);
@@ -773,7 +773,7 @@ async function iniciarApp(s){
   const openCard=new URLSearchParams(window.location.search).get('openCard');
   if(openCard){
     try{
-      const res=await sbGet('roi_campanha_cards',`id=eq.${openCard}&select=id,campanha_id,perfil`);
+      const res=await sbGet('cave_campanha_cards',`id=eq.${openCard}&select=id,campanha_id,perfil`);
       const card=res[0];
       if(card){
         // SEGURANÇA: só abre se a campanha desse card pertencer mesmo à lista de
@@ -825,7 +825,7 @@ function toggleMostrarArquivadas(){
 async function carregarCampanhas(){
   if(!sessao.academia_id){document.getElementById('campGrid').innerHTML='<div class="empty-state">Sem academia vinculada a este usuário.</div>';return;}
   try{
-    const camps=await sbGet('roi_campanhas',`academia_id=eq.${sessao.academia_id}&order=created_at.desc`);
+    const camps=await sbGet('cave_campanhas',`academia_id=eq.${sessao.academia_id}&order=created_at.desc`);
     minhasCampanhas=ehTreinador()?camps.filter(c=>(c.perfis||[]).includes('sucesso_cliente')):camps;
     renderGridCampanhas();
   }catch(e){console.error(e);toast('Erro ao carregar campanhas',true);}
@@ -898,7 +898,7 @@ async function abrirMeuDesempenho(){
   // não uma dedução da etapa do Kanban).
   let vendasAlvo=[];
   try{
-    vendasAlvo=await sbGet('roi_vendas',`campanha_id=eq.${kbCampanha.id}&consultora_id=eq.${targetId}&select=*`);
+    vendasAlvo=await sbGet('cave_vendas',`campanha_id=eq.${kbCampanha.id}&consultora_id=eq.${targetId}&select=*`);
   }catch(e){console.error(e);}
   const convertidoAgendado=vendasAlvo.filter(v=>v.tipo_venda==='agendado').length;
   const convertidoEspontaneo=vendasAlvo.filter(v=>v.tipo_venda==='espontaneo').length;
@@ -934,7 +934,7 @@ async function abrirMeuDesempenho(){
   const inicioMes=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-01`;
   let vendasMes=[];
   try{
-    vendasMes=await sbGet('roi_vendas',`academia_id=eq.${sessao.academia_id}&consultora_id=eq.${targetId}&data=gte.${inicioMes}&select=valor,saldo_devedor`);
+    vendasMes=await sbGet('cave_vendas',`academia_id=eq.${sessao.academia_id}&consultora_id=eq.${targetId}&data=gte.${inicioMes}&select=valor,saldo_devedor`);
   }catch(e){console.error(e);}
   const totalVendidoMes=vendasMes.reduce((s,v)=>s+(parseFloat(v.valor)||0),0);
   const totalSaldoDevedorMes=vendasMes.reduce((s,v)=>s+(parseFloat(v.saldo_devedor)||0),0);
@@ -1038,7 +1038,7 @@ async function salvarEdicaoCampanha(id){
     upgrade_agregadores:document.getElementById('ed-sucesso-upgrade').checked
   };
   try{
-    await sbPatch('roi_campanhas',id,{nome,mes_referencia:mes,investimento_trafego:invest,perfis,config_renovacao:configRenov,config_sucesso:configSucesso,updated_at:Date.now()});
+    await sbPatch('cave_campanhas',id,{nome,mes_referencia:mes,investimento_trafego:invest,perfis,config_renovacao:configRenov,config_sucesso:configSucesso,updated_at:Date.now()});
     toast('Campanha atualizada!');
     fecharModalGenerico();
     await carregarCampanhas();
@@ -1103,7 +1103,7 @@ async function contarCardsRedistribuir(campanhaId){
   const perfil=document.getElementById('rd-perfil').value;
   const de=document.getElementById('rd-de').value;
   try{
-    const cards=await sbGet('roi_campanha_cards',`campanha_id=eq.${campanhaId}&perfil=eq.${perfil}&consultora_id=eq.${de}&status=eq.ativo&select=id`);
+    const cards=await sbGet('cave_campanha_cards',`campanha_id=eq.${campanhaId}&perfil=eq.${perfil}&consultora_id=eq.${de}&status=eq.ativo&select=id`);
     document.getElementById('rd-contagem').textContent=`${cards.length} card(s) ativo(s) serão transferidos.`;
   }catch(e){console.error(e);}
 }
@@ -1114,12 +1114,12 @@ async function confirmarRedistribuir(campanhaId){
   const qtdInformada=parseInt(document.getElementById('rd-qtd').value)||null;
   if(de===para){toast('Escolha consultores(as) diferentes.',true);return;}
   try{
-    let cards=await sbGet('roi_campanha_cards',`campanha_id=eq.${campanhaId}&perfil=eq.${perfil}&consultora_id=eq.${de}&status=eq.ativo&select=id`);
+    let cards=await sbGet('cave_campanha_cards',`campanha_id=eq.${campanhaId}&perfil=eq.${perfil}&consultora_id=eq.${de}&status=eq.ativo&select=id`);
     if(!cards.length){toast('Nenhum card ativo pra transferir.',true);return;}
     if(qtdInformada&&qtdInformada<cards.length)cards=cards.slice(0,qtdInformada);
     if(!confirm(`Transferir ${cards.length} card(s) de carteira?`))return;
     for(const c of cards){
-      await sbPatch('roi_campanha_cards',c.id,{consultora_id:para,updated_at:Date.now()});
+      await sbPatch('cave_campanha_cards',c.id,{consultora_id:para,updated_at:Date.now()});
     }
     toast(`${cards.length} card(s) transferido(s)!`);
     fecharModalGenerico();
@@ -1136,7 +1136,7 @@ async function carregarCarteiras(){
   if(!consultoras.length){wrap.innerHTML='<div class="ag-empty">Nenhum(a) consultor(a) cadastrado(a) nesta academia ainda.</div>';return;}
   try{
     const idsStr=campsAtivas.map(c=>c.id).join(',');
-    const cards=await sbGet('roi_campanha_cards',`campanha_id=in.(${idsStr})&select=perfil,status,consultora_id,campanha_id`);
+    const cards=await sbGet('cave_campanha_cards',`campanha_id=in.(${idsStr})&select=perfil,status,consultora_id,campanha_id`);
     const perfisAtivos=[...new Set(campsAtivas.flatMap(c=>c.perfis||[]))];
 
     // matriz[consultoraId][perfil] = {ativos, convertidos}
@@ -1197,7 +1197,7 @@ function abrirRedistribuirDaMatriz(perfil,consultoraId,campanhaIdsDoPerfil){
 async function arquivarCampanha(id){
   if(!confirm('Arquivar esta campanha? Ela some da lista principal, mas os dados continuam salvos — dá pra reativar depois.'))return;
   try{
-    await sbPatch('roi_campanhas',id,{status_anterior_arquivamento:(minhasCampanhas.find(c=>c.id===id)||{}).status||'ativa',status:'arquivada',updated_at:Date.now()});
+    await sbPatch('cave_campanhas',id,{status_anterior_arquivamento:(minhasCampanhas.find(c=>c.id===id)||{}).status||'ativa',status:'arquivada',updated_at:Date.now()});
     toast('Campanha arquivada.');
     await carregarCampanhas();
   }catch(e){console.error(e);toast('Erro ao arquivar',true);}
@@ -1206,7 +1206,7 @@ async function reativarCampanha(id){
   const c=minhasCampanhas.find(x=>x.id===id);
   const statusVolta=c?.status_anterior_arquivamento||'ativa';
   try{
-    await sbPatch('roi_campanhas',id,{status:statusVolta,updated_at:Date.now()});
+    await sbPatch('cave_campanhas',id,{status:statusVolta,updated_at:Date.now()});
     toast('Campanha reativada!');
     await carregarCampanhas();
   }catch(e){console.error(e);toast('Erro ao reativar',true);}
@@ -1218,8 +1218,8 @@ async function excluirCampanhaDefinitivo(id,nome){
   if(digitado===null)return;
   if(digitado.trim()!==nome){toast('Nome não confere — nada foi excluído.',true);return;}
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_campanha_cards?campanha_id=eq.${id}`,{method:'DELETE',headers:H});
-    await fetch(`${SB_URL}/rest/v1/roi_campanhas?id=eq.${id}`,{method:'DELETE',headers:H});
+    await fetch(`${SB_URL}/rest/v1/cave_campanha_cards?campanha_id=eq.${id}`,{method:'DELETE',headers:H});
+    await fetch(`${SB_URL}/rest/v1/cave_campanhas?id=eq.${id}`,{method:'DELETE',headers:H});
     toast('Campanha excluída definitivamente.');
     await carregarCampanhas();
   }catch(e){console.error(e);toast('Erro ao excluir campanha',true);}
@@ -1290,7 +1290,7 @@ const PTAG_CLASS={leads:'ptag-leads',rematricula:'ptag-rematricula',renovacao:'p
 let metasPadraoAcademia=null;
 async function carregarJornadas(){
   try{
-    const acs=await sbGet('roi_academias',`id=eq.${sessao.academia_id}&select=jornada_leads,jornada_rematricula,jornada_renovacao,jornada_sucesso,metas_padrao`);
+    const acs=await sbGet('cave_academias',`id=eq.${sessao.academia_id}&select=jornada_leads,jornada_rematricula,jornada_renovacao,jornada_sucesso,metas_padrao`);
     const reg=acs&&acs[0]||{};
     ETAPAS.leads=(reg.jornada_leads&&reg.jornada_leads.length)?reg.jornada_leads:JORNADAS_PADRAO.leads;
     ETAPAS.rematricula=(reg.jornada_rematricula&&reg.jornada_rematricula.length)?reg.jornada_rematricula:JORNADAS_PADRAO.rematricula;
@@ -1349,7 +1349,7 @@ async function aplicarFiltroVendas(){
   if(!sessao.academia_id){el.innerHTML='<div class="ag-empty">Sem academia vinculada.</div>';return;}
   try{
     const filtroConsultora=sessao.role==='consultor'&&sessao.consultora_id?`&consultora_id=eq.${sessao.consultora_id}`:'';
-    vendasPeriodo=await sbGet('roi_vendas',`academia_id=eq.${sessao.academia_id}&data=gte.${inicio}&data=lte.${fim}${filtroConsultora}&order=data.desc`);
+    vendasPeriodo=await sbGet('cave_vendas',`academia_id=eq.${sessao.academia_id}&data=gte.${inicio}&data=lte.${fim}${filtroConsultora}&order=data.desc`);
     renderLivroVendas();
   }catch(e){console.error(e);el.innerHTML='<div class="ag-empty">Erro ao carregar. Veja o console.</div>';}
 }
@@ -1410,7 +1410,7 @@ function renderLivroVendas(){
 
 async function toggleConferidoLider(vendaId,valor){
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_vendas?id=eq.${vendaId}`,{method:'PATCH',headers:H,body:JSON.stringify({conferido_lider:valor})});
+    await fetch(`${SB_URL}/rest/v1/cave_vendas?id=eq.${vendaId}`,{method:'PATCH',headers:H,body:JSON.stringify({conferido_lider:valor})});
     toast(valor?'Marcado como conferido!':'Desmarcado.');
   }catch(e){console.error(e);toast('Erro ao atualizar',true);}
 }
@@ -1424,7 +1424,7 @@ async function carregarAgenda(){
   try{
     const idsStr=campsAtivas.map(c=>c.id).join(',');
     const filtroConsultora=sessao.role==='consultor'&&sessao.consultora_id?`&consultora_id=eq.${sessao.consultora_id}`:(ehTreinador()?'&perfil=eq.sucesso_cliente':'');
-    const todosCards=await sbGet('roi_campanha_cards',`campanha_id=in.(${idsStr})&status=neq.convertido&status=neq.perdido${filtroConsultora}&order=proxima_acao_data.asc.nullslast`);
+    const todosCards=await sbGet('cave_campanha_cards',`campanha_id=in.(${idsStr})&status=neq.convertido&status=neq.perdido${filtroConsultora}&order=proxima_acao_data.asc.nullslast`);
     agendaCampanhaPorCard={};
     todosCards.forEach(c=>{agendaCampanhaPorCard[c.id]=campsAtivas.find(camp=>camp.id===c.campanha_id);});
     ultimosCardsAgenda=todosCards;
@@ -1437,7 +1437,7 @@ async function carregarAgenda(){
     if(comExperiencia.length){
       const expIds=comExperiencia.map(c=>`"${c.experiencia_id}"`).join(',');
       try{
-        const tarefas=await sbGet('roi_agenda_tarefas',`experiencia_id=in.(${expIds})&feita=eq.false&order=data_prevista.asc`);
+        const tarefas=await sbGet('cave_agenda_tarefas',`experiencia_id=in.(${expIds})&feita=eq.false&order=data_prevista.asc`);
         comExperiencia.forEach(c=>{
           const pendente=tarefas.find(t=>t.experiencia_id===c.experiencia_id);
           if(pendente)tarefaExperienciaPorCard[c.id]=pendente;
@@ -1656,17 +1656,17 @@ async function adicionarTreinador(){
   const nome=document.getElementById('novoTreinadorNome').value.trim();
   if(!nome){toast('Informe o nome',true);return;}
   try{
-    await sbPost('roi_treinadores',{id:uid(),academia_id:sessao.academia_id,nome,ativo:true,created_at:Date.now()});
+    await sbPost('cave_treinadores',{id:uid(),academia_id:sessao.academia_id,nome,ativo:true,created_at:Date.now()});
     toast(`${nome} adicionado(a)!`);
     document.getElementById('novoTreinadorNome').value='';
-    treinadores=await sbGet('roi_treinadores',`academia_id=eq.${sessao.academia_id}&ativo=eq.true&select=id,nome`);
+    treinadores=await sbGet('cave_treinadores',`academia_id=eq.${sessao.academia_id}&ativo=eq.true&select=id,nome`);
     renderListaTreinadores();
   }catch(e){console.error(e);toast('Erro ao adicionar',true);}
 }
 async function removerTreinador(id){
   if(!confirm('Remover este(a) treinador(a) da lista?'))return;
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_treinadores?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:false})});
+    await fetch(`${SB_URL}/rest/v1/cave_treinadores?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:false})});
     treinadores=treinadores.filter(t=>t.id!==id);
     renderListaTreinadores();
     toast('Removido(a).');
@@ -1785,7 +1785,7 @@ async function confirmarAtribuirCarteira(){
   if(!consultorId){toast('Escolha o(a) consultor(a).',true);return;}
   try{
     for(const id of ids){
-      await sbPatch('roi_campanha_cards',id,{consultora_id:consultorId,updated_at:Date.now()});
+      await sbPatch('cave_campanha_cards',id,{consultora_id:consultorId,updated_at:Date.now()});
     }
     toast(`${ids.length} card(s) enviado(s) para a carteira de ${nomeConsultora(consultorId)}!`);
     fecharModalGenerico();
@@ -1802,7 +1802,7 @@ async function salvarJornadaSucesso(){
   if(faltando.length){toast('Alguma etapa protegida sumiu da lista — recarregue e tente de novo.',true);return;}
   const campoDb={leads:'jornada_leads',rematricula:'jornada_rematricula',renovacao:'jornada_renovacao',sucesso_cliente:'jornada_sucesso'}[jornadaPerfilEmEdicao];
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_academias?id=eq.${sessao.academia_id}`,{method:'PATCH',headers:H,body:JSON.stringify({[campoDb]:jornadaEmEdicao})});
+    await fetch(`${SB_URL}/rest/v1/cave_academias?id=eq.${sessao.academia_id}`,{method:'PATCH',headers:H,body:JSON.stringify({[campoDb]:jornadaEmEdicao})});
     ETAPAS[jornadaPerfilEmEdicao]=jornadaEmEdicao;
     toast('Jornada salva!');
     closeM('m-jornada-sucesso');
@@ -1849,7 +1849,7 @@ async function salvarNovoCardManual(){
   const origemLead=origemSel==='outro'?(document.getElementById('nc-origem-outro').value.trim()||'Outro'):ORIGEM_LEAD_LABEL[origemSel];
   const dataLead=document.getElementById('nc-data-lead').value||new Date().toISOString().slice(0,10);
   try{
-    await sbPost('roi_campanha_cards',{
+    await sbPost('cave_campanha_cards',{
       campanha_id:kbCampanha.id,onda_id:null,perfil:kbPerfilAtivo,
       nome,codigo_matricula:document.getElementById('nc-codigo').value.trim(),
       telefone:document.getElementById('nc-telefone').value.replace(/\D/g,''),
@@ -1908,10 +1908,10 @@ async function carregarCardsKanban(){
   try{
     // Consultor(a) só vê os próprios cards; gestor(a)/admin veem tudo (visão completa)
     const filtroConsultora=sessao.role==='consultor'&&sessao.consultora_id?`&consultora_id=eq.${sessao.consultora_id}`:(ehTreinador()?'&perfil=eq.sucesso_cliente':'');
-    kbCards=await sbGet('roi_campanha_cards',`campanha_id=eq.${kbCampanha.id}${filtroConsultora}&order=nome.asc`);
+    kbCards=await sbGet('cave_campanha_cards',`campanha_id=eq.${kbCampanha.id}${filtroConsultora}&order=nome.asc`);
   }catch(e){console.error(e);toast('Erro ao carregar cards',true);kbCards=[];}
   try{
-    vendasCampanha=await sbGet('roi_vendas',`campanha_id=eq.${kbCampanha.id}&select=id,card_id,perfil_venda,valor`);
+    vendasCampanha=await sbGet('cave_vendas',`campanha_id=eq.${kbCampanha.id}&select=id,card_id,perfil_venda,valor`);
   }catch(e){console.error(e);vendasCampanha=[];}
 }
 function trocarPerfilKanban(perfil){
@@ -1936,7 +1936,7 @@ const CATEGORIA_LABEL_AGENDA={
 async function criarTarefaAgendaCampanhas(card,categoria,titulo,dataPrevista){
   if(!dataPrevista)return;
   try{
-    await sbPost('roi_agenda_tarefas',{
+    await sbPost('cave_agenda_tarefas',{
       id:uid(), academia_id:sessao.academia_id, campanha_card_id:card.id, campanha_id:card.campanha_id,
       categoria, tipo:categoria, titulo,
       responsavel_id:card.consultora_id||null, responsavel_nome:nomeConsultora(card.consultora_id),
@@ -2150,7 +2150,7 @@ function cancelarVendaModal(){
   _resolveVendaModal=null;
 }
 async function registrarLinhaVenda(card,dados){
-  await sbPost('roi_vendas',{
+  await sbPost('cave_vendas',{
     campanha_id:card.campanha_id,card_id:card.id,academia_id:sessao.academia_id,
     consultora_id:dados.atribuido_a_id,lancado_por_id:dados.lancado_por_id,
     data:new Date().toISOString().slice(0,10),
@@ -2323,10 +2323,10 @@ async function abrirCardModal(cardId){
   if(cardAberto.status==='ativo'){
     try{
       const hoje=new Date().toISOString().slice(0,10);
-      const existentes=await sbGet('roi_campanha_interacoes',`card_id=eq.${cardAberto.id}&data=eq.${hoje}&order=created_at.desc`);
+      const existentes=await sbGet('cave_campanha_interacoes',`card_id=eq.${cardAberto.id}&data=eq.${hoje}&order=created_at.desc`);
       interacaoHojeAtual=existentes[0]||null;
       // se a última interação registrada foi "não compareceu", já abre direto na Reconexão
-      const ultimaGeral=await sbGet('roi_campanha_interacoes',`card_id=eq.${cardAberto.id}&order=created_at.desc&limit=1`);
+      const ultimaGeral=await sbGet('cave_campanha_interacoes',`card_id=eq.${cardAberto.id}&order=created_at.desc&limit=1`);
       modoScriptCompromisso=(ultimaGeral[0]&&(ultimaGeral[0].resultado||'').includes('nao_compareceu'))?'reconexao':'confirmacao';
     }catch(e){console.error(e);}
   }
@@ -2539,7 +2539,7 @@ function toggleDadosCard(){
 async function salvarQualificacao(){
   const texto=document.getElementById('qualificacaoTexto').value.trim();
   try{
-    await sbPatch('roi_campanha_cards',cardAberto.id,{qualificacao:texto,qualificacao_por:sessao.nome||sessao.email,qualificacao_em:Date.now(),updated_at:Date.now()});
+    await sbPatch('cave_campanha_cards',cardAberto.id,{qualificacao:texto,qualificacao_por:sessao.nome||sessao.email,qualificacao_em:Date.now(),updated_at:Date.now()});
     toast('Qualificação salva!');
     await carregarCardsKanban();
     cardAberto=kbCards.find(x=>x.id===cardAberto.id)||cardAberto;
@@ -2562,9 +2562,9 @@ async function registrarContatoCard(){
   const ehNovoRegistroHoje=!interacaoHojeAtual;
   try{
     if(interacaoHojeAtual){
-      await fetch(`${SB_URL}/rest/v1/roi_campanha_interacoes?id=eq.${interacaoHojeAtual.id}`,{method:'PATCH',headers:H,body:JSON.stringify({resultado:resultadoCSV,nota})});
+      await fetch(`${SB_URL}/rest/v1/cave_campanha_interacoes?id=eq.${interacaoHojeAtual.id}`,{method:'PATCH',headers:H,body:JSON.stringify({resultado:resultadoCSV,nota})});
     }else{
-      await sbPost('roi_campanha_interacoes',{card_id:c.id,data:new Date().toISOString().slice(0,10),canal:(SCRIPT_CADENCIA[c.perfil]||[])[c.cadencia_atual]?.tipo||'',tentativa_numero:c.cadencia_atual+1,resultado:resultadoCSV,nota,consultora_id:c.consultora_id,created_at:Date.now()});
+      await sbPost('cave_campanha_interacoes',{card_id:c.id,data:new Date().toISOString().slice(0,10),canal:(SCRIPT_CADENCIA[c.perfil]||[])[c.cadencia_atual]?.tipo||'',tentativa_numero:c.cadencia_atual+1,resultado:resultadoCSV,nota,consultora_id:c.consultora_id,created_at:Date.now()});
     }
     const patch={proxima_acao_data:proximaData,updated_at:Date.now()};
     if(ehNovoRegistroHoje){
@@ -2596,7 +2596,7 @@ async function registrarContatoCard(){
       const idxMax2=(ETAPAS[c.perfil]||[]).findIndex(e=>e.k===(patch.etapa_maxima||c.etapa_maxima||'lista'));
       if(idxNova2>idxMax2)patch.etapa_maxima=patch.etapa_atual;
     }
-    await sbPatch('roi_campanha_cards',c.id,patch);
+    await sbPatch('cave_campanha_cards',c.id,patch);
     toast(ehNovoRegistroHoje?`Contato registrado — tentativa ${c.cadencia_atual+1}/${c.cadencia_total}`:'Registro de hoje atualizado!');
 
     // Gera a tarefa correspondente na Agenda unificada — o que mudou define a categoria
@@ -2614,7 +2614,7 @@ async function registrarContatoCard(){
     renderKbSummary();
     cardAberto=kbCards.find(x=>x.id===c.id)||cardAberto;
     const hoje=new Date().toISOString().slice(0,10);
-    const existentes=await sbGet('roi_campanha_interacoes',`card_id=eq.${cardAberto.id}&data=eq.${hoje}&order=created_at.desc`);
+    const existentes=await sbGet('cave_campanha_interacoes',`card_id=eq.${cardAberto.id}&data=eq.${hoje}&order=created_at.desc`);
     interacaoHojeAtual=existentes[0]||null;
     renderCardModalBody();
   }catch(e){console.error(e);toast('Erro ao registrar contato',true);}
@@ -2644,9 +2644,9 @@ async function registrarCompromissoCard(){
   const ehNovoRegistroHoje=!interacaoHojeAtual;
   try{
     if(interacaoHojeAtual){
-      await fetch(`${SB_URL}/rest/v1/roi_campanha_interacoes?id=eq.${interacaoHojeAtual.id}`,{method:'PATCH',headers:H,body:JSON.stringify({resultado:resultadoCSV,nota,treinador_id:treinadorId})});
+      await fetch(`${SB_URL}/rest/v1/cave_campanha_interacoes?id=eq.${interacaoHojeAtual.id}`,{method:'PATCH',headers:H,body:JSON.stringify({resultado:resultadoCSV,nota,treinador_id:treinadorId})});
     }else{
-      await sbPost('roi_campanha_interacoes',{card_id:c.id,data:new Date().toISOString().slice(0,10),canal:'compromisso',tentativa_numero:null,resultado:resultadoCSV,nota,consultora_id:c.consultora_id,treinador_id:treinadorId,created_at:Date.now()});
+      await sbPost('cave_campanha_interacoes',{card_id:c.id,data:new Date().toISOString().slice(0,10),canal:'compromisso',tentativa_numero:null,resultado:resultadoCSV,nota,consultora_id:c.consultora_id,treinador_id:treinadorId,created_at:Date.now()});
     }
     const patch={updated_at:Date.now()};
     if(precisaNovaData){patch.data_agendamento=novaData;patch.hora_agendamento=novaHora;}
@@ -2658,7 +2658,7 @@ async function registrarCompromissoCard(){
       const idxMax=etapasPerfil.findIndex(e=>e.k===(c.etapa_maxima||'lista'));
       if(idxNova>idxMax)patch.etapa_maxima=patch.etapa_atual;
     }
-    await sbPatch('roi_campanha_cards',c.id,patch);
+    await sbPatch('cave_campanha_cards',c.id,patch);
     toast(marcados.includes('compareceu')?'Presença registrada!':(precisaNovaData?'Novo compromisso registrado!':'Confirmação registrada!'));
     if(precisaNovaData){
       await criarTarefaAgendaCampanhas(c,'visita_matricula',`Compromisso remarcado — ${c.nome}`,novaData);
@@ -2670,7 +2670,7 @@ async function registrarCompromissoCard(){
     renderKbSummary();
     cardAberto=kbCards.find(x=>x.id===c.id)||cardAberto;
     const hoje=new Date().toISOString().slice(0,10);
-    const existentes=await sbGet('roi_campanha_interacoes',`card_id=eq.${cardAberto.id}&data=eq.${hoje}&order=created_at.desc`);
+    const existentes=await sbGet('cave_campanha_interacoes',`card_id=eq.${cardAberto.id}&data=eq.${hoje}&order=created_at.desc`);
     interacaoHojeAtual=existentes[0]||null;
     renderCardModalBody();
   }catch(e){console.error(e);toast('Erro ao registrar',true);}
@@ -2680,7 +2680,7 @@ async function registrarCompromissoCard(){
 // de botão "salvar" separado.
 async function salvarPerfilQualificacao(valor){
   try{
-    await sbPatch('roi_campanha_cards',cardAberto.id,{perfil_qualificacao:valor,updated_at:Date.now()});
+    await sbPatch('cave_campanha_cards',cardAberto.id,{perfil_qualificacao:valor,updated_at:Date.now()});
     cardAberto.perfil_qualificacao=valor;
     toast(valor?`Classificado como Perfil ${valor}%`:'Classificação removida');
     await carregarCardsKanban();
@@ -2697,7 +2697,7 @@ async function salvarPerfilQualificacao(valor){
 async function salvarObservacoesCard(valor){
   if(!cardAberto||valor===(cardAberto.observacoes||''))return;
   try{
-    await sbPatch('roi_campanha_cards',cardAberto.id,{observacoes:valor,updated_at:Date.now()});
+    await sbPatch('cave_campanha_cards',cardAberto.id,{observacoes:valor,updated_at:Date.now()});
     cardAberto.observacoes=valor;
     const idx=kbCards.findIndex(x=>x.id===cardAberto.id);
     if(idx>=0)kbCards[idx].observacoes=valor;
@@ -2707,7 +2707,7 @@ async function salvarObservacoesCard(valor){
 
 async function toggleCompareceu(val){
   try{
-    await sbPatch('roi_campanha_cards',cardAberto.id,{compareceu:val,compareceu_em:val?Date.now():null,updated_at:Date.now()});
+    await sbPatch('cave_campanha_cards',cardAberto.id,{compareceu:val,compareceu_em:val?Date.now():null,updated_at:Date.now()});
     cardAberto.compareceu=val;
     toast(val?'Marcado como compareceu! ✅':'Desmarcado.');
     await carregarCardsKanban();
@@ -2720,7 +2720,7 @@ async function toggleCompareceu(val){
 // Usado depois para preencher automaticamente o card em Experiências ao agendar a experiência.
 async function salvarProgramaPilar(valor){
   try{
-    await sbPatch('roi_campanha_cards',cardAberto.id,{programa_pilar:valor,updated_at:Date.now()});
+    await sbPatch('cave_campanha_cards',cardAberto.id,{programa_pilar:valor,updated_at:Date.now()});
     cardAberto.programa_pilar=valor;
     toast('Programa definido!');
     await carregarCardsKanban();
@@ -2830,7 +2830,7 @@ async function moverCardParaEtapa(cardId,novaEtapa,dataAgendamento,horaAgendamen
     if(card.etapa_atual==='lista'&&novaEtapa!=='lista')patch.cadencia_atual=1;
   }
   try{
-    await sbPatch('roi_campanha_cards',cardId,patch);
+    await sbPatch('cave_campanha_cards',cardId,patch);
     toast('Card atualizado!');
     if(novaEtapa==='exp_agendada' && !card.experiencia_id){
       await criarExperienciaVinculada(card);
@@ -2862,7 +2862,7 @@ async function criarExperienciaVinculada(card){
   try{
     const perfil = card.perfil_qualificacao==='95' ? '95' : card.perfil_qualificacao==='5' ? '5' : 'sem_qualificacao';
     const duracao = perfil==='5' ? 4 : 12;
-    const novaExp = await sbPost('roi_experiencias',{
+    const novaExp = await sbPost('cave_experiencias',{
       id: (crypto.randomUUID?crypto.randomUUID():'exp_'+Date.now()+Math.random().toString(36).slice(2)),
       academia_id: sessao.academia_id,
       nome_lead: card.nome,
@@ -2880,7 +2880,7 @@ async function criarExperienciaVinculada(card){
     });
     const criada = Array.isArray(novaExp) ? novaExp[0] : novaExp;
     if(criada && criada.id){
-      await sbPatch('roi_campanha_cards',card.id,{experiencia_id:criada.id,updated_at:Date.now()});
+      await sbPatch('cave_campanha_cards',card.id,{experiencia_id:criada.id,updated_at:Date.now()});
     }
     toast('🎯 Card criado no módulo Experiências, já conectado!');
   }catch(e){
@@ -2906,8 +2906,8 @@ async function confirmarPerda(motivoKey){
   let nota='';
   if(motivoKey==='outro'){nota=prompt('Descreva o motivo:')||'';}
   try{
-    await sbPost('roi_campanha_perdas',{campanha_id:kbCampanha.id,card_id:cardAberto.id,nome:cardAberto.nome,telefone:cardAberto.telefone,motivo:motivoKey,nota,consultora_id:cardAberto.consultora_id,academia_id:sessao.academia_id,created_at:Date.now()});
-    await sbPatch('roi_campanha_cards',cardAberto.id,{status:'perdido',updated_at:Date.now()});
+    await sbPost('cave_campanha_perdas',{campanha_id:kbCampanha.id,card_id:cardAberto.id,nome:cardAberto.nome,telefone:cardAberto.telefone,motivo:motivoKey,nota,consultora_id:cardAberto.consultora_id,academia_id:sessao.academia_id,created_at:Date.now()});
+    await sbPatch('cave_campanha_cards',cardAberto.id,{status:'perdido',updated_at:Date.now()});
     toast(`Enviado para Perdas: ${motivoLbl}`);
     acaoConfirmadaNesteCard=true;
     closeM('m-perda');
@@ -2920,7 +2920,7 @@ async function confirmarPerda(motivoKey){
 // descobre quais perfis já têm cards e continua o upload de onde parou.
 async function abrirCampanhaExistente(campId){
   try{
-    const camps=await sbGet('roi_campanhas',`id=eq.${campId}&select=*`);
+    const camps=await sbGet('cave_campanhas',`id=eq.${campId}&select=*`);
     if(!camps.length){toast('Campanha não encontrada',true);return;}
     const camp=camps[0];
     // SEGURANÇA: nunca abre uma campanha que não pertence à academia logada,
@@ -2930,7 +2930,7 @@ async function abrirCampanhaExistente(campId){
       abrirKanban(camp);
       return;
     }
-    const cardsExistentes=await sbGet('roi_campanha_cards',`campanha_id=eq.${campId}&select=perfil`);
+    const cardsExistentes=await sbGet('cave_campanha_cards',`campanha_id=eq.${campId}&select=perfil`);
     const perfisComCards=new Set(cardsExistentes.map(c=>c.perfil));
     const perfisRestantes=(camp.perfis||[]).filter(p=>!perfisComCards.has(p));
 
@@ -2938,7 +2938,7 @@ async function abrirCampanhaExistente(campId){
 
     if(!perfisRestantes.length){
       // todos os perfis já têm cards, só faltou ativar
-      await sbPatch('roi_campanhas',camp.id,{status:'ativa',updated_at:Date.now()});
+      await sbPatch('cave_campanhas',camp.id,{status:'ativa',updated_at:Date.now()});
       toast('Campanha já tinha todas as listas — ativada agora!');
       await carregarCampanhas();
       return;
@@ -3002,7 +3002,7 @@ async function salvarCampanhaBase(){
     upgrade_agregadores:document.getElementById('w-sucesso-upgrade').checked
   };
   try{
-    const res=await sbPost('roi_campanhas',{academia_id:sessao.academia_id,nome,mes_referencia:mes,status:'planejamento',perfis,config_renovacao:configRenov,config_sucesso:configSucesso,investimento_trafego:invest,created_at:Date.now(),updated_at:Date.now()});
+    const res=await sbPost('cave_campanhas',{academia_id:sessao.academia_id,nome,mes_referencia:mes,status:'planejamento',perfis,config_renovacao:configRenov,config_sucesso:configSucesso,investimento_trafego:invest,created_at:Date.now(),updated_at:Date.now()});
     wiz.campanhaId=res[0].id;
     wiz.perfisFila=[...perfis];
     prepararProximoUpload();
@@ -3198,7 +3198,7 @@ async function rodarCrossCheckPerdas(cards){
   if(telefones.length&&sessao.academia_id){
     try{
       const lista=telefones.slice(0,300).join(','); // limite de segurança por URL
-      const perdas=await sbGet('roi_campanha_perdas',`academia_id=eq.${sessao.academia_id}&telefone=in.(${lista})`);
+      const perdas=await sbGet('cave_campanha_perdas',`academia_id=eq.${sessao.academia_id}&telefone=in.(${lista})`);
       perdas.forEach(p=>{
         if(p.motivo==='nao_contatar')bloquear.add(p.telefone);
         else if(!bloquear.has(p.telefone))alertar.set(p.telefone,p.motivo);
@@ -3214,7 +3214,7 @@ async function rodarCrossCheckPerdas(cards){
   wiz.jaExistentesQtd=0;
   if(wiz.campanhaId){
     try{
-      const existentes=await sbGet('roi_campanha_cards',`campanha_id=eq.${wiz.campanhaId}&perfil=eq.${wiz.perfilAtual}&select=nome,telefone`);
+      const existentes=await sbGet('cave_campanha_cards',`campanha_id=eq.${wiz.campanhaId}&perfil=eq.${wiz.perfilAtual}&select=nome,telefone`);
       const telExistentes=new Set(existentes.map(e=>e.telefone).filter(Boolean));
       const nomesExistentes=new Set(existentes.map(e=>(e.nome||'').trim().toLowerCase()));
       const antesDedup=cardsLiberados.length;
@@ -3274,7 +3274,7 @@ async function finalizarSoComConsultor(){
   }));
   try{
     for(let i=0;i<cardsParaInserir.length;i+=200){
-      await sbPost('roi_campanha_cards',cardsParaInserir.slice(i,i+200));
+      await sbPost('cave_campanha_cards',cardsParaInserir.slice(i,i+200));
     }
     toast(`${cardsParaInserir.length} cards criados, já na carteira certa!`);
     fecharModalGenerico();
@@ -3393,7 +3393,7 @@ async function confirmarOndasECards(){
     // cria as ondas, já com o departamento decidido pra este perfil
     const ondasSalvas=[];
     for(const o of ondasCalc){
-      const r=await sbPost('roi_campanha_ondas',{campanha_id:wiz.campanhaId,numero_onda:o.numero,status:'planejada',departamento:wiz.departamento});
+      const r=await sbPost('cave_campanha_ondas',{campanha_id:wiz.campanhaId,numero_onda:o.numero,status:'planejada',departamento:wiz.departamento});
       ondasSalvas.push({...o,onda_id:r[0].id});
     }
     // distribui os cards sequencialmente conforme a quantidade definida por onda/responsável
@@ -3422,7 +3422,7 @@ async function confirmarOndasECards(){
     }
     // insere em lotes de 200 pra não estourar o payload
     for(let i=0;i<cardsParaInserir.length;i+=200){
-      await sbPost('roi_campanha_cards',cardsParaInserir.slice(i,i+200));
+      await sbPost('cave_campanha_cards',cardsParaInserir.slice(i,i+200));
     }
     toast(`${cardsParaInserir.length} cards criados para "${PERFIL_LABEL[wiz.perfilAtual]}"!`);
 
@@ -3434,7 +3434,7 @@ async function confirmarOndasECards(){
       prepararProximoUpload();
       irParaStep(2);
     }else{
-      await sbPatch('roi_campanhas',wiz.campanhaId,{status:'ativa',updated_at:Date.now()});
+      await sbPatch('cave_campanhas',wiz.campanhaId,{status:'ativa',updated_at:Date.now()});
       toast('Campanha ativada! 🎉');
       await carregarCampanhas();
       switchITab('lista');
@@ -3455,7 +3455,7 @@ async function pularUploadPerfil(){
     prepararProximoUpload();
     irParaStep(2);
   }else{
-    await sbPatch('roi_campanhas',wiz.campanhaId,{status:'ativa',updated_at:Date.now()});
+    await sbPatch('cave_campanhas',wiz.campanhaId,{status:'ativa',updated_at:Date.now()});
     toast('Campanha ativada! 🎉');
     await carregarCampanhas();
     switchITab('lista');

@@ -1454,11 +1454,11 @@ async function doCadastro(){
   if(senha!==senha2){err.textContent='As senhas não coincidem.';err.classList.add('show');return}
   const btn=document.getElementById('btn-cadastrar');btn.disabled=true;btn.textContent='Criando conta...';
   try{
-    const exist=await sbGet('roi_gestores',`email=eq.${encodeURIComponent(email)}&select=id`);
+    const exist=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(email)}&select=id`);
     if(exist&&exist.length){err.textContent='Este e-mail já está cadastrado.';err.classList.add('show');btn.disabled=false;btn.textContent='Criar Conta';return}
     const acId2=uid();
-    await sbPost('roi_academias',{id:acId2,nome:academia,cidade});
-    await sbPost('roi_gestores',{id:uid(),nome,email,senha_hash:senha,academia_id:acId2,role:'gestor'});
+    await sbPost('cave_academias',{id:acId2,nome:academia,cidade});
+    await sbPost('cave_gestores',{id:uid(),nome,email,senha_hash:senha,academia_id:acId2,role:'gestor'});
     ok.textContent='Conta criada! Faça login agora.';ok.classList.add('show');
     ['cad-academia','cad-cidade','cad-nome','cad-email','cad-senha','cad-senha2'].forEach(x=>document.getElementById(x).value='');
     setTimeout(()=>showScreen('screen-login'),2000);
@@ -1474,7 +1474,7 @@ async function doLogin(){
   if(!email||!senha){err.textContent='Preencha e-mail e senha.';err.classList.add('show');return}
   const btn=document.getElementById('btn-login');btn.disabled=true;btn.textContent='Verificando...';
   try{
-    const res=await sbGet('roi_gestores',`email=eq.${encodeURIComponent(email)}&senha_hash=eq.${encodeURIComponent(senha)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,modulos_ativos`);
+    const res=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(email)}&senha_hash=eq.${encodeURIComponent(senha)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,modulos_ativos`);
     if(!res||!res.length){err.textContent='E-mail ou senha incorretos.';err.classList.add('show');btn.disabled=false;btn.textContent='Entrar';return}
     sessao=res[0];
     sessionStorage.setItem('qg90_sessao_roi',JSON.stringify(sessao));
@@ -1495,7 +1495,7 @@ async function checkSessaoInicial(){
   let s;
   try{s=JSON.parse(raw);}catch(e){sessionStorage.removeItem('qg90_sessao_roi');return;}
   try{
-    const res=await sbGet('roi_gestores',`id=eq.${encodeURIComponent(s.id)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,modulos_ativos`);
+    const res=await sbGet('cave_gestores',`id=eq.${encodeURIComponent(s.id)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,modulos_ativos`);
     if(!res||!res.length){sessionStorage.removeItem('qg90_sessao_roi');return;}
     sessao=res[0];
     sessionStorage.setItem('qg90_sessao_roi',JSON.stringify(sessao));
@@ -1582,7 +1582,7 @@ async function loadAll(){
       // mostrando todas as academias).
       acsQ = sessao.academia_id ? `id=eq.${sessao.academia_id}` : `id=eq.__sem_academia_vinculada__`;
     }
-    const[acs,cons,regs,treins]=await Promise.all([sbGet('roi_academias',acsQ),sbGet('roi_consultoras','order=created_at.asc'),sbGet('roi_registros','order=dia.asc,ts.asc'),sbGet('roi_treinadores','ativo=eq.true&order=created_at.asc')]);
+    const[acs,cons,regs,treins]=await Promise.all([sbGet('cave_academias',acsQ),sbGet('cave_consultoras','order=created_at.asc'),sbGet('cave_registros','order=dia.asc,ts.asc'),sbGet('cave_treinadores','ativo=eq.true&order=created_at.asc')]);
     db.acs={};
     acs.forEach(a=>{db.acs[a.id]={...a,consultoras:{},registros:[],treinadores:{}}});
     if(!isAdmin()&&!sessao.academia_id){
@@ -1597,7 +1597,7 @@ async function loadAll(){
     cons.forEach(c=>{if(db.acs[c.academia_id])db.acs[c.academia_id].consultoras[c.id]={nome:c.nome,meta:c.meta,meta_tipo:c.meta_tipo||'planos',horas:c.horas||0,funis:c.funis||[],metas:c.metas||null}});
     treins.forEach(t=>{if(db.acs[t.academia_id])db.acs[t.academia_id].treinadores[t.id]={nome:t.nome,grau:t.grau_academico||'',cref:t.cref||'',nivel:t.nivel_carreira||'',hi:t.horario_inicio||'',hf:t.horario_fim||'',tel:t.telefone||''}});
     try{
-      const[alR,exR]=await Promise.all([sbGet('roi_alunos','select=treinador_id,status').catch(()=>[]),sbGet('roi_experiencias','select=treinador_id,status').catch(()=>[])]);
+      const[alR,exR]=await Promise.all([sbGet('cave_alunos','select=treinador_id,status').catch(()=>[]),sbGet('cave_experiencias','select=treinador_id,status').catch(()=>[])]);
       treinMet={};
       alR.forEach(x=>{if(!x.treinador_id)return;const m=treinMet[x.treinador_id]=treinMet[x.treinador_id]||{al:0,ex:0,cv:0};if(x.status==='ativo')m.al++});
       exR.forEach(x=>{if(!x.treinador_id)return;const m=treinMet[x.treinador_id]=treinMet[x.treinador_id]||{al:0,ex:0,cv:0};if(x.status!=='agendada')m.ex++;if(x.status==='convertida')m.cv++});
@@ -1662,7 +1662,7 @@ async function addCons(){
   if(!selFunis.length){toast('Selecione ao menos 1 funil',true);return}
   const btn=document.getElementById('btn-add-cons');btn.disabled=true;btn.textContent='Salvando...';
   try{
-    await sbPost('roi_consultoras',{id:uid(),academia_id:acId,nome:nm,meta:metaVal,meta_tipo:metaTipo,horas,funis:selFunis,lista:{},metas:(m1||m2||m3)?{meta1:m1,meta2:m2,meta3:m3}:null});
+    await sbPost('cave_consultoras',{id:uid(),academia_id:acId,nome:nm,meta:metaVal,meta_tipo:metaTipo,horas,funis:selFunis,lista:{},metas:(m1||m2||m3)?{meta1:m1,meta2:m2,meta3:m3}:null});
     document.getElementById('cons-nm').value='';document.getElementById('cons-meta-val').value='';document.getElementById('cons-horas').value='';
     document.getElementById('cons-meta1').value='';document.getElementById('cons-meta2').value='';document.getElementById('cons-meta3').value='';
     toast('Consultor(a) adicionado(a)!');await loadAll();renderConsManage();
@@ -1671,7 +1671,7 @@ async function addCons(){
 }
 async function removeCons(id){
   if(!confirm('Remover consultor(a)?'))return;
-  try{await sbDelete('roi_consultoras',{id});toast('Removido(a)');await loadAll();renderConsManage()}
+  try{await sbDelete('cave_consultoras',{id});toast('Removido(a)');await loadAll();renderConsManage()}
   catch(e){toast('Erro',true)}
 }
 function renderConsManage(){
@@ -1737,7 +1737,7 @@ async function salvarEdicaoConsultor(id){
   if(!nome){toast('Informe o nome',true);return}
   if(!edFunisSel.length){toast('Selecione ao menos 1 funil',true);return}
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_consultoras?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({nome,meta_tipo:metaTipoNovo,meta:metaVal,horas,funis:edFunisSel})});
+    await fetch(`${SB_URL}/rest/v1/cave_consultoras?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({nome,meta_tipo:metaTipoNovo,meta:metaVal,horas,funis:edFunisSel})});
     Object.assign(ac().consultoras[id],{nome,meta_tipo:metaTipoNovo,meta:metaVal,horas,funis:edFunisSel});
     toast('Consultor(a) atualizado(a)!');
     fecharModalGenericoROI();
@@ -1765,7 +1765,7 @@ async function salvarMetasPadraoAcademia(){
   const m2=parseFloat(document.getElementById('mp-meta2').value)||null;
   const m3=parseFloat(document.getElementById('mp-meta3').value)||null;
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_academias?id=eq.${acId}`,{method:'PATCH',headers:H,body:JSON.stringify({metas_padrao:{meta1:m1,meta2:m2,meta3:m3}})});
+    await fetch(`${SB_URL}/rest/v1/cave_academias?id=eq.${acId}`,{method:'PATCH',headers:H,body:JSON.stringify({metas_padrao:{meta1:m1,meta2:m2,meta3:m3}})});
     ac().metas_padrao={meta1:m1,meta2:m2,meta3:m3};
     toast('Metas padrão salvas!');
     fecharModalGenericoROI();
@@ -1792,7 +1792,7 @@ async function salvarMetasConsultor(id){
   const m3=parseFloat(document.getElementById('ec-meta3').value)||null;
   const metas=(m1||m2||m3)?{meta1:m1,meta2:m2,meta3:m3}:null;
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_consultoras?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({metas})});
+    await fetch(`${SB_URL}/rest/v1/cave_consultoras?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({metas})});
     ac().consultoras[id].metas=metas;
     toast('Metas salvas!');
     fecharModalGenericoROI();
@@ -1830,7 +1830,7 @@ let campanhasAtivasCache=null;
 async function getCampanhasAtivas(){
   if(campanhasAtivasCache)return campanhasAtivasCache;
   try{
-    campanhasAtivasCache=await sbGet('roi_campanhas',`academia_id=eq.${acId}&status=eq.ativa&select=id,perfis`);
+    campanhasAtivasCache=await sbGet('cave_campanhas',`academia_id=eq.${acId}&status=eq.ativa&select=id,perfis`);
   }catch(e){console.error(e);campanhasAtivasCache=[];}
   return campanhasAtivasCache;
 }
@@ -1851,7 +1851,7 @@ async function buscarDadosCampanhaHoje(consultoraId,perfil){
   const campIds=await idsCampanhasAtivasPorPerfil(perfil);
   if(!campIds.length)return null; // sem campanha ativa desse perfil — cai pro modo manual
   try{
-    const cards=await sbGet('roi_campanha_cards',`consultora_id=eq.${consultoraId}&perfil=eq.${perfil}&campanha_id=in.(${campIds.join(',')})&select=id,status,etapa_atual,created_at,updated_at`);
+    const cards=await sbGet('cave_campanha_cards',`consultora_id=eq.${consultoraId}&perfil=eq.${perfil}&campanha_id=in.(${campIds.join(',')})&select=id,status,etapa_atual,created_at,updated_at`);
     if(!cards.length)return null;
     const hojeStr=new Date().toISOString().slice(0,10);
     const inicioHoje=new Date();inicioHoje.setHours(0,0,0,0);
@@ -1859,7 +1859,7 @@ async function buscarDadosCampanhaHoje(consultoraId,perfil){
     const emHoje=ts=>ts>=inicioHoje.getTime()&&ts<=fimHoje.getTime();
 
     const cardIds=cards.map(c=>c.id);
-    const interacoesHoje=cardIds.length?await sbGet('roi_campanha_interacoes',`card_id=in.(${cardIds.join(',')})&data=eq.${hojeStr}`):[];
+    const interacoesHoje=cardIds.length?await sbGet('cave_campanha_interacoes',`card_id=in.(${cardIds.join(',')})&data=eq.${hojeStr}`):[];
 
     const tent_novas=interacoesHoje.filter(i=>i.tentativa_numero===1).length;
     const tent_cadencia=interacoesHoje.filter(i=>i.tentativa_numero>1).length;
@@ -1886,7 +1886,7 @@ async function setModoLancamento(fid,modo){
   atual[fid]=modo;
   a.modo_lancamento=atual;
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_academias?id=eq.${acId}`,{method:'PATCH',headers:H,body:JSON.stringify({modo_lancamento:atual})});
+    await fetch(`${SB_URL}/rest/v1/cave_academias?id=eq.${acId}`,{method:'PATCH',headers:H,body:JSON.stringify({modo_lancamento:atual})});
   }catch(e){console.error(e);}
   renderLancFunis();
 }
@@ -2039,7 +2039,7 @@ async function lancarDia(){
   });
   const btn=document.getElementById('btn-lancar');btn.disabled=true;btn.textContent='Salvando...';
   try{
-    await sbPost('roi_registros',{id:uid(),academia_id:acId,consultora_id:cid,dia,data,obs,ciclos,modo,funis:funisData,ts:Date.now()});
+    await sbPost('cave_registros',{id:uid(),academia_id:acId,consultora_id:cid,dia,data,obs,ciclos,modo,funis:funisData,ts:Date.now()});
     closeM('m-lanc');toast('Lançamento salvo!');await loadAll();
   }catch(e){toast('Erro ao salvar',true);console.error(e)}
   btn.disabled=false;btn.textContent='Salvar Lançamento';
@@ -2217,7 +2217,7 @@ async function abrirEdicaoInicioDesafio(){
   if(!nova)return;
   if(!/^\d{4}-\d{2}-\d{2}$/.test(nova)){toast('Formato inválido. Use AAAA-MM-DD.',true);return;}
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_academias?id=eq.${acId}`,{method:'PATCH',headers:H,body:JSON.stringify({desafio_inicio:nova})});
+    await fetch(`${SB_URL}/rest/v1/cave_academias?id=eq.${acId}`,{method:'PATCH',headers:H,body:JSON.stringify({desafio_inicio:nova})});
     a.desafio_inicio=nova;
     toast('Início do Desafio atualizado!');
     renderPainel(a);
@@ -2561,7 +2561,7 @@ async function salvarTreinadorROI(){
   const comCref=trGrauSel==='formado'||trGrauSel==='provisionado';
   const btn=document.getElementById('btn-add-trein');btn.disabled=true;
   try{
-    await sbPost('roi_treinadores',{id:uid(),academia_id:acId,nome,ativo:true,
+    await sbPost('cave_treinadores',{id:uid(),academia_id:acId,nome,ativo:true,
       telefone:document.getElementById('tr-tel').value.trim()||null,
       grau_academico:trGrauSel||null,
       cref:comCref?(document.getElementById('tr-cref').value.trim()||null):null,
@@ -2585,7 +2585,7 @@ async function abrirAcessoPessoa(tipo,pessoaId,pessoaNome){
   openM('m-acesso');
   const campoId=tipo==='consultor'?'consultora_id':'treinador_id';
   try{
-    const existentes=await sbGet('roi_gestores',`${campoId}=eq.${pessoaId}&select=id,nome,email,senha_hash,ativo,modulos_ativos`);
+    const existentes=await sbGet('cave_gestores',`${campoId}=eq.${pessoaId}&select=id,nome,email,senha_hash,ativo,modulos_ativos`);
     const login=existentes[0];
     if(login){
       el.innerHTML=`
@@ -2611,7 +2611,7 @@ async function abrirAcessoPessoa(tipo,pessoaId,pessoaNome){
       return;
     }
     // Sem login ainda — verifica limite de 5 por tipo antes de mostrar o formulário
-    const todos=await sbGet('roi_gestores',`academia_id=eq.${acId}&role=eq.${tipo}&select=id`);
+    const todos=await sbGet('cave_gestores',`academia_id=eq.${acId}&role=eq.${tipo}&select=id`);
     if(todos.length>=5){
       el.innerHTML=`<div style="color:var(--re);font-size:13.5px;padding:10px 0">⚠️ Limite de 5 ${tipo==='consultor'?'consultores(as)':'treinadores(as)'} com acesso já atingido nesta academia. Suspenda ou remova um acesso existente antes de criar outro.</div>`;
       return;
@@ -2639,10 +2639,10 @@ async function criarAcessoPessoa(tipo,pessoaId,pessoaNome){
   if(!email||!senha||senha.length<4){toast('Preencha e-mail e uma senha com ao menos 4 caracteres',true);return}
   if(!modulos.length){toast('Selecione ao menos 1 módulo pra liberar.',true);return}
   try{
-    const existeEmail=await sbGet('roi_gestores',`email=eq.${encodeURIComponent(email)}&select=id`);
+    const existeEmail=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(email)}&select=id`);
     if(existeEmail.length){toast('Já existe um acesso com esse e-mail.',true);return}
     const campoId=tipo==='consultor'?'consultora_id':'treinador_id';
-    await sbPost('roi_gestores',{
+    await sbPost('cave_gestores',{
       id:uid(),nome:pessoaNome,email,senha_hash:senha,academia_id:acId,
       role:tipo,ativo:true,[campoId]:pessoaId,modulos_ativos:modulos
     });
@@ -2663,10 +2663,10 @@ function renderModulosCheckboxPessoa(loginId,ativos){
 }
 async function toggleModuloPessoa(loginId,moduloKey,ligar){
   try{
-    const atuais=await sbGet('roi_gestores',`id=eq.${loginId}&select=modulos_ativos`);
+    const atuais=await sbGet('cave_gestores',`id=eq.${loginId}&select=modulos_ativos`);
     const lista=(atuais[0]&&atuais[0].modulos_ativos)||[];
     const novos=ligar?(lista.includes(moduloKey)?lista:[...lista,moduloKey]):lista.filter(m=>m!==moduloKey);
-    await fetch(`${SB_URL}/rest/v1/roi_gestores?id=eq.${loginId}`,{method:'PATCH',headers:H,body:JSON.stringify({modulos_ativos:novos})});
+    await fetch(`${SB_URL}/rest/v1/cave_gestores?id=eq.${loginId}`,{method:'PATCH',headers:H,body:JSON.stringify({modulos_ativos:novos})});
     toast(ligar?'Módulo liberado!':'Módulo bloqueado.');
   }catch(e){console.error(e);toast('Erro ao atualizar módulo',true);}
 }
@@ -2755,7 +2755,7 @@ async function renderAdminPanel(){
   `;
   // carrega gestores
   try{
-    const gs=await sbGet('roi_gestores','role=eq.gestor&select=id,nome,email,senha_hash,academia_id,ativo,modulos_ativos');
+    const gs=await sbGet('cave_gestores','role=eq.gestor&select=id,nome,email,senha_hash,academia_id,ativo,modulos_ativos');
     gestoresDB={};
     gs.forEach(g=>{if(g.academia_id)gestoresDB[g.academia_id]=g});
   }catch(e){console.error(e)}
@@ -2832,12 +2832,12 @@ async function criarNovaAcademia(){
   if(!nome||!gn||!ge.includes('@')||gs.length<6){toast('Preencha academia, gestor(a), e-mail válido e senha com 6+ caracteres.',true);return}
   const btn=document.getElementById('na-btn');btn.disabled=true;
   try{
-    const ex=await sbGet('roi_gestores',`email=eq.${encodeURIComponent(ge)}&select=id`);
+    const ex=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(ge)}&select=id`);
     if(ex&&ex.length){toast('Já existe um acesso com esse e-mail.',true);btn.disabled=false;return}
     const id=uid();
     const contrato={tipo:'compartilhada',status:document.getElementById('na-status').value,periodicidade:document.getElementById('na-period').value,inicio:g('na-inicio'),vencimento:g('na-venc'),valor:parseFloat(g('na-valor'))||0,url:'',obs:'',historico:[{data:hojeISO(),evento:'Academia criada'}]};
-    await sbPost('roi_academias',{id,nome,cidade,contrato});
-    await sbPost('roi_gestores',{id:uid(),nome:gn,email:ge,senha_hash:gs,academia_id:id,role:'gestor',ativo:true,modulos_ativos:MODULOS_QG90.map(m=>m.key)});
+    await sbPost('cave_academias',{id,nome,cidade,contrato});
+    await sbPost('cave_gestores',{id:uid(),nome:gn,email:ge,senha_hash:gs,academia_id:id,role:'gestor',ativo:true,modulos_ativos:MODULOS_QG90.map(m=>m.key)});
     toast('Academia e gestor(a) criados!');
     closeM('m-nova-ac');
     await loadAll();
@@ -2855,7 +2855,7 @@ async function salvarContrato(acId2){
   if(mudou.length)hist.push({data:hojeISO(),evento:mudou.join(' | ')});
   novo.historico=hist;
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_academias?id=eq.${acId2}`,{method:'PATCH',headers:H,body:JSON.stringify({contrato:novo})});
+    await fetch(`${SB_URL}/rest/v1/cave_academias?id=eq.${acId2}`,{method:'PATCH',headers:H,body:JSON.stringify({contrato:novo})});
     toast('Contrato salvo!');
     await loadAll();
     openAcesso(acId2);
@@ -2865,7 +2865,7 @@ async function salvarContrato(acId2){
 async function toggleAtivoAcademiaToda(acId2,ativar){
   if(!confirm(ativar?'Reativar o acesso de TODOS os usuários desta academia?':'Suspender o acesso de TODOS os usuários desta academia?\n(Os dados ficam preservados.)'))return;
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_gestores?academia_id=eq.${acId2}&role=neq.admin`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:ativar})});
+    await fetch(`${SB_URL}/rest/v1/cave_gestores?academia_id=eq.${acId2}&role=neq.admin`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:ativar})});
     toast(ativar?'Acessos reativados!':'Academia suspensa.');
     await renderAdminPanel();openAcesso(acId2);
   }catch(e){toast('Erro ao atualizar acessos',true);console.error(e)}
@@ -2873,7 +2873,7 @@ async function toggleAtivoAcademiaToda(acId2,ativar){
 async function carregarUsuariosAcademia(acId2){
   const el=document.getElementById('ac-usuarios');if(!el)return;
   try{
-    const us=await sbGet('roi_gestores',`academia_id=eq.${acId2}&role=neq.admin&select=id,nome,email,role,ativo&order=role.asc`);
+    const us=await sbGet('cave_gestores',`academia_id=eq.${acId2}&role=neq.admin&select=id,nome,email,role,ativo&order=role.asc`);
     const rot={gestor:'Gestor(a)',consultor:'Consultor(a)',treinador:'Treinador(a)'};
     el.innerHTML=us.length?us.map(u=>`<div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12.5px">
       <div style="flex:1;min-width:0"><div style="font-weight:600">${u.nome||'-'} <span style="color:var(--td);font-weight:400">· ${rot[u.role]||u.role}</span></div><div style="color:var(--td);overflow:hidden;text-overflow:ellipsis">${u.email}</div></div>
@@ -2882,7 +2882,7 @@ async function carregarUsuariosAcademia(acId2){
   }catch(e){el.innerHTML='<div style="color:var(--re);font-size:12.5px">Erro ao carregar usuários.</div>';console.error(e)}
 }
 async function toggleUsuarioAc(uidU,ativo,acId2){
-  try{await fetch(`${SB_URL}/rest/v1/roi_gestores?id=eq.${uidU}`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:!ativo})});carregarUsuariosAcademia(acId2)}catch(e){toast('Erro',true)}
+  try{await fetch(`${SB_URL}/rest/v1/cave_gestores?id=eq.${uidU}`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:!ativo})});carregarUsuariosAcademia(acId2)}catch(e){toast('Erro',true)}
 }
 
 function openAcesso(acId2){
@@ -2978,7 +2978,7 @@ async function salvarCadastroAcademia(acId2){
   const cidade=document.getElementById('ac-edit-cidade').value.trim();
   if(!nome){toast('Nome não pode ficar vazio',true);return}
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_academias?id=eq.${acId2}`,{method:'PATCH',headers:H,body:JSON.stringify({nome,cidade})});
+    await fetch(`${SB_URL}/rest/v1/cave_academias?id=eq.${acId2}`,{method:'PATCH',headers:H,body:JSON.stringify({nome,cidade})});
     toast('Cadastro da academia atualizado!');
     await loadAll();
     if(typeof renderAdminPanel==='function')renderAdminPanel();
@@ -2990,7 +2990,7 @@ async function salvarUsuarioAcademia(gId){
   const email=document.getElementById('ac-edit-gemail').value.trim().toLowerCase();
   if(!nome||!email){toast('Preencha nome e e-mail',true);return}
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_gestores?id=eq.${gId}`,{method:'PATCH',headers:H,body:JSON.stringify({nome,email})});
+    await fetch(`${SB_URL}/rest/v1/cave_gestores?id=eq.${gId}`,{method:'PATCH',headers:H,body:JSON.stringify({nome,email})});
     toast('Usuário atualizado!');
     Object.values(gestoresDB).forEach(g=>{if(g.id===gId){g.nome=nome;g.email=email}});
     if(typeof renderAdminPanel==='function')renderAdminPanel();
@@ -3034,7 +3034,7 @@ async function toggleModulo(gId, moduloKey, ligar){
     novos = atuais.filter(m=>m!==moduloKey);
   }
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_gestores?id=eq.${gId}`,{method:'PATCH',headers:H,body:JSON.stringify({modulos_ativos:novos})});
+    await fetch(`${SB_URL}/rest/v1/cave_gestores?id=eq.${gId}`,{method:'PATCH',headers:H,body:JSON.stringify({modulos_ativos:novos})});
     g.modulos_ativos = novos;
     toast(ligar?'Módulo liberado!':'Módulo bloqueado.');
   }catch(e){toast('Erro ao atualizar módulo',true);console.error(e)}
@@ -3047,7 +3047,7 @@ async function toggleAtivoAcademia(gId,ativoAtual){
   const acao=novo?'reativar':'suspender';
   if(!confirm(`Confirma ${acao} o acesso desta academia?`))return;
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_gestores?id=eq.${gId}`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:novo})});
+    await fetch(`${SB_URL}/rest/v1/cave_gestores?id=eq.${gId}`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:novo})});
     toast(novo?'Acesso reativado!':'Acesso suspenso!');
     Object.values(gestoresDB).forEach(g=>{if(g.id===gId)g.ativo=novo});
     closeM('m-acesso');
@@ -3061,10 +3061,10 @@ async function excluirAcademiaCompleta(acId2,nomeAc){
   const conf=prompt(`Isso vai excluir "${nomeAc}" e TODOS os dados vinculados (consultores, lançamentos, acessos) PERMANENTEMENTE.\n\nDigite o nome da academia para confirmar:`);
   if(conf!==nomeAc){if(conf!==null)toast('Nome não confere — exclusão cancelada.',true);return}
   try{
-    await sbDelete('roi_registros',{academia_id:acId2});
-    await sbDelete('roi_consultoras',{academia_id:acId2});
-    await sbDelete('roi_gestores',{academia_id:acId2});
-    await sbDelete('roi_academias',{id:acId2});
+    await sbDelete('cave_registros',{academia_id:acId2});
+    await sbDelete('cave_consultoras',{academia_id:acId2});
+    await sbDelete('cave_gestores',{academia_id:acId2});
+    await sbDelete('cave_academias',{id:acId2});
     toast('Academia excluída permanentemente.');
     closeM('m-acesso');
     await loadAll();
@@ -3090,7 +3090,7 @@ async function abrirDetalheConsultora(consultoraId,consultoraNome){
   body.innerHTML='<div style="color:var(--td);font-size:13px;padding:10px 0">Carregando dados do módulo de Campanhas...</div>';
   openM('m-cons-detalhe');
   try{
-    const cards=await sbGet('roi_campanha_cards',`consultora_id=eq.${consultoraId}&select=id,perfil,status,onda_id,campanha_id`);
+    const cards=await sbGet('cave_campanha_cards',`consultora_id=eq.${consultoraId}&select=id,perfil,status,onda_id,campanha_id`);
     if(!cards.length){
       body.innerHTML='<div style="color:var(--td);font-size:13.5px;padding:10px 0">Este(a) consultor(a) ainda não tem cards em nenhuma campanha do módulo de Campanhas.</div>';
       return;
@@ -3098,8 +3098,8 @@ async function abrirDetalheConsultora(consultoraId,consultoraNome){
     const ondaIds=[...new Set(cards.map(c=>c.onda_id).filter(Boolean))];
     const campIds=[...new Set(cards.map(c=>c.campanha_id).filter(Boolean))];
     const [ondas,camps]=await Promise.all([
-      ondaIds.length?sbGet('roi_campanha_ondas',`id=in.(${ondaIds.join(',')})&select=id,data_inicio,numero_onda`):[],
-      campIds.length?sbGet('roi_campanhas',`id=in.(${campIds.join(',')})&select=id,nome`):[]
+      ondaIds.length?sbGet('cave_campanha_ondas',`id=in.(${ondaIds.join(',')})&select=id,data_inicio,numero_onda`):[],
+      campIds.length?sbGet('cave_campanhas',`id=in.(${campIds.join(',')})&select=id,nome`):[]
     ]);
     const ondaById={};ondas.forEach(o=>ondaById[o.id]=o);
     const campById={};camps.forEach(c=>campById[c.id]=c);
@@ -3146,7 +3146,7 @@ async function resetSenha(gId){
   if(!nova||nova.length<4){toast('Informe uma senha com ao menos 4 caracteres',true);return}
   try{
     const params=`id=eq.${gId}`;
-    await fetch(`${SB_URL}/rest/v1/roi_gestores?${params}`,{method:'PATCH',headers:H,body:JSON.stringify({senha_hash:nova})});
+    await fetch(`${SB_URL}/rest/v1/cave_gestores?${params}`,{method:'PATCH',headers:H,body:JSON.stringify({senha_hash:nova})});
     toast('Senha atualizada!');
     // atualiza cache
     const g=Object.values(gestoresDB).find(g=>g.id===gId);
@@ -3352,7 +3352,7 @@ async function salvarEdicaoLancamento(){
   });
   const btn=document.getElementById('btn-salvar-edit');btn.disabled=true;btn.textContent='Salvando...';
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_registros?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({consultora_id:cid,dia,data,obs,ciclos,modo,funis:funisData,ts:Date.now()})});
+    await fetch(`${SB_URL}/rest/v1/cave_registros?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({consultora_id:cid,dia,data,obs,ciclos,modo,funis:funisData,ts:Date.now()})});
     closeM('m-edit-lanc');toast('Lançamento atualizado!');await loadAll();
   }catch(e){toast('Erro ao salvar',true);console.error(e)}
   btn.disabled=false;btn.textContent='Salvar Alterações';
@@ -3361,7 +3361,7 @@ async function salvarEdicaoLancamento(){
 async function deletarLancamento(id){
   if(!confirm('Excluir este lançamento? Essa ação não pode ser desfeita.'))return;
   try{
-    await sbDelete('roi_registros',{id});toast('Lançamento excluído');await loadAll();
+    await sbDelete('cave_registros',{id});toast('Lançamento excluído');await loadAll();
   }catch(e){toast('Erro ao excluir',true);console.error(e)}
 }
 
@@ -3396,7 +3396,7 @@ async function finalizarDesafio(){
   const diaMax=regs.length?Math.max(...regs.map(r=>r.dia)):0;
   const datas=regs.map(r=>r.data).filter(Boolean).sort();
   // conta desafios anteriores
-  const desafiosAnt=await sbGet('roi_desafios',`academia_id=eq.${acId}&order=numero.desc&limit=1`);
+  const desafiosAnt=await sbGet('cave_desafios',`academia_id=eq.${acId}&order=numero.desc&limit=1`);
   const numAnterior=desafiosAnt&&desafiosAnt.length?desafiosAnt[0].numero:0;
   const resumo={
     matrículas:acMat(a),vendido:acVend(a),
@@ -3405,16 +3405,16 @@ async function finalizarDesafio(){
   };
   try{
     // 1. Salva resumo do desafio
-    await sbPost('roi_desafios',{
+    await sbPost('cave_desafios',{
       id:uid(),academia_id:acId,numero:numAnterior+1,
       data_inicio:datas[0]||null,data_fim:datas[datas.length-1]||null,
       dias_ativos:diaMax,resumo:{...resumo,nome:nomeDesafio}
     });
     // 2. Deleta todos os registros da academia
-    await fetch(`${SB_URL}/rest/v1/roi_registros?academia_id=eq.${acId}`,{method:'DELETE',headers:{...H,'Prefer':''}});
+    await fetch(`${SB_URL}/rest/v1/cave_registros?academia_id=eq.${acId}`,{method:'DELETE',headers:{...H,'Prefer':''}});
     // 3. Zera lista dos funis em todas as consultoras
     const updates=Object.keys(a.consultoras).map(cid=>
-      fetch(`${SB_URL}/rest/v1/roi_consultoras?id=eq.${cid}`,{method:'PATCH',headers:H,body:JSON.stringify({lista:{}})})
+      fetch(`${SB_URL}/rest/v1/cave_consultoras?id=eq.${cid}`,{method:'PATCH',headers:H,body:JSON.stringify({lista:{}})})
     );
     await Promise.all(updates);
     closeM('m-finalizar');
@@ -3427,7 +3427,7 @@ async function finalizarDesafio(){
 async function carregarHistoricoDesafios(){
   if(isAdmin()||!acId)return;
   try{
-    const hist=await sbGet('roi_desafios',`academia_id=eq.${acId}&order=numero.desc`);
+    const hist=await sbGet('cave_desafios',`academia_id=eq.${acId}&order=numero.desc`);
     const sel=document.getElementById('sel-desafio');
     if(!sel)return;
     sel.innerHTML='<option value="">Desafio Atual</option>';
@@ -3455,7 +3455,7 @@ function switchDesafio(desafioId){
   }
   // mostra dados históricos (somente leitura)
   document.getElementById('btn-finalizar-desafio').style.display='none';
-  sbGet('roi_desafios',`id=eq.${desafioId}`).then(rows=>{
+  sbGet('cave_desafios',`id=eq.${desafioId}`).then(rows=>{
     if(!rows||!rows.length)return;
     const d=rows[0];const r=d.resumo||{};
     const dtI=d.data_inicio?new Date(d.data_inicio+'T00:00:00').toLocaleDateString('pt-BR'):'—';
@@ -3600,7 +3600,7 @@ function bcRenderPers(p){
 async function bcCarregar(){
   if(!sessao.academia_id)return;
   try{
-    const rows=await sbGet('roi_briefing_negocio',`academia_id=eq.${sessao.academia_id}`);
+    const rows=await sbGet('cave_briefing_negocio',`academia_id=eq.${sessao.academia_id}`);
     const b=rows&&rows[0];
     bcDados=(b&&b.dados&&b.dados.blocos)?b.dados:null;
   }catch(e){console.error('briefing completo:',e);bcDados=null}
@@ -3664,7 +3664,7 @@ async function bcSalvar(veioDoImport){
   if(g('publico','publico_alvo'))payload.publico_alvo=g('publico','publico_alvo');
   if(Array.isArray(g('estrutura','modalidades')))payload.modalidades=g('estrutura','modalidades');
   try{
-    await sbUpsert('roi_briefing_negocio',payload);
+    await sbUpsert('cave_briefing_negocio',payload);
     bcDados=b;
     document.getElementById('bc-msg').textContent='✓ Briefing salvo!';
     setTimeout(()=>document.getElementById('bc-msg').textContent='',3000);
@@ -3683,7 +3683,7 @@ function bcExportar(){
 async function carregarBriefing(){
   if(!sessao.academia_id)return;
   try{
-    const rows=await sbGet('roi_briefing_negocio',`academia_id=eq.${sessao.academia_id}`);
+    const rows=await sbGet('cave_briefing_negocio',`academia_id=eq.${sessao.academia_id}`);
     const b=rows&&rows[0];
     if(b){
       document.getElementById('bf-m2').value=b.espaco_m2??'';
@@ -3711,7 +3711,7 @@ async function salvarBriefing(){
     modalidades, updated_at:Date.now()
   };
   try{
-    await sbUpsert('roi_briefing_negocio',payload);
+    await sbUpsert('cave_briefing_negocio',payload);
     document.getElementById('bf-msg').textContent='✓ Salvo!';
     setTimeout(()=>document.getElementById('bf-msg').textContent='',2500);
   }catch(e){console.error(e);toast('Erro ao salvar briefing.',true);}
@@ -3719,7 +3719,7 @@ async function salvarBriefing(){
 async function carregarTranscricoes(){
   const el=document.getElementById('bf-transcricoes-lista');
   try{
-    const rows=await sbGet('roi_briefing_transcricoes',`academia_id=eq.${sessao.academia_id}&order=data.desc`);
+    const rows=await sbGet('cave_briefing_transcricoes',`academia_id=eq.${sessao.academia_id}&order=data.desc`);
     if(!rows.length){el.innerHTML='<div style="color:var(--td);font-size:12px">Nenhuma transcrição registrada ainda.</div>';return;}
     el.innerHTML=rows.map(r=>`<details style="background:var(--s2);border-radius:8px;padding:10px 14px;margin-bottom:8px">
       <summary style="cursor:pointer;font-size:13px;font-weight:600">${new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR')} — ${r.titulo||'Sem título'}</summary>
@@ -3732,7 +3732,7 @@ async function addTranscricao(){
   const conteudo=document.getElementById('bf-t-conteudo').value.trim();
   if(!data||!conteudo)return toast('Preencha data e conteúdo da transcrição.',true);
   try{
-    await sbPost('roi_briefing_transcricoes',{
+    await sbPost('cave_briefing_transcricoes',{
       academia_id:sessao.academia_id, data, titulo:document.getElementById('bf-t-titulo').value||null,
       conteudo, criado_em:Date.now()
     });
@@ -3752,10 +3752,10 @@ async function carregarVendasMkt(){
   let cards=[],exps=[],campanhas=[],vendas=[];
   try{
     [cards,exps,campanhas,vendas]=await Promise.all([
-      sbGet('roi_campanha_cards',`select=*,campanhas!inner(academia_id)&campanhas.academia_id=eq.${sessao.academia_id}`).catch(()=>[]),
-      sbGet('roi_experiencias',`academia_id=eq.${sessao.academia_id}`),
-      sbGet('roi_campanhas',`academia_id=eq.${sessao.academia_id}`),
-      sbGet('roi_vendas',`academia_id=eq.${sessao.academia_id}`)
+      sbGet('cave_campanha_cards',`select=*,campanhas!inner(academia_id)&campanhas.academia_id=eq.${sessao.academia_id}`).catch(()=>[]),
+      sbGet('cave_experiencias',`academia_id=eq.${sessao.academia_id}`),
+      sbGet('cave_campanhas',`academia_id=eq.${sessao.academia_id}`),
+      sbGet('cave_vendas',`academia_id=eq.${sessao.academia_id}`)
     ]);
   }catch(e){console.error(e);}
 
@@ -3772,8 +3772,8 @@ async function carregarVendasMkt(){
   document.getElementById('vm-exps').textContent=expsMes.length;
 
   const [consultoras,registros]=await Promise.all([
-    sbGet('roi_consultoras',`academia_id=eq.${sessao.academia_id}`),
-    sbGet('roi_registros',`academia_id=eq.${sessao.academia_id}&data=gte.${mesAtual}-01`)
+    sbGet('cave_consultoras',`academia_id=eq.${sessao.academia_id}`),
+    sbGet('cave_registros',`academia_id=eq.${sessao.academia_id}&data=gte.${mesAtual}-01`)
   ]);
   const diasDoMes=new Date().getDate();
   const adesoes=consultoras.map(c=>{
@@ -3832,10 +3832,10 @@ async function carregarRetencao(){
   const mesAtual=new Date().toISOString().slice(0,7);
   const hoje=new Date();
   const [alunos,exps,treins,planRows]=await Promise.all([
-    sbGet('roi_alunos',`academia_id=eq.${sessao.academia_id}`),
-    sbGet('roi_experiencias',`academia_id=eq.${sessao.academia_id}`),
-    sbGet('roi_treinadores',`academia_id=eq.${sessao.academia_id}`),
-    sbGet('roi_planejamento_mensal',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mesAtual}-01`)
+    sbGet('cave_alunos',`academia_id=eq.${sessao.academia_id}`),
+    sbGet('cave_experiencias',`academia_id=eq.${sessao.academia_id}`),
+    sbGet('cave_treinadores',`academia_id=eq.${sessao.academia_id}`),
+    sbGet('cave_planejamento_mensal',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mesAtual}-01`)
   ]);
   const plan=planRows[0];
   const ativos=alunos.filter(a=>a.status==='ativo');
@@ -3900,11 +3900,11 @@ async function carregarGeral(){
   const anoAtual=mesAtual.slice(0,4);
   try{
     const [registros, planRows, alunos, despesas, npsRows] = await Promise.all([
-      sbGet('roi_registros',`academia_id=eq.${sessao.academia_id}&data=gte.${anoAtual}-01-01`),
-      sbGet('roi_planejamento_mensal',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mesAtual}-01`),
-      sbGet('roi_alunos',`academia_id=eq.${sessao.academia_id}`),
-      sbGet('roi_centros_custo',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mesAtual}-01`),
-      sbGet('roi_nps_respostas',`academia_id=eq.${sessao.academia_id}`)
+      sbGet('cave_registros',`academia_id=eq.${sessao.academia_id}&data=gte.${anoAtual}-01-01`),
+      sbGet('cave_planejamento_mensal',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mesAtual}-01`),
+      sbGet('cave_alunos',`academia_id=eq.${sessao.academia_id}`),
+      sbGet('cave_centros_custo',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mesAtual}-01`),
+      sbGet('cave_nps_respostas',`academia_id=eq.${sessao.academia_id}`)
     ]);
     const plan=planRows&&planRows[0];
 
@@ -4013,7 +4013,7 @@ let alunosCache=[];
 async function carregarAlunos(){
   if(!sessao.academia_id)return;
   try{
-    alunosCache=await sbGet('roi_alunos',`academia_id=eq.${sessao.academia_id}&order=criado_em.desc`);
+    alunosCache=await sbGet('cave_alunos',`academia_id=eq.${sessao.academia_id}&order=criado_em.desc`);
   }catch(e){console.error(e);alunosCache=[];}
   renderAlunos();
 }
@@ -4066,7 +4066,7 @@ async function salvarAluno(){
     status:'ativo'
   };
   try{
-    await sbPost('roi_alunos',payload);
+    await sbPost('cave_alunos',payload);
     document.getElementById('al-msg').textContent='✓ Adicionado!';
     setTimeout(()=>document.getElementById('al-msg').textContent='',2000);
     ['al-nome','al-tel','al-valor','al-data'].forEach(id=>document.getElementById(id).value='');
@@ -4075,7 +4075,7 @@ async function salvarAluno(){
 }
 async function mudarStatusAluno(id,status){
   try{
-    await fetch(`${SB_URL}/rest/v1/roi_alunos?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({status})});
+    await fetch(`${SB_URL}/rest/v1/cave_alunos?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({status})});
     toast('Status atualizado!');
     carregarAlunos();
   }catch(e){console.error(e);toast('Erro ao atualizar.',true);}
@@ -4083,7 +4083,7 @@ async function mudarStatusAluno(id,status){
 async function excluirAluno(id){
   if(!confirm('Remover esse aluno da lista?'))return;
   try{
-    await sbDelete('roi_alunos',{id});
+    await sbDelete('cave_alunos',{id});
     carregarAlunos();
   }catch(e){console.error(e);toast('Erro ao remover.',true);}
 }
@@ -4162,14 +4162,14 @@ function atualizarMediasDiag(){
 async function carregarDiagnostico(){
   if(!sessao.academia_id)return;
   try{
-    const rows=await sbGet('roi_diagnostico_avaliacao',`academia_id=eq.${sessao.academia_id}`);
+    const rows=await sbGet('cave_diagnostico_avaliacao',`academia_id=eq.${sessao.academia_id}`);
     diagValores=(rows&&rows[0]&&rows[0].indicadores)||{};
   }catch(e){console.error('Erro ao carregar diagnóstico:',e);diagValores={};}
   renderDiagnostico();
 }
 async function salvarDiagnostico(){
   try{
-    await sbUpsert('roi_diagnostico_avaliacao',{academia_id:sessao.academia_id,indicadores:diagValores,updated_at:Date.now()});
+    await sbUpsert('cave_diagnostico_avaliacao',{academia_id:sessao.academia_id,indicadores:diagValores,updated_at:Date.now()});
     document.getElementById('diag-msg').textContent='✓ Salvo!';
     setTimeout(()=>document.getElementById('diag-msg').textContent='',2500);
     toast('Diagnóstico salvo!');
@@ -4198,7 +4198,7 @@ function addLinhaDespesa(categoria='',meta='',realizado=''){
 }
 async function carregarDespesas(mes){
   try{
-    const rows=await sbGet('roi_centros_custo',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mes}-01`);
+    const rows=await sbGet('cave_centros_custo',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mes}-01`);
     renderLinhasDespesa(rows||[]);
   }catch(e){console.error(e);renderLinhasDespesa([]);}
 }
@@ -4208,7 +4208,7 @@ async function salvarDespesas(mes){
     return {categoria:inputs[0].value.trim(),meta_mensal:parseFloat(inputs[1].value)||null,realizado_mensal:parseFloat(inputs[2].value)||null};
   }).filter(d=>d.categoria);
   for(const d of linhas){
-    await sbUpsert('roi_centros_custo',{academia_id:sessao.academia_id,mes_referencia:mes+'-01',categoria:d.categoria,meta_mensal:d.meta_mensal,realizado_mensal:d.realizado_mensal});
+    await sbUpsert('cave_centros_custo',{academia_id:sessao.academia_id,mes_referencia:mes+'-01',categoria:d.categoria,meta_mensal:d.meta_mensal,realizado_mensal:d.realizado_mensal});
   }
 }
 function initPlanejamento(){
@@ -4237,7 +4237,7 @@ async function carregarPlanejamento(){
   const mes=document.getElementById('pj-mes').value;
   if(!mes||!sessao.academia_id)return;
   try{
-    const rows=await sbGet('roi_planejamento_mensal',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mes}-01`);
+    const rows=await sbGet('cave_planejamento_mensal',`academia_id=eq.${sessao.academia_id}&mes_referencia=eq.${mes}-01`);
     const p=rows&&rows[0];
     const ids=['pj-m1-fat','pj-m1-planos','pj-m1-ativos','pj-m2-fat','pj-m2-planos','pj-m2-ativos','pj-ms-fat','pj-ms-planos','pj-ms-ativos','pj-fc-atual','pj-fc-ant','pj-fc-ano-ant','pj-custo','pj-inadimp','pj-fat-ano-ant','pj-enc-meta','pj-enc-atual','pj-a-renovar','pj-renov-enc','pj-renov-nenc','pj-cancel','pj-recebiveis','pj-reserva-min','pj-reserva-max'];
     ids.forEach(id=>document.getElementById(id).value='');
@@ -4297,7 +4297,7 @@ async function salvarPlanejamento(){
     reserva_estrategica_meses_max:parseInt(document.getElementById('pj-reserva-max').value)||6
   };
   try{
-    await sbUpsert('roi_planejamento_mensal',payload);
+    await sbUpsert('cave_planejamento_mensal',payload);
     await salvarDespesas(mes);
     document.getElementById('pj-msg').textContent='✓ Salvo!';
     setTimeout(()=>document.getElementById('pj-msg').textContent='',2500);
@@ -4836,8 +4836,8 @@ setInterval(()=>{
 
 async function initAdmin(){
   try{
-    const ex=await sbGet('roi_gestores','email=eq.admin%40qg90.com&select=id');
-    if(!ex||!ex.length)await sbPost('roi_gestores',{id:'gest_qg90_admin',nome:'RG Cave Admin',email:'admin@qg90.com',senha_hash:'qg90admin2025',academia_id:null,role:'admin'});
+    const ex=await sbGet('cave_gestores','email=eq.admin%40qg90.com&select=id');
+    if(!ex||!ex.length)await sbPost('cave_gestores',{id:'gest_qg90_admin',nome:'RG Cave Admin',email:'admin@qg90.com',senha_hash:'qg90admin2025',academia_id:null,role:'admin'});
   }catch(e){console.log('Admin init:',e)}
 }
 if(MODO_MESTRE)initAdmin();
