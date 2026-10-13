@@ -1478,8 +1478,8 @@ function iniciarAppInterno(){
 // AUTENTICAÇÃO — compatível com o mesmo login do Desafio ROI 21 Dias
 // (mesma tabela `gestores` no Supabase — suspender lá também bloqueia aqui)
 // ══════════════════════════════════════════
-const SB_URL='https://COLE-AQUI-O-PROJETO-RGCAVE.supabase.co';
-const SB_KEY='COLE-AQUI-A-ANON-KEY-DO-PROJETO-RGCAVE';
+const SB_URL='https://irwvagffrguiljaxrzmd.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd3ZhZ2Zmcmd1aWxqYXhyem1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNDk5ODUsImV4cCI6MjEwNDkyNTk4NX0.YAApyaH6iIHEua_89fgCUpMzgXRIcWb_vNRkBQAoq5A';
 const SB_H={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
 async function sbGet(t,p=''){
   const r=await fetch(`${SB_URL}/rest/v1/${t}?${p}`,{headers:SB_H});
