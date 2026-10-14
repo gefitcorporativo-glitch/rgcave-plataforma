@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Perfil do(a) Consultor(a) — RG Cave</title>
+<title>Perfil do(a) Consultor(a), RG Cave</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,500;0,600;0,700;0,800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -92,12 +92,12 @@ header .logo{color:#F5B800!important}
 
   function uidGen(){return 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
   function fmtR$(v){return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
-  function fmtData(d){return d?new Date(d+'T00:00:00').toLocaleDateString('pt-BR'):'—';}
+  function fmtData(d){return d?new Date(d+'T00:00:00').toLocaleDateString('pt-BR'):'-';}
   function trimestreAtual(){const m=new Date().getMonth();const t=Math.floor(m/3)+1;return `${new Date().getFullYear()}-Q${t}`;}
 
   async function init(){
     const app=document.getElementById('app');
-    if(!uid||!consultoraId){app.innerHTML='<div class="locked">Link inválido — acesse pela aba Equipe do sistema.</div>';return;}
+    if(!uid||!consultoraId){app.innerHTML='<div class="locked">Link inválido, acesse pela aba Equipe do sistema.</div>';return;}
     try{
       const [viewers,conss]=await Promise.all([
         sbGet('cave_gestores',`id=eq.${uid}`),
@@ -118,7 +118,7 @@ header .logo{color:#F5B800!important}
     app.innerHTML=`
       <div class="card">
         <h2 style="font-size:22px">${consultora.nome}</h2>
-        <div class="sub">Consultor(a) de Vendas · desde ${fmtData((consultora.criado_em||'').slice(0,10))} · meta atual: ${tipoLbl[consultora.meta_tipo]||'—'} ${consultora.meta_tipo==='rs'?fmtR$(consultora.meta):consultora.meta||''}</div>
+        <div class="sub">Consultor(a) de Vendas · desde ${fmtData((consultora.criado_em||'').slice(0,10))} · meta atual: ${tipoLbl[consultora.meta_tipo]||'-'} ${consultora.meta_tipo==='rs'?fmtR$(consultora.meta):consultora.meta||''}</div>
       </div>
 
       <div class="card">
@@ -176,8 +176,8 @@ header .logo{color:#F5B800!important}
     const tipoLbl={planos:'Nº Planos',rs:'R$ Valor',treino:'Treinamento'};
     const el=document.getElementById('metas-lista');
     if(!rows.length){el.innerHTML='<div class="item" style="color:var(--td)">Nenhum período registrado ainda.</div>';return;}
-    el.innerHTML=rows.map(r=>`<div class="item">${fmtData(r.periodo_inicio)} ${r.periodo_fim?'– '+fmtData(r.periodo_fim):'(em aberto)'}
-      <div class="meta">${tipoLbl[r.meta_tipo]||'—'}: ${r.meta_tipo==='rs'?fmtR$(r.meta_valor):r.meta_valor}</div></div>`).join('');
+    el.innerHTML=rows.map(r=>`<div class="item">${fmtData(r.periodo_inicio)} ${r.periodo_fim?'-'+fmtData(r.periodo_fim):'(em aberto)'}
+      <div class="meta">${tipoLbl[r.meta_tipo]||'-'}: ${r.meta_tipo==='rs'?fmtR$(r.meta_valor):r.meta_valor}</div></div>`).join('');
   }
   async function addMetaPeriodo(){
     const inicio=document.getElementById('mp-inicio').value;
@@ -208,7 +208,7 @@ header .logo{color:#F5B800!important}
     if(!meses.length){tbody.innerHTML='<tr><td colspan="4" style="color:var(--td)">Sem lançamentos ainda.</td></tr>';return;}
     tbody.innerHTML=meses.map(m=>{
       const d=porMes[m];
-      const editable=canEdit?`<input class="fi" style="font-size:12px;padding:5px 7px" value="${(obsMap[m]||'').replace(/"/g,'&quot;')}" onchange="salvarObsKpi('${m}',this.value)">`:(obsMap[m]||'—');
+      const editable=canEdit?`<input class="fi" style="font-size:12px;padding:5px 7px" value="${(obsMap[m]||'').replace(/"/g,'&quot;')}" onchange="salvarObsKpi('${m}',this.value)">`:(obsMap[m]||'-');
       return `<tr><td>${m}</td><td>${d.matriculas}</td><td>${fmtR$(d.vendido)}</td><td>${editable}</td></tr>`;
     }).join('');
   }

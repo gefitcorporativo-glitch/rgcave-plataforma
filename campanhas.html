@@ -338,7 +338,7 @@ header.top button,header.top a{color:rgba(255,255,255,.88)}
   
   <div class="badge">Módulo de Campanhas · Fase 1</div>
   <div class="user-chip">
-    <div class="uinfo"><b id="userNome">—</b><span id="userAcademia">—</span></div>
+    <div class="uinfo"><b id="userNome">-</b><span id="userAcademia">-</span></div>
     <button class="btn-logout" onclick="doLogout()">Sair</button>
   </div>
 </header>
@@ -393,7 +393,7 @@ header.top button,header.top a{color:rgba(255,255,255,.88)}
         <div class="section">
           <h3>1. Dados da Campanha</h3>
           <div class="form-row">
-            <div class="fg"><label>Nome da campanha</label><input class="fi" id="w-nome" placeholder="Ex: Agosto — Mês dos Pais"></div>
+            <div class="fg"><label>Nome da campanha</label><input class="fi" id="w-nome" placeholder="Ex: Agosto, Mês dos Pais"></div>
             <div class="fg"><label>Mês de referência</label><input class="fi" type="month" id="w-mes"></div>
           </div>
           <div class="fg" style="margin-bottom:14px"><label>Investimento em tráfego pago (R$)</label><input class="fi" type="number" id="w-invest" placeholder="0" min="0"></div>
@@ -425,7 +425,7 @@ header.top button,header.top a{color:rgba(255,255,255,.88)}
           <p style="color:var(--texto2);font-size:13.5px;margin-bottom:14px">Suba uma planilha por perfil. Progresso: <span id="perfilProgresso"></span></p>
           <div class="fg" style="margin-bottom:16px"><label>Perfil desta lista</label><select class="fsel" id="w-perfil-upload"></select></div>
 
-          <p style="color:var(--texto2);font-size:12.5px;margin-bottom:16px">Não precisa seguir uma ordem exata de colunas — no próximo passo você mapeia manualmente qual coluna é qual campo. <a onclick="baixarModeloCSV()" style="color:var(--laranja-t);cursor:pointer;text-decoration:underline">📥 Baixar modelo de planilha (CSV)</a></p>
+          <p style="color:var(--texto2);font-size:12.5px;margin-bottom:16px">Não precisa seguir uma ordem exata de colunas, no próximo passo você mapeia manualmente qual coluna é qual campo. <a onclick="baixarModeloCSV()" style="color:var(--laranja-t);cursor:pointer;text-decoration:underline">📥 Baixar modelo de planilha (CSV)</a></p>
 
           <div id="uploadArea">
             <div class="upload-drop" onclick="document.getElementById('fileInput').click()" ondrop="handleDrop(event)" ondragover="event.preventDefault()">
@@ -482,7 +482,7 @@ header.top button,header.top a{color:rgba(255,255,255,.88)}
 
 </main>
 
-<!-- MODAL: DETALHE DO CARD (Fase 2 — leitura + mover etapa + perdas) -->
+<!-- MODAL: DETALHE DO CARD (Fase 2, leitura + mover etapa + perdas) -->
 <div class="modal-ov" id="m-card">
   <div class="modal" style="max-width:540px">
     <div class="modal-hd"><h3 id="cardModalNome">Card</h3><button class="btn-x" onclick="tentarFecharCardModal()">×</button></div>
@@ -565,7 +565,7 @@ header.top button,header.top a{color:rgba(255,255,255,.88)}
 <div class="modal-ov" id="m-jornada-sucesso">
   <div class="modal" style="max-width:460px">
     <div class="modal-hd"><h3 id="jornadaModalTitulo">🎯 Jornada</h3><button class="btn-x" onclick="closeM('m-jornada-sucesso')">×</button></div>
-    <p style="font-size:12.5px;color:var(--texto2);margin-bottom:14px">Etapas do Kanban desse funil — editável pra academia montar a própria jornada. Reordene, renomeie, adicione ou remova etapas.</p>
+    <p style="font-size:12.5px;color:var(--texto2);margin-bottom:14px">Etapas do Kanban desse funil, editável pra academia montar a própria jornada. Reordene, renomeie, adicione ou remova etapas.</p>
     <div id="listaJornadaSucesso" style="margin-bottom:16px"></div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
       <input class="fi" id="novaEtapaJornadaNome" placeholder="Nome da nova etapa" style="flex:1">
@@ -578,7 +578,7 @@ header.top button,header.top a{color:rgba(255,255,255,.88)}
 <div class="modal-ov" id="m-venda">
   <div class="modal" style="max-width:460px">
     <div class="modal-hd"><h3>💰 Registrar Venda</h3><button class="btn-x" onclick="cancelarVendaModal()">×</button></div>
-    <p style="font-size:12.5px;color:var(--texto2);margin-bottom:14px">Antes de marcar como Convertido, confirme os dados da venda — vira uma linha automática no seu Livro de Vendas.</p>
+    <p style="font-size:12.5px;color:var(--texto2);margin-bottom:14px">Antes de marcar como Convertido, confirme os dados da venda, vira uma linha automática no seu Livro de Vendas.</p>
     <div class="form-row">
       <div class="fg"><label>Nome do Cliente</label><input class="fi" id="v-nome"></div>
       <div class="fg"><label>Nº Matrícula</label><input class="fi" id="v-matricula"></div>
@@ -619,7 +619,7 @@ header.top button,header.top a{color:rgba(255,255,255,.88)}
       <div class="fg"><label>Recebido/Lançado por</label><select class="fsel" id="v-lancado-por"></select></div>
       <div class="fg"><label>Venda atribuída a</label><select class="fsel" id="v-atribuido-a"></select></div>
     </div>
-    <p style="font-size:11.5px;color:var(--texto2);margin-top:-10px;margin-bottom:16px">"Lançado por" é quem está registrando agora. "Atribuída a" é quem fez o CRM/agendou — é essa pessoa que recebe o crédito da venda, mesmo que outra tenha atendido no fechamento.</p>
+    <p style="font-size:11.5px;color:var(--texto2);margin-top:-10px;margin-bottom:16px">"Lançado por" é quem está registrando agora. "Atribuída a" é quem fez o CRM/agendou, é essa pessoa que recebe o crédito da venda, mesmo que outra tenha atendido no fechamento.</p>
     <button class="btn-primary" style="width:100%" onclick="confirmarVendaModal()">✅ Confirmar Venda e Converter</button>
   </div>
 </div>
@@ -629,7 +629,7 @@ header.top button,header.top a{color:rgba(255,255,255,.88)}
 
 <script>
 // ══════════════════════════════════════════
-// SUPABASE — mesmo projeto usado pelo Desafio ROI / Central de Scripts
+// SUPABASE, mesmo projeto usado pelo Desafio ROI / Central de Scripts
 // ══════════════════════════════════════════
 const SB_URL='https://irwvagffrguiljaxrzmd.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd3ZhZ2Zmcmd1aWxqYXhyem1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNDk5ODUsImV4cCI6MjEwNDkyNTk4NX0.YAApyaH6iIHEua_89fgCUpMzgXRIcWb_vNRkBQAoq5A';
@@ -651,7 +651,7 @@ function toast(msg,err){
 }
 
 // ══════════════════════════════════════════
-// AUTENTICAÇÃO — mesmo padrão da Central de Scripts (tabela gestores)
+// AUTENTICAÇÃO, mesmo padrão da Central de Scripts (tabela gestores)
 // ══════════════════════════════════════════
 let sessao=null;
 
@@ -686,7 +686,7 @@ async function doLogin(){
 }
 function doLogout(){sessionStorage.removeItem('qg90_sessao');mostrarTela('screen-login');}
 
-// Atalhos rápidos — mesmo padrão de SSO via ?uid=, sem precisar voltar ao Desafio ROI
+// Atalhos rápidos, mesmo padrão de SSO via ?uid=, sem precisar voltar ao Desafio ROI
 function abrirExperienciasCampanhas(){
   if(!sessao||!sessao.id){toast('Faça login primeiro.',true);return;}
   window.location.href=`controle-experiencias.html?uid=${encodeURIComponent(sessao.id)}`;
@@ -756,7 +756,7 @@ async function iniciarApp(s){
   await carregarCampanhas();
 
   // Veio de um atalho externo (ex: card do painel Desafio ROI) pedindo pra abrir
-  // direto o Kanban de um perfil específico — acha a primeira campanha ativa com
+  // direto o Kanban de um perfil específico, acha a primeira campanha ativa com
   // esse perfil e já entra nela, sem passar pela lista.
   const openPerfil=new URLSearchParams(window.location.search).get('openPerfil');
   if(openPerfil){
@@ -777,7 +777,7 @@ async function iniciarApp(s){
       const card=res[0];
       if(card){
         // SEGURANÇA: só abre se a campanha desse card pertencer mesmo à lista de
-        // campanhas da academia logada — nunca busca campanha de outra academia
+        // campanhas da academia logada, nunca busca campanha de outra academia
         // como "fallback", mesmo que o card exista no banco.
         const camp=minhasCampanhas.find(c=>c.id===card.campanha_id);
         if(camp){
@@ -788,7 +788,7 @@ async function iniciarApp(s){
           toast('Esse card não pertence à sua academia ou não foi encontrado.',true);
         }
       }else{
-        toast('Card não encontrado — pode já ter sido movido ou removido.',true);
+        toast('Card não encontrado, pode já ter sido movido ou removido.',true);
       }
     }catch(e){console.error(e);toast('Erro ao abrir o card vindo da Agenda.',true);}
   }
@@ -860,7 +860,7 @@ function renderGridCampanhas(){
 }
 
 // ══════════════════════════════════════════
-// MEU DESEMPENHO — funil de conversão individual + vendas + metas
+// MEU DESEMPENHO, funil de conversão individual + vendas + metas
 // ══════════════════════════════════════════
 const ETAPA_KEY_INICIO_ATENDIMENTO='atendimento';
 async function abrirMeuDesempenho(){
@@ -871,7 +871,7 @@ async function abrirMeuDesempenho(){
   }else{
     if(!kbFiltroConsultor){toast('Selecione um(a) consultor(a) no filtro do Kanban primeiro.',true);return;}
     targetId=kbFiltroConsultor;
-    targetNome=(consultoras.find(c=>c.id===targetId)||{}).nome||'—';
+    targetNome=(consultoras.find(c=>c.id===targetId)||{}).nome||'-';
   }
 
   const etapas=ETAPAS[kbPerfilAtivo]||[];
@@ -893,7 +893,7 @@ async function abrirMeuDesempenho(){
   const agVisitaMatricula=chaveAgVisita?alcancou(chaveAgVisita):null;
   const comparecido=cardsAlvo.filter(c=>c.compareceu).length;
 
-  // Vendas — busca fresca, escopada nesta campanha + este(a) consultor(a), pra separar
+  // Vendas, busca fresca, escopada nesta campanha + este(a) consultor(a), pra separar
   // Agendado x Espontâneo com precisão (a fonte de verdade é o que foi lançado na venda,
   // não uma dedução da etapa do Kanban).
   let vendasAlvo=[];
@@ -928,7 +928,7 @@ async function abrirMeuDesempenho(){
       <div class="desemp-funil-val">${f.val}${f.pct!==null?` <span class="desemp-funil-pct">(${f.pct}%)</span>`:''}</div>
     </div>`).join('');
 
-  // Metas — escopo mensal (mês corrente), somando TODAS as vendas dessa pessoa na academia
+  // Metas, escopo mensal (mês corrente), somando TODAS as vendas dessa pessoa na academia
   // (não só deste funil/campanha), igual a planilha física fazia por mês.
   const hoje=new Date();
   const inicioMes=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-01`;
@@ -954,7 +954,7 @@ async function abrirMeuDesempenho(){
   }).join('')||'<p style="font-size:12.5px;color:var(--texto2);">Nenhuma meta configurada (nem própria, nem padrão da academia).</p>';
 
   const html=`<div class="auth-box" style="max-width:640px;max-height:85vh;overflow-y:auto;">
-    <h3 style="margin-bottom:2px;">📊 Desempenho — ${targetNome}</h3>
+    <h3 style="margin-bottom:2px;">📊 Desempenho, ${targetNome}</h3>
     <p style="font-size:12.5px;color:var(--texto2);margin-bottom:16px;">${PERFIL_LABEL[kbPerfilAtivo]} · campanha "${kbCampanha.nome}"</p>
 
     <h4 style="font-size:13.5px;margin-bottom:10px;color:var(--laranja-t);">Funil de Conversão</h4>
@@ -1045,7 +1045,7 @@ async function salvarEdicaoCampanha(id){
   }catch(e){console.error(e);toast('Erro ao salvar edição',true);}
 }
 
-// ── Adicionar mais nomes a uma campanha já ativa — reaproveita o wizard de upload
+// ── Adicionar mais nomes a uma campanha já ativa, reaproveita o wizard de upload
 // (steps 2 e 3), só pulando o step 1 (a campanha já existe). Duplicidade é resolvida
 // automaticamente em rodarCrossCheckPerdas (mantém o(a) consultor(a) já responsável).
 function abrirAdicionarNomes(campanhaId){
@@ -1056,7 +1056,7 @@ function abrirAdicionarNomes(campanhaId){
   if((camp.perfis||[]).length>1){
     const opts=camp.perfis.map(p=>`<option value="${p}">${PERFIL_LABEL[p]}</option>`).join('');
     abrirModalGenerico(`<div class="auth-box" style="max-width:380px;">
-      <h3 style="margin-bottom:14px;">Adicionar nomes — qual funil?</h3>
+      <h3 style="margin-bottom:14px;">Adicionar nomes, qual funil?</h3>
       <select class="fsel" id="add-nomes-perfil" style="margin-bottom:14px;">${opts}</select>
       <button class="btn-primary" style="width:100%" onclick="confirmarPerfilAdicaoNomes()">Continuar</button>
     </div>`);
@@ -1076,11 +1076,11 @@ function confirmarPerfilAdicaoNomes(){
   irParaStep(2);
 }
 
-// ── Redistribuir carteira — gestor(a) transfere cards de um(a) consultor(a) pra outro(a),
+// ── Redistribuir carteira, gestor(a) transfere cards de um(a) consultor(a) pra outro(a),
 // dentro de um perfil desta campanha. Só cards ainda ATIVOS (não convertidos/perdidos).
 async function abrirRedistribuir(campanhaId,perfilInicial,deInicial){
   // SEGURANÇA: só opera em campanha que já pertence à lista carregada da própria
-  // academia — nunca busca no banco por ID solto, mesmo como fallback.
+  // academia, nunca busca no banco por ID solto, mesmo como fallback.
   const camp=minhasCampanhas.find(c=>c.id===campanhaId);
   if(!camp){toast('Campanha não encontrada nesta academia.',true);return;}
   if(ehRestrito()){toast('Só gestor(a) pode redistribuir carteira.',true);return;}
@@ -1127,7 +1127,7 @@ async function confirmarRedistribuir(campanhaId){
   }catch(e){console.error(e);toast('Erro ao transferir',true);}
 }
 
-// ── CARTEIRAS — visão consolidada: consultor(a) x funil, só campanhas ativas ──
+// ── CARTEIRAS, visão consolidada: consultor(a) x funil, só campanhas ativas ──
 async function carregarCarteiras(){
   const wrap=document.getElementById('carteirasWrap');
   wrap.innerHTML='<div class="ag-empty">Carregando carteiras...</div>';
@@ -1152,7 +1152,7 @@ async function carregarCarteiras(){
     perfisAtivos.forEach(p=>{totalPorPerfil[p]=consultoras.reduce((s,c)=>s+matriz[c.id][p].ativos,0);});
 
     wrap.innerHTML=`
-      <p style="font-size:12.5px;color:var(--texto2);margin-bottom:14px">Carteira ativa de cada consultor(a), por funil — só considera campanhas ativas. Clique num número pra redistribuir.</p>
+      <p style="font-size:12.5px;color:var(--texto2);margin-bottom:14px">Carteira ativa de cada consultor(a), por funil, só considera campanhas ativas. Clique num número pra redistribuir.</p>
       <div style="overflow-x:auto;">
       <table class="carteiras-table">
         <thead><tr>
@@ -1195,7 +1195,7 @@ function abrirRedistribuirDaMatriz(perfil,consultoraId,campanhaIdsDoPerfil){
   abrirRedistribuir(campId,perfil,consultoraId);
 }
 async function arquivarCampanha(id){
-  if(!confirm('Arquivar esta campanha? Ela some da lista principal, mas os dados continuam salvos — dá pra reativar depois.'))return;
+  if(!confirm('Arquivar esta campanha? Ela some da lista principal, mas os dados continuam salvos, dá pra reativar depois.'))return;
   try{
     await sbPatch('cave_campanhas',id,{status_anterior_arquivamento:(minhasCampanhas.find(c=>c.id===id)||{}).status||'ativa',status:'arquivada',updated_at:Date.now()});
     toast('Campanha arquivada.');
@@ -1216,7 +1216,7 @@ async function reativarCampanha(id){
 async function excluirCampanhaDefinitivo(id,nome){
   const digitado=prompt(`Isso vai apagar a campanha "${nome}" e TODOS os cards de leads ligados a ela, sem volta.\n\nPra confirmar, digite o nome exato da campanha:`);
   if(digitado===null)return;
-  if(digitado.trim()!==nome){toast('Nome não confere — nada foi excluído.',true);return;}
+  if(digitado.trim()!==nome){toast('Nome não confere, nada foi excluído.',true);return;}
   try{
     await fetch(`${SB_URL}/rest/v1/cave_campanha_cards?campanha_id=eq.${id}`,{method:'DELETE',headers:H});
     await fetch(`${SB_URL}/rest/v1/cave_campanhas?id=eq.${id}`,{method:'DELETE',headers:H});
@@ -1246,7 +1246,7 @@ function fecharModalGenerico(){
 // ══════════════════════════════════════════
 // KANBAN (Fase 2)
 // ══════════════════════════════════════════
-// Jornadas padrão de cada funil — servem de ponto de partida, mas toda academia pode
+// Jornadas padrão de cada funil, servem de ponto de partida, mas toda academia pode
 // editar (renomear, reordenar, adicionar, remover) na tela "🎯 Jornada" de cada funil.
 const JORNADAS_PADRAO={
   leads:[
@@ -1276,7 +1276,7 @@ const JORNADAS_PADRAO={
   ]
 };
 // Chaves que disparam automação interna (criação automática de Experiência, popup de
-// agendamento, etc.) — podem ser renomeadas e reordenadas livremente, mas não excluídas,
+// agendamento, etc.), podem ser renomeadas e reordenadas livremente, mas não excluídas,
 // senão a integração correspondente para de funcionar silenciosamente.
 const CHAVES_PROTEGIDAS={
   leads:['lista','exp_agendada','exp_iniciada','agendada_matricula','convertido','cadencia_futura'],
@@ -1306,10 +1306,10 @@ async function carregarJornadas(){
 let kbCampanha=null,kbCards=[],kbPerfilAtivo=null;
 
 // ══════════════════════════════════════════
-// AGENDA (Fase 4) — cruza cards de TODAS as campanhas ativas da academia
+// AGENDA (Fase 4), cruza cards de TODAS as campanhas ativas da academia
 // ══════════════════════════════════════════
 // Os 2 tipos de Agendamento que contam pra produtividade da consultora de vendas.
-// "consultoria_agendada" (avaliação/consultoria da equipe técnica) fica de fora daqui —
+// "consultoria_agendada" (avaliação/consultoria da equipe técnica) fica de fora daqui
 // não conta como produtividade dela, mas ainda aparece em "Em Cadência Ativa" pra ela
 // continuar acompanhando o card (ex: lead/ex-aluno ainda não matriculado).
 const ETAPAS_AG_EXPERIENCIA=['exp_agendada']; // controle = agendar/registrar o INÍCIO (dia 1) da experiência
@@ -1322,7 +1322,7 @@ let agendaView='lista';
 let agendaWeekOffset=0;
 
 // ══════════════════════════════════════════
-// LIVRO DE VENDAS — total por consultora, % de meta, breakdown por tipo, período
+// LIVRO DE VENDAS, total por consultora, % de meta, breakdown por tipo, período
 // ══════════════════════════════════════════
 const PERFIL_VENDA_LABEL={novo:'Novos',renovacao:'Renovações',rematricula:'Rematrículas',upgrade:'Upgrades'};
 let vendasPeriodo=[];
@@ -1381,7 +1381,7 @@ function renderLivroVendas(){
         <div class="vtot">R$${dados.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
         <div style="font-size:12px;color:var(--texto2)">${dados.qtd} venda${dados.qtd===1?'':'s'}</div>
         ${pctMeta!==null?`<div class="vbar"><div class="vbar-fill" style="width:${pctMeta}%"></div></div><div style="font-size:11.5px;color:var(--texto2)">${pctMeta}% da meta</div>`:''}
-        <div class="vbreak">${breakdown||'—'}</div>
+        <div class="vbreak">${breakdown||'-'}</div>
       </div>`;
   }).join('');
 
@@ -1430,7 +1430,7 @@ async function carregarAgenda(){
     ultimosCardsAgenda=todosCards;
 
     // Puxa as tarefas pendentes do módulo Experiências pros cards que já viraram experiência
-    // (etapa exp_iniciada em diante) — assim a Minha Agenda continua mostrando o card,
+    // (etapa exp_iniciada em diante), assim a Minha Agenda continua mostrando o card,
     // agora com a tarefa real que está pendente lá (feedback D+1, sexta, etc.)
     tarefaExperienciaPorCard={};
     const comExperiencia=todosCards.filter(c=>c.experiencia_id);
@@ -1451,7 +1451,7 @@ async function carregarAgenda(){
 let tarefaExperienciaPorCard={};
 
 // Casca fixa (toggle de visão + carteira ativa) + conteúdo trocável (lista OU calendário)
-// Catálogo completo de funis — inclui os já construídos e os planejados (roadmap visível).
+// Catálogo completo de funis, inclui os já construídos e os planejados (roadmap visível).
 const CATALOGO_FUNIS=[
   {p:'leads',label:'Leads Novos',cor:'#f59e0b',ativo:true},
   {p:'rematricula',label:'Rematrícula',cor:'#B57BEE',ativo:true},
@@ -1496,7 +1496,7 @@ function renderAgendaCalendario(cards){
 
   // Eventos: retornos de cadência (proxima_acao_data) + agendamentos com data (data_agendamento)
   // Cards já em "Experiência Iniciada" NÃO usam mais data_agendamento (é a data do compromisso
-  // original, que fica parada no passado/futuro sem sentido) — usam a tarefa real pendente,
+  // original, que fica parada no passado/futuro sem sentido), usam a tarefa real pendente,
   // vinda do módulo Experiências.
   function eventosDoDia(d){
     const iso=d.toISOString().slice(0,10);
@@ -1506,7 +1506,7 @@ function renderAgendaCalendario(cards){
     return[...retornos,...agendados,...emAndamento];
   }
 
-  const labelSemana=`${inicioSemana.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})} — ${dias[6].toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}`;
+  const labelSemana=`${inicioSemana.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}, ${dias[6].toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}`;
 
   el.innerHTML=`
     <div class="ag-cal-nav">
@@ -1521,7 +1521,7 @@ function renderAgendaCalendario(cards){
         const evs=eventosDoDia(d);
         return`<div class="ag-cal-day ${isToday?'is-today':''}">
           <h5>${d.toLocaleDateString('pt-BR',{weekday:'short'})} ${d.getDate()}</h5>
-          ${evs.map(ev=>`<div class="ag-cal-event ce-${ev.c.perfil}" onclick="${ev.c.etapa_atual==='exp_iniciada'&&ev.c.experiencia_id?`abrirExperienciaPelaAgenda('${ev.c.experiencia_id}')`:`abrirCardPelaAgenda('${ev.c.id}')`}" title="${ev.c.nome} — ${ev.tipo}">${ev.c.nome.split(' ')[0]} · ${ev.tipo}</div>`).join('')}
+          ${evs.map(ev=>`<div class="ag-cal-event ce-${ev.c.perfil}" onclick="${ev.c.etapa_atual==='exp_iniciada'&&ev.c.experiencia_id?`abrirExperienciaPelaAgenda('${ev.c.experiencia_id}')`:`abrirCardPelaAgenda('${ev.c.id}')`}" title="${ev.c.nome}, ${ev.tipo}">${ev.c.nome.split(' ')[0]} · ${ev.tipo}</div>`).join('')}
         </div>`;
       }).join('')}
     </div>
@@ -1557,7 +1557,7 @@ function renderAgenda(cards){
     </div>
     <div class="ag-section">
       <h3>🏃 Experiência em Andamento <span class="cnt">${agEmAndamento.length}</span></h3>
-      <p style="font-size:12px;color:var(--texto2);margin-bottom:10px">O treinador já registrou o Dia 1 — a partir daqui, a jornada é acompanhada no módulo Experiências. Aqui aparece só a próxima tarefa pendente, com link direto.</p>
+      <p style="font-size:12px;color:var(--texto2);margin-bottom:10px">O treinador já registrou o Dia 1, a partir daqui, a jornada é acompanhada no módulo Experiências. Aqui aparece só a próxima tarefa pendente, com link direto.</p>
       ${agEmAndamento.length?agEmAndamento.map(c=>renderAgItemExperiencia(c)).join(''):'<div class="ag-empty">Nenhuma experiência em andamento no momento.</div>'}
     </div>
     <div class="ag-section">
@@ -1568,7 +1568,7 @@ function renderAgenda(cards){
 
     <div class="ag-section">
       <h3>🔴 Atrasados <span class="cnt">${atrasados.length}</span></h3>
-      ${atrasados.length?atrasados.map(c=>renderAgItem(c,'overdue')).join(''):'<div class="ag-empty">Nada atrasado — tudo em dia.</div>'}
+      ${atrasados.length?atrasados.map(c=>renderAgItem(c,'overdue')).join(''):'<div class="ag-empty">Nada atrasado, tudo em dia.</div>'}
     </div>
     <div class="ag-section">
       <h3>🟠 Hoje <span class="cnt">${deHoje.length}</span></h3>
@@ -1638,7 +1638,7 @@ async function abrirCardPelaAgenda(cardId){
 // Usado pra leads/alunos que chegam fora da planilha original: indicação, walk-in,
 // ou enquanto não há integração automática com o sistema de gestão da academia.
 const CADENCIA_TOTAL_PADRAO_MANUAL={leads:9,rematricula:4,renovacao:4};
-// ── Gerenciar Treinadores(as) — equipe técnica que recebe as experiências/consultorias ──
+// ── Gerenciar Treinadores(as), equipe técnica que recebe as experiências/consultorias ──
 function abrirGerenciarTreinadores(){
   renderListaTreinadores();
   document.getElementById('novoTreinadorNome').value='';
@@ -1672,11 +1672,11 @@ async function removerTreinador(id){
     toast('Removido(a).');
   }catch(e){console.error(e);toast('Erro ao remover',true);}
 }
-function nomeTreinador(id){const t=treinadores.find(x=>x.id===id);return t?t.nome:'—';}
+function nomeTreinador(id){const t=treinadores.find(x=>x.id===id);return t?t.nome:'-';}
 
-// ── Editor de Jornada — etapas customizáveis por academia, pra qualquer funil.
+// ── Editor de Jornada, etapas customizáveis por academia, pra qualquer funil.
 // Etapas em CHAVES_PROTEGIDAS[perfil] disparam automação interna (criação automática de
-// Experiência, popup de compromisso, cadência) — podem ser renomeadas e reordenadas
+// Experiência, popup de compromisso, cadência), podem ser renomeadas e reordenadas
 // livremente, mas não excluídas, pra não quebrar essa integração sem querer.
 let jornadaEmEdicao=[];
 let jornadaPerfilEmEdicao=null;
@@ -1685,7 +1685,7 @@ function abrirEditorJornada(perfil){
   jornadaPerfilEmEdicao=perfil;
   jornadaEmEdicao=(ETAPAS[perfil]||JORNADAS_PADRAO[perfil]||[]).map(e=>({...e}));
   document.getElementById('novaEtapaJornadaNome').value='';
-  document.getElementById('jornadaModalTitulo').textContent=`🎯 Jornada — ${PERFIL_LABEL[perfil]||perfil}`;
+  document.getElementById('jornadaModalTitulo').textContent=`🎯 Jornada, ${PERFIL_LABEL[perfil]||perfil}`;
   renderListaJornadaSucesso();
   openM('m-jornada-sucesso');
 }
@@ -1707,7 +1707,7 @@ function renderListaJornadaSucesso(){
         <option value="perda" ${e.resultado==='perda'?'selected':''}>Final: Perda</option>
       </select>
       ${isProtegida
-        ?`<span title="Essa etapa aciona uma automação interna — não pode ser excluída, só renomeada/reordenada." style="padding:3px 8px;font-size:13px;color:var(--texto2);cursor:help;">🔒</span>`
+        ?`<span title="Essa etapa aciona uma automação interna, não pode ser excluída, só renomeada/reordenada." style="padding:3px 8px;font-size:13px;color:var(--texto2);cursor:help;">🔒</span>`
         :`<button class="btn-gh" style="padding:3px 8px;font-size:11px;border-color:var(--vermelho);color:var(--vermelho)" onclick="removerEtapaJornada(${i})">✕</button>`}
     </div>`;
   }).join('');
@@ -1725,7 +1725,7 @@ function moverEtapaJornada(i,dir){
 function renomearEtapaJornada(i,valor){jornadaEmEdicao[i].l=valor.trim()||jornadaEmEdicao[i].l;}
 function removerEtapaJornada(i){
   const protegidas=CHAVES_PROTEGIDAS[jornadaPerfilEmEdicao]||[];
-  if(protegidas.includes(jornadaEmEdicao[i].k)){toast('Essa etapa é protegida — aciona uma automação interna, não pode ser excluída.',true);return;}
+  if(protegidas.includes(jornadaEmEdicao[i].k)){toast('Essa etapa é protegida, aciona uma automação interna, não pode ser excluída.',true);return;}
   if(jornadaEmEdicao.length<=1){toast('Precisa ter pelo menos 1 etapa',true);return;}
   jornadaEmEdicao.splice(i,1);
   renderListaJornadaSucesso();
@@ -1738,14 +1738,14 @@ function adicionarEtapaJornada(){
   document.getElementById('novaEtapaJornadaNome').value='';
   renderListaJornadaSucesso();
 }
-// ── Atribuir Carteira — seleção manual de nomes pra definir/trocar consultor(a) de vez ──
+// ── Atribuir Carteira, seleção manual de nomes pra definir/trocar consultor(a) de vez ──
 function abrirAtribuirCarteira(){
   if(ehRestrito()){toast('Só gestor(a) pode atribuir carteira.',true);return;}
   const cardsDoPerfil=kbCards.filter(c=>c.perfil===kbPerfilAtivo&&c.status==='ativo');
   if(!cardsDoPerfil.length){toast('Nenhum card ativo nesse funil.',true);return;}
   const optsCons=consultoras.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
   const html=`<div class="auth-box" style="max-width:560px;max-height:80vh;overflow-y:auto;">
-    <h3 style="margin-bottom:6px;">📋 Atribuir Carteira — ${PERFIL_LABEL[kbPerfilAtivo]}</h3>
+    <h3 style="margin-bottom:6px;">📋 Atribuir Carteira, ${PERFIL_LABEL[kbPerfilAtivo]}</h3>
     <p style="font-size:12.5px;color:var(--texto2);margin-bottom:12px;">Selecione os nomes, escolha o(a) consultor(a) responsável e envie pra carteira.</p>
     <input class="fi" id="ac-busca" placeholder="🔍 Filtrar por nome..." style="margin-bottom:10px;" oninput="filtrarAtribuirCarteira()">
     <div style="display:flex;gap:8px;margin-bottom:10px;font-size:12px;">
@@ -1799,7 +1799,7 @@ async function salvarJornadaSucesso(){
   if(!jornadaEmEdicao.length){toast('Adicione ao menos 1 etapa',true);return;}
   const protegidas=CHAVES_PROTEGIDAS[jornadaPerfilEmEdicao]||[];
   const faltando=protegidas.filter(k=>!jornadaEmEdicao.some(e=>e.k===k));
-  if(faltando.length){toast('Alguma etapa protegida sumiu da lista — recarregue e tente de novo.',true);return;}
+  if(faltando.length){toast('Alguma etapa protegida sumiu da lista, recarregue e tente de novo.',true);return;}
   const campoDb={leads:'jornada_leads',rematricula:'jornada_rematricula',renovacao:'jornada_renovacao',sucesso_cliente:'jornada_sucesso'}[jornadaPerfilEmEdicao];
   try{
     await fetch(`${SB_URL}/rest/v1/cave_academias?id=eq.${sessao.academia_id}`,{method:'PATCH',headers:H,body:JSON.stringify({[campoDb]:jornadaEmEdicao})});
@@ -1924,9 +1924,9 @@ function trocarPerfilKanban(perfil){
   renderKanbanBoard();
   renderKbSummary();
 }
-function nomeConsultora(id){const c=consultoras.find(x=>x.id===id);return c?c.nome:'—';}
+function nomeConsultora(id){const c=consultoras.find(x=>x.id===id);return c?c.nome:'-';}
 
-// ══ AGENDA UNIFICADA — gera tarefa de verdade na tabela agenda_tarefas sempre que um
+// ══ AGENDA UNIFICADA, gera tarefa de verdade na tabela agenda_tarefas sempre que um
 // compromisso é marcado no Campanhas (cadência, experiência agendada, visita/matrícula).
 // Antes disso, esses compromissos só existiam como campo solto no card.
 const CATEGORIA_LABEL_AGENDA={
@@ -1945,9 +1945,9 @@ async function criarTarefaAgendaCampanhas(card,categoria,titulo,dataPrevista){
   }catch(e){console.error('Erro ao criar tarefa de agenda:',e);}
 }
 
-// Painel resumido — contagem ACUMULADA por etapa (quem chegou em "Experiência Agendada"
+// Painel resumido, contagem ACUMULADA por etapa (quem chegou em "Experiência Agendada"
 // necessariamente já passou por "Iniciou Atendimento", então conta nos dois).
-// Visão sempre com TODAS as consultoras juntas (visão de gestor) — sem filtro individual.
+// Visão sempre com TODAS as consultoras juntas (visão de gestor), sem filtro individual.
 function renderKbSummary(){
   const etapas=(ETAPAS[kbPerfilAtivo]||[]).filter(e=>!e.end);
   let cardsDoPerfil=kbCards.filter(c=>c.perfil===kbPerfilAtivo);
@@ -1973,10 +1973,10 @@ function renderKbSummary(){
   const receitaConvertidos=vendasCampanha.filter(v=>idsConvertidosDoPerfil.has(v.card_id)).reduce((s,v)=>s+(parseFloat(v.valor)||0),0);
   const roas=invest>0?(receitaConvertidos/invest):0;
 
-  const inicio=kbCampanha.created_at?new Date(kbCampanha.created_at).toLocaleDateString('pt-BR'):'—';
-  const fim=kbCampanha.status==='encerrada'?(kbCampanha.updated_at?new Date(kbCampanha.updated_at).toLocaleDateString('pt-BR'):'—'):'Em andamento';
+  const inicio=kbCampanha.created_at?new Date(kbCampanha.created_at).toLocaleDateString('pt-BR'):'-';
+  const fim=kbCampanha.status==='encerrada'?(kbCampanha.updated_at?new Date(kbCampanha.updated_at).toLocaleDateString('pt-BR'):'-'):'Em andamento';
 
-  // Quebra objetiva por consultor(a) — só visível pra gestor(a)/admin (consultor(a) já vê
+  // Quebra objetiva por consultor(a), só visível pra gestor(a)/admin (consultor(a) já vê
   // só os próprios cards, não precisa da comparação).
   let blocoPorConsultor='';
   if(!ehRestrito()){
@@ -2008,8 +2008,8 @@ function renderKbSummary(){
     ${blocoPorConsultor}
     <div class="kb-sum-fin">
       <div>Investimento tráfego: <b>R$${invest.toLocaleString('pt-BR')}</b></div>
-      <div>CPL: <b>${leadsGerados>0?'R$'+cpl.toFixed(2).replace('.',','):'—'}</b></div>
-      <div>ROAS: <b>${invest>0?roas.toFixed(2).replace('.',',')+'x':'—'}</b></div>
+      <div>CPL: <b>${leadsGerados>0?'R$'+cpl.toFixed(2).replace('.',','):'-'}</b></div>
+      <div>ROAS: <b>${invest>0?roas.toFixed(2).replace('.',',')+'x':'-'}</b></div>
       <div>Total Vendido: <b style="color:var(--verde)">R$${receitaConvertidos.toLocaleString('pt-BR',{minimumFractionDigits:2})}</b></div>
       <div>Início/Ativação: <b>${inicio}</b></div>
       <div>Finalização: <b>${fim}</b></div>
@@ -2018,7 +2018,7 @@ function renderKbSummary(){
   `;
 }
 
-let kbFiltroConsultor=''; // '' = todos(as) — só gestor(a)/admin usa isso
+let kbFiltroConsultor=''; // '' = todos(as), só gestor(a)/admin usa isso
 function renderKanbanBoard(){
   const etapas=ETAPAS[kbPerfilAtivo]||[];
   const termo=(document.getElementById('kbSearch')?.value||'').trim().toLowerCase();
@@ -2049,7 +2049,7 @@ function renderKbCard(c){
   if(ETAPAS_COMPROMISSO.includes(c.etapa_atual)){
     prox=`Compromisso: ${c.data_agendamento?new Date(c.data_agendamento+'T00:00:00').toLocaleDateString('pt-BR'):'sem data'}${c.hora_agendamento?' às '+c.hora_agendamento:''}`;
   }else if(c.status==='espera'){
-    prox=`Retorno: ${c.proxima_acao_data||'—'}`;
+    prox=`Retorno: ${c.proxima_acao_data||'-'}`;
   }else{
     prox=c.cadencia_atual>0?`Tentativa ${c.cadencia_atual} de ${c.cadencia_total}`:'Aguardando 1º contato';
   }
@@ -2077,7 +2077,7 @@ function onDragEndCard(ev){
   ev.target.classList.remove('dragging');
   document.querySelectorAll('.kb-col.drag-over').forEach(c=>c.classList.remove('drag-over'));
 }
-// Modal reutilizável de "Data + Hora do compromisso" — baseado em Promise, pra
+// Modal reutilizável de "Data + Hora do compromisso", baseado em Promise, pra
 // poder usar com await em qualquer fluxo (drag-and-drop, registro, movimentação manual).
 let _resolveAgendamentoModal=null;
 function pedirDataHoraAgendamento(titulo,subtitulo){
@@ -2102,7 +2102,7 @@ function cancelarAgendamentoModal(){
   _resolveAgendamentoModal=null;
 }
 
-// Modal de venda — Promise-based, igual o de data/hora. Abre antes de qualquer
+// Modal de venda, Promise-based, igual o de data/hora. Abre antes de qualquer
 // card virar "Convertido", em qualquer fluxo (drag-and-drop ou movimentação manual).
 let _resolveVendaModal=null;
 const PERFIL_VENDA_PADRAO={leads:'novo',rematricula:'rematricula',renovacao:'renovacao'};
@@ -2200,34 +2200,34 @@ function ativarArrasteBoard(){
   };
 }
 
-// ── Modal do Card — MODO ATENDIMENTO (Fase 3) ──
+// ── Modal do Card, MODO ATENDIMENTO (Fase 3) ──
 function openM(id){document.getElementById(id).classList.add('open');}
 function closeM(id){document.getElementById(id).classList.remove('open');}
 
-// Repertório de scripts por tentativa — baseado nos blocos B.11 (leads/10x15),
+// Repertório de scripts por tentativa, baseado nos blocos B.11 (leads/10x15),
 // B.13/B.14 (rematrícula) e B.17 (renovação) já validados na Central de Scripts.
 const SCRIPT_CADENCIA={
   leads:[
-    {tipo:'Texto + Áudio · Primeiro Contato',texto:'Oi, {NOME}! Que alegria receber sua mensagem 🙌 Parabéns pela decisão — dar esse passo já mostra que você está levando sua saúde a sério. Aqui a gente trabalha diferente das academias convencionais: montamos um projeto personalizado pra cada aluno. Pra eu te ajudar melhor: qual sua idade, e você já está treinando atualmente?'},
-    {tipo:'Direcionar p/ Ligação',texto:'Oi, {NOME}! Separei um presente de boas-vindas especial pra você e quero te explicar rapidinho como funciona nossa metodologia. Entendo a correria e quero valorizar seu tempo — consigo ligar rapidinho agora, ou prefere que eu ligue em outro horário? São só 2 a 3 minutinhos, garanto que vai valer a pena.'},
+    {tipo:'Texto + Áudio · Primeiro Contato',texto:'Oi, {NOME}! Que alegria receber sua mensagem 🙌 Parabéns pela decisão, dar esse passo já mostra que você está levando sua saúde a sério. Aqui a gente trabalha diferente das academias convencionais: montamos um projeto personalizado pra cada aluno. Pra eu te ajudar melhor: qual sua idade, e você já está treinando atualmente?'},
+    {tipo:'Direcionar p/ Ligação',texto:'Oi, {NOME}! Separei um presente de boas-vindas especial pra você e quero te explicar rapidinho como funciona nossa metodologia. Entendo a correria e quero valorizar seu tempo, consigo ligar rapidinho agora, ou prefere que eu ligue em outro horário? São só 2 a 3 minutinhos, garanto que vai valer a pena.'},
     {tipo:'Ligação',texto:'Oi, {NOME}! Aqui é a equipe. Consigo falar 2 a 3 minutinhos com você agora? Quero entender rapidinho o que te motivou a procurar a gente nesse momento.'},
     {tipo:'Texto + Áudio',texto:'Oi, {NOME}! Passando pra te lembrar que seu presente de boas-vindas continua reservado. Consigo ligar rapidinho agora, ou prefere outro horário? Vou te mostrar como funciona.'},
-    {tipo:'Vídeo + Texto',texto:'Separei um vídeo rapidinho pra você conhecer um pouco mais de como funciona por aqui, {NOME} — acho que você vai se identificar com o que a gente construiu. [vídeo]'},
+    {tipo:'Vídeo + Texto',texto:'Separei um vídeo rapidinho pra você conhecer um pouco mais de como funciona por aqui, {NOME}, acho que você vai se identificar com o que a gente construiu. [vídeo]'},
     {tipo:'Ligação',texto:'Oi, {NOME}! Queria só confirmar uma coisa com você: esse objetivo que você me contou ainda é prioridade pra esse momento, ou mudou alguma coisa aí?'},
-    {tipo:'Texto',texto:'Oi, {NOME}! Algumas conversas acontecem exatamente no momento certo — por isso resolvi passar aqui de novo. Consigo ligar rapidinho agora, ou prefere outro horário?'},
-    {tipo:'Vídeo + Texto',texto:'Separei mais um vídeo que acho que você vai gostar de ver, {NOME} — muita gente que treina com a gente hoje começou exatamente como você. [vídeo]'},
+    {tipo:'Texto',texto:'Oi, {NOME}! Algumas conversas acontecem exatamente no momento certo, por isso resolvi passar aqui de novo. Consigo ligar rapidinho agora, ou prefere outro horário?'},
+    {tipo:'Vídeo + Texto',texto:'Separei mais um vídeo que acho que você vai gostar de ver, {NOME}, muita gente que treina com a gente hoje começou exatamente como você. [vídeo]'},
     {tipo:'Texto (reflexão)',texto:'Só uma reflexão rápida, {NOME}: quantas vezes você já disse pra si mesmo(a) que ia começar "semana que vem"? Consigo te ligar amanhã, ou prefere outro dia? São só 2 minutinhos pra gente conversar sobre isso.'}
   ],
   rematricula:[
     {tipo:'Atenção (headline)',texto:'Nossa conversa ficou pela metade, {NOME}, e resolvi aparecer novamente. Como você está?'},
-    {tipo:'Texto',texto:'Seu presente de boas-vindas continua reservado, {NOME} — separei um tempinho essa semana caso você queira retomar essa conversa.'},
-    {tipo:'Vídeo (prova social)',texto:'Muita gente que treina com a gente hoje começou de um jeito parecido com o seu, {NOME} — com uma pausa no meio do caminho. [vídeo]'},
+    {tipo:'Texto',texto:'Seu presente de boas-vindas continua reservado, {NOME}, separei um tempinho essa semana caso você queira retomar essa conversa.'},
+    {tipo:'Vídeo (prova social)',texto:'Muita gente que treina com a gente hoje começou de um jeito parecido com o seu, {NOME}, com uma pausa no meio do caminho. [vídeo]'},
     {tipo:'CTA',texto:'Consigo te ligar amanhã rapidinho, {NOME}, ou prefere outro horário? São só 2 a 3 minutinhos, só pra retomarmos essa conversa com calma.'}
   ],
   renovacao:[
     {tipo:'Texto (D-15)',texto:'Estava olhando sua jornada por aqui, {NOME}, e acho que vale a pena a gente conversar sobre os próximos passos.'},
-    {tipo:'Texto (D-10)',texto:'Tenho algumas ideias que acho que fazem bastante sentido pro momento que você está vivendo agora, {NOME} — quero te mostrar antes de mais nada.'},
-    {tipo:'Texto (D-5)',texto:'Vou reservar uns minutinhos pra alinharmos como vai ser a continuidade do seu projeto, {NOME} — consigo te encontrar essa semana.'},
+    {tipo:'Texto (D-10)',texto:'Tenho algumas ideias que acho que fazem bastante sentido pro momento que você está vivendo agora, {NOME}, quero te mostrar antes de mais nada.'},
+    {tipo:'Texto (D-5)',texto:'Vou reservar uns minutinhos pra alinharmos como vai ser a continuidade do seu projeto, {NOME}, consigo te encontrar essa semana.'},
     {tipo:'CTA presencial (D-2)',texto:'Vamos tomar um café antes do seu próximo treino, {NOME}? Acho que essa conversa merece acontecer pessoalmente.'}
   ],
   sucesso_cliente:[
@@ -2237,7 +2237,7 @@ const SCRIPT_CADENCIA={
   ]
 };
 
-// ── MODO COMPROMISSO — etapas onde o card já tem um agendamento confirmado.
+// ── MODO COMPROMISSO, etapas onde o card já tem um agendamento confirmado.
 // Aqui a cadência de prospecção para de contar; o script vira Confirmação ou
 // Reconexão (se a pessoa faltou), nunca mais um script de "primeiro contato frio".
 const ETAPAS_COMPROMISSO=['exp_agendada','agendada_matricula','consultoria_agendada','feedback_matricula'];
@@ -2251,11 +2251,11 @@ const COMPROMISSO_POR_ETAPA={
 const HEADLINES_CONFIRMACAO=[
   'Chegou o dia de avançar e construir novos resultados!',
   'Hoje você acessa sua nova versão.',
-  'O seu momento chegou — hoje é o dia!'
+  'O seu momento chegou, hoje é o dia!'
 ];
 const HEADLINES_RECONEXAO=[
   'Sentimos sua falta hoje!',
-  'Ei, {NOME}, vi que não conseguiu vir — tudo bem?'
+  'Ei, {NOME}, vi que não conseguiu vir, tudo bem?'
 ];
 function montarScriptCompromisso(card,modo){
   const nome=card.nome;
@@ -2265,15 +2265,15 @@ function montarScriptCompromisso(card,modo){
     return[
       h,
       'Imagino que algo tenha surgido de última hora. Quero muito que você não perca essa oportunidade.',
-      'Seu projeto continua disponível pra você — não quero que você fique sem viver isso.',
-      'Consigo remarcar pra amanhã ou depois — qual funciona melhor pra você?'
+      'Seu projeto continua disponível pra você, não quero que você fique sem viver isso.',
+      'Consigo remarcar pra amanhã ou depois, qual funciona melhor pra você?'
     ].join('\n\n');
   }
   const h=HEADLINES_CONFIRMACAO[Math.floor(Math.random()*HEADLINES_CONFIRMACAO.length)];
   return[
     h,
     `${nome}, conforme combinamos, estamos te esperando hoje para ${compromisso}. Foi a melhor decisão que você tomou, e pode ficar orgulhoso(a) disso.`,
-    'Vamos começar hoje essa jornada juntos — inclusive, vou te mostrar/entregar uma coisa que vai garantir mais segurança e resultados ainda mais rápidos pra você.',
+    'Vamos começar hoje essa jornada juntos, inclusive, vou te mostrar/entregar uma coisa que vai garantir mais segurança e resultados ainda mais rápidos pra você.',
     'Te espero aqui, e tenho certeza que vai ser incrível. Qualquer dúvida antes do nosso encontro, é só me chamar. Até mais tarde!'
   ].join('\n\n');
 }
@@ -2308,8 +2308,8 @@ const ACOES_CONTATO=[
 let cardAberto=null;
 let acaoConfirmadaNesteCard=false; // controla a trava
 let formTocado=false; // true assim que a consultora mexe em algo do formulário de registro (não conta só abrir/consultar)
-let interacaoHojeAtual=null; // registro de hoje já existente pra esse card (se houver) — permite atualizar em vez de duplicar
-let modoScriptCompromisso='confirmacao'; // 'confirmacao' ou 'reconexao' — só usado em Modo Compromisso
+let interacaoHojeAtual=null; // registro de hoje já existente pra esse card (se houver), permite atualizar em vez de duplicar
+let modoScriptCompromisso='confirmacao'; // 'confirmacao' ou 'reconexao', só usado em Modo Compromisso
 
 async function abrirCardModal(cardId){
   cardAberto=kbCards.find(c=>c.id===cardId);
@@ -2368,7 +2368,7 @@ function renderCardModalBody(){
   const blocoOrigemData = (c.origem_lead||c.data_lead) ? `
     <div class="at-perfil-box" style="opacity:.85;">
       <span class="at-perfil-lbl">Origem/data do lead:</span>
-      <span style="font-size:12.5px;color:var(--texto2);">${c.origem_lead||'—'}${c.data_lead?' · '+new Date(c.data_lead+'T00:00:00').toLocaleDateString('pt-BR'):''}</span>
+      <span style="font-size:12.5px;color:var(--texto2);">${c.origem_lead||'-'}${c.data_lead?' · '+new Date(c.data_lead+'T00:00:00').toLocaleDateString('pt-BR'):''}</span>
     </div>
   ` : '';
 
@@ -2379,7 +2379,7 @@ function renderCardModalBody(){
     </div>
   `;
 
-  // "Compareceu" só faz sentido quando o card está esperando a visita/matrícula agendada —
+  // "Compareceu" só faz sentido quando o card está esperando a visita/matrícula agendada
   // é o dado que faltava pra medir taxa de comparecimento no funil (agendou x veio de fato).
   const blocoCompareceu = ETAPAS_AG_VISITA.includes(c.etapa_atual) ? `
     <div class="at-perfil-box" style="${c.compareceu?'border-color:var(--verde)':''}">
@@ -2391,7 +2391,7 @@ function renderCardModalBody(){
 
   const blocoQualificacao=`
     <div class="at-qual-box">
-      <div class="at-qual-tipo">📋 Qualificação — informações pra rapport e conexão</div>
+      <div class="at-qual-tipo">📋 Qualificação, informações pra rapport e conexão</div>
       <textarea class="fi" id="qualificacaoTexto" rows="3" placeholder="Ex: 54 anos; sem exercícios regulares há mais de 5 anos; dores na região lombar; trabalha sentado o dia todo; diabetes tipo 2...">${c.qualificacao||''}</textarea>
       ${c.qualificacao_por?`<div class="at-qual-meta">Qualificado por: <b>${c.qualificacao_por}</b>${c.qualificacao_em?' em '+new Date(c.qualificacao_em).toLocaleDateString('pt-BR'):''}</div>`:''}
       <button class="btn-gh" style="width:100%;margin-top:8px;font-size:13px" onclick="salvarQualificacao()">💾 Salvar Qualificação</button>
@@ -2403,7 +2403,7 @@ function renderCardModalBody(){
     const dataFmt=c.data_agendamento?new Date(c.data_agendamento+'T00:00:00').toLocaleDateString('pt-BR')+(c.hora_agendamento?' às '+c.hora_agendamento:''):'sem data definida';
     const scriptTexto=montarScriptCompromisso(c,modoScriptCompromisso);
     blocoAtendimento=`
-      <div class="at-proxima"><b>📅 Compromisso agendado:</b> ${dataFmt} — cadência de prospecção pausada${c.treinador_id?`<br><b>👤 Treinador(a):</b> ${nomeTreinador(c.treinador_id)}`:''}</div>
+      <div class="at-proxima"><b>📅 Compromisso agendado:</b> ${dataFmt}, cadência de prospecção pausada${c.treinador_id?`<br><b>👤 Treinador(a):</b> ${nomeTreinador(c.treinador_id)}`:''}</div>
       <div class="at-script-tabs">
         <button class="at-tab-btn ${modoScriptCompromisso==='confirmacao'?'active':''}" onclick="trocarModoScriptCompromisso('confirmacao')">✅ Confirmação</button>
         <button class="at-tab-btn ${modoScriptCompromisso==='reconexao'?'active':''}" onclick="trocarModoScriptCompromisso('reconexao')">↩️ Reconexão (faltou)</button>
@@ -2413,7 +2413,7 @@ function renderCardModalBody(){
         <button class="at-copy-btn" onclick="copiarScriptAtendimento()">Copiar</button>
         <div class="at-script-texto" id="scriptAtendimentoTexto">${scriptTexto}</div>
       </div>
-      ${interacaoHojeAtual?'<div style="font-size:12px;color:var(--verde);margin-bottom:10px">✓ Já tem registro de hoje pra esse card — marque o que mudou e salve de novo.</div>':''}
+      ${interacaoHojeAtual?'<div style="font-size:12px;color:var(--verde);margin-bottom:10px">✓ Já tem registro de hoje pra esse card, marque o que mudou e salve de novo.</div>':''}
       <label class="fl" style="display:block;margin-bottom:8px">O que aconteceu?</label>
       <div class="at-checks">
         ${ACOES_COMPROMISSO.map(a=>`
@@ -2425,10 +2425,10 @@ function renderCardModalBody(){
       <div id="treinadorWrap" style="display:none;margin-bottom:14px">
         <label class="fl" style="display:block;margin-bottom:6px">Quem da equipe técnica recebeu essa pessoa? *</label>
         <select class="fsel" id="treinadorSelect" onchange="formTocado=true">
-          <option value="">— selecione —</option>
+          <option value="">- selecione -</option>
           ${treinadores.map(t=>`<option value="${t.id}" ${c.treinador_id===t.id?'selected':''}>${t.nome}</option>`).join('')}
         </select>
-        ${!treinadores.length?'<p style="font-size:11.5px;color:var(--vermelho);margin-top:6px">Nenhum(a) treinador(a) cadastrado — clique em "👥 Treinadores(as)" no topo do Kanban pra adicionar.</p>':''}
+        ${!treinadores.length?'<p style="font-size:11.5px;color:var(--vermelho);margin-top:6px">Nenhum(a) treinador(a) cadastrado, clique em "👥 Treinadores(as)" no topo do Kanban pra adicionar.</p>':''}
       </div>
       <div class="fg" style="margin-bottom:10px"><label class="fl">Nota (opcional)</label><input class="fi" id="notaContato" placeholder="Alguma observação relevante..." value="${interacaoHojeAtual?.nota||''}" oninput="formTocado=true"></div>
       <div class="form-row" style="margin-bottom:14px">
@@ -2438,7 +2438,7 @@ function renderCardModalBody(){
       <button class="btn-primary" style="width:100%;margin-bottom:8px" onclick="registrarCompromissoCard()">✅ ${interacaoHojeAtual?'Atualizar registro de hoje':'Registrar e salvar'}</button>
     `;
   }else if(c.status==='ativo'&&semScript){
-    blocoAtendimento=`<div style="color:var(--texto2);font-size:13px;margin-bottom:14px">Experiência em andamento — acompanhe presencialmente. Quando concluir, mova o card pra etapa seguinte na seção "Ver dados completos" abaixo.</div>`;
+    blocoAtendimento=`<div style="color:var(--texto2);font-size:13px;margin-bottom:14px">Experiência em andamento, acompanhe presencialmente. Quando concluir, mova o card pra etapa seguinte na seção "Ver dados completos" abaixo.</div>`;
     acaoConfirmadaNesteCard=true; // consultar essa etapa não exige registro obrigatório
   }else if(c.status==='ativo'&&!cadenciaEsgotada&&scriptAtual){
     blocoAtendimento=`
@@ -2448,7 +2448,7 @@ function renderCardModalBody(){
         <button class="at-copy-btn" onclick="copiarScriptAtendimento()">Copiar</button>
         <div class="at-script-texto" id="scriptAtendimentoTexto">${scriptAtual.texto.replaceAll('{NOME}',c.nome)}</div>
       </div>
-      ${interacaoHojeAtual?'<div style="font-size:12px;color:var(--verde);margin-bottom:10px">✓ Já tem registro de hoje pra esse card — marque o que mudou e salve de novo.</div>':''}
+      ${interacaoHojeAtual?'<div style="font-size:12px;color:var(--verde);margin-bottom:10px">✓ Já tem registro de hoje pra esse card, marque o que mudou e salve de novo.</div>':''}
       <label class="fl" style="display:block;margin-bottom:8px">O que já aconteceu nesse contato? (marque quantos fizerem sentido)</label>
       <div class="at-checks">
         ${acoesDisponiveis.map(a=>`
@@ -2470,7 +2470,7 @@ function renderCardModalBody(){
   }else if(c.status==='ativo'&&cadenciaEsgotada){
     blocoAtendimento=`<div class="at-trava-msg show">A cadência de ${c.cadencia_total} tentativas terminou sem conversão. Mova para <b>Cadência Futura</b> abaixo (o sistema calcula a próxima data automaticamente) ou envie para Perdas.</div>`;
   }else{
-    blocoAtendimento=`<div style="color:var(--texto2);font-size:13px;margin-bottom:14px">Este card já está com status "${c.status}" — sem ação pendente de cadência.</div>`;
+    blocoAtendimento=`<div style="color:var(--texto2);font-size:13px;margin-bottom:14px">Este card já está com status "${c.status}", sem ação pendente de cadência.</div>`;
   }
 
   document.getElementById('cardModalBody').innerHTML=`
@@ -2486,11 +2486,11 @@ function renderCardModalBody(){
     <button class="at-collapse-btn" onclick="toggleDadosCard()" id="btnToggleDados">▸ Ver dados completos e mover manualmente</button>
     <div id="dadosCardWrap" style="display:none;margin-top:12px">
       <div style="font-size:13px;color:var(--texto2);margin-bottom:14px;line-height:1.8">
-        <b style="color:var(--texto)">Código:</b> ${c.codigo_matricula||'—'}<br>
-        <b style="color:var(--texto)">Telefone:</b> ${c.telefone||'—'}<br>
-        <b style="color:var(--texto)">Idade:</b> ${c.idade||'—'}<br>
-        <b style="color:var(--texto)">Plano atual:</b> ${c.plano_atual||'—'}<br>
-        <b style="color:var(--texto)">Vencimento:</b> ${c.plano_termino||'—'}<br>
+        <b style="color:var(--texto)">Código:</b> ${c.codigo_matricula||'-'}<br>
+        <b style="color:var(--texto)">Telefone:</b> ${c.telefone||'-'}<br>
+        <b style="color:var(--texto)">Idade:</b> ${c.idade||'-'}<br>
+        <b style="color:var(--texto)">Plano atual:</b> ${c.plano_atual||'-'}<br>
+        <b style="color:var(--texto)">Vencimento:</b> ${c.plano_termino||'-'}<br>
         <b style="color:var(--texto)">Ticket médio:</b> R$${(c.ticket_medio||0).toLocaleString('pt-BR')}<br>
         <b style="color:var(--texto)">Consultor(a):</b> ${nomeConsultora(c.consultora_id)}
         ${c.tag_extra?`<br><b style="color:var(--texto)">Tag:</b> ${c.tag_extra}`:''}
@@ -2597,15 +2597,15 @@ async function registrarContatoCard(){
       if(idxNova2>idxMax2)patch.etapa_maxima=patch.etapa_atual;
     }
     await sbPatch('cave_campanha_cards',c.id,patch);
-    toast(ehNovoRegistroHoje?`Contato registrado — tentativa ${c.cadencia_atual+1}/${c.cadencia_total}`:'Registro de hoje atualizado!');
+    toast(ehNovoRegistroHoje?`Contato registrado, tentativa ${c.cadencia_atual+1}/${c.cadencia_total}`:'Registro de hoje atualizado!');
 
-    // Gera a tarefa correspondente na Agenda unificada — o que mudou define a categoria
+    // Gera a tarefa correspondente na Agenda unificada, o que mudou define a categoria
     if(patch.etapa_atual==='exp_agendada'){
-      await criarTarefaAgendaCampanhas(c,'exp_agendada',`Experiência agendada — ${c.nome}`,patch.data_agendamento);
+      await criarTarefaAgendaCampanhas(c,'exp_agendada',`Experiência agendada, ${c.nome}`,patch.data_agendamento);
     }else if(patch.etapa_atual==='agendada_matricula'||patch.etapa_atual==='feedback_matricula'){
-      await criarTarefaAgendaCampanhas(c,'visita_matricula',`Visita/Matrícula agendada — ${c.nome}`,patch.data_agendamento);
+      await criarTarefaAgendaCampanhas(c,'visita_matricula',`Visita/Matrícula agendada, ${c.nome}`,patch.data_agendamento);
     }else{
-      await criarTarefaAgendaCampanhas(c,'cadencia',`Retorno de cadência — ${c.nome}`,proximaData);
+      await criarTarefaAgendaCampanhas(c,'cadencia',`Retorno de cadência, ${c.nome}`,proximaData);
     }
 
     acaoConfirmadaNesteCard=true;
@@ -2620,7 +2620,7 @@ async function registrarContatoCard(){
   }catch(e){console.error(e);toast('Erro ao registrar contato',true);}
 }
 
-// Registro em Modo Compromisso — não conta cadência de prospecção. Se marcar
+// Registro em Modo Compromisso, não conta cadência de prospecção. Se marcar
 // "não compareceu" ou "remarcado", exige nova data e mantém a etapa (aguardando
 // o novo encontro); se "confirmado", só loga, sem mudar mais nada.
 async function registrarCompromissoCard(){
@@ -2661,7 +2661,7 @@ async function registrarCompromissoCard(){
     await sbPatch('cave_campanha_cards',c.id,patch);
     toast(marcados.includes('compareceu')?'Presença registrada!':(precisaNovaData?'Novo compromisso registrado!':'Confirmação registrada!'));
     if(precisaNovaData){
-      await criarTarefaAgendaCampanhas(c,'visita_matricula',`Compromisso remarcado — ${c.nome}`,novaData);
+      await criarTarefaAgendaCampanhas(c,'visita_matricula',`Compromisso remarcado, ${c.nome}`,novaData);
     }
     acaoConfirmadaNesteCard=true;
     modoScriptCompromisso=marcados.includes('nao_compareceu')?'reconexao':'confirmacao';
@@ -2676,7 +2676,7 @@ async function registrarCompromissoCard(){
   }catch(e){console.error(e);toast('Erro ao registrar',true);}
 }
 
-// Tag de Perfil 5%/95% — Caminho A (seletor manual). Salva na hora, sem precisar
+// Tag de Perfil 5%/95%, Caminho A (seletor manual). Salva na hora, sem precisar
 // de botão "salvar" separado.
 async function salvarPerfilQualificacao(valor){
   try{
@@ -2690,9 +2690,9 @@ async function salvarPerfilQualificacao(valor){
   }catch(e){console.error(e);toast('Erro ao salvar classificação',true);}
 }
 
-// Marca se a pessoa realmente veio na visita/matrícula agendada — é o dado que faltava
+// Marca se a pessoa realmente veio na visita/matrícula agendada, é o dado que faltava
 // pra medir taxa de comparecimento (agendou x compareceu) no funil de cada consultor(a).
-// Salva a observação ao sair do campo (onblur) — evita disparar uma chamada a cada
+// Salva a observação ao sair do campo (onblur), evita disparar uma chamada a cada
 // letra digitada.
 async function salvarObservacoesCard(valor){
   if(!cardAberto||valor===(cardAberto.observacoes||''))return;
@@ -2716,7 +2716,7 @@ async function toggleCompareceu(val){
   }catch(e){console.error(e);toast('Erro ao salvar',true);}
 }
 
-// Programa/pilar RG Cave — mesma lógica do perfil, salva na hora.
+// Programa/pilar RG Cave, mesma lógica do perfil, salva na hora.
 // Usado depois para preencher automaticamente o card em Experiências ao agendar a experiência.
 async function salvarProgramaPilar(valor){
   try{
@@ -2739,7 +2739,7 @@ function tentarFecharCardModal(){
   closeM('m-card');
 }
 
-// Descartar o que foi preenchido e fechar — só pede confirmação se algo foi de fato
+// Descartar o que foi preenchido e fechar, só pede confirmação se algo foi de fato
 // tocado no formulário; se a consultora só estava consultando, fecha direto.
 function fecharSemRegistrar(){
   if(formTocado&&!acaoConfirmadaNesteCard){
@@ -2749,7 +2749,7 @@ function fecharSemRegistrar(){
   closeM('m-card');
 }
 
-// "Próximo Card" — ATALHO OPCIONAL, nunca obrigatório. A consultora pode sempre fechar (X)
+// "Próximo Card", ATALHO OPCIONAL, nunca obrigatório. A consultora pode sempre fechar (X)
 // e escolher livremente o próximo card no Kanban ou na Agenda. Quando usa este atalho,
 // o critério é URGÊNCIA: primeiro quem está atrasado/vence hoje (mais atrasado primeiro),
 // depois quem tem retorno futuro mais próximo, por último quem nunca foi tocado (por nome).
@@ -2796,7 +2796,7 @@ async function salvarMovimentacao(){
   }
 }
 
-// Função única de movimentação — usada tanto pelo drag-and-drop quanto pelo seletor manual do modal
+// Função única de movimentação, usada tanto pelo drag-and-drop quanto pelo seletor manual do modal
 async function moverCardParaEtapa(cardId,novaEtapa,dataAgendamento,horaAgendamento){
   const card=kbCards.find(c=>c.id===cardId);
   if(!card)return;
@@ -2808,7 +2808,7 @@ async function moverCardParaEtapa(cardId,novaEtapa,dataAgendamento,horaAgendamen
   if(horaAgendamento)patch.hora_agendamento=horaAgendamento;
 
   // Mantém etapa_maxima (a etapa "real" mais avançada já alcançada), usada no painel resumido acumulado.
-  // Convertido/Cadência Futura são ramificações, não avançam a etapa_maxima por si — ela já reflete
+  // Convertido/Cadência Futura são ramificações, não avançam a etapa_maxima por si, ela já reflete
   // a última etapa real (ex: "Agendada Matrícula") alcançada antes de ramificar.
   if(!etapaInfo.end){
     const idxAtual=etapasPerfil.findIndex(e=>e.k===(card.etapa_maxima||'lista'));
@@ -2820,7 +2820,7 @@ async function moverCardParaEtapa(cardId,novaEtapa,dataAgendamento,horaAgendamen
     patch.status='convertido';
   }else if(etapaInfo.k==='cadencia_futura'){
     patch.status='espera';
-    const dias=30+Math.floor(Math.random()*16); // 30–45 dias
+    const dias=30+Math.floor(Math.random()*16); // 30-45 dias
     const d=new Date();d.setDate(d.getDate()+dias);
     patch.proxima_acao_data=d.toISOString().slice(0,10);
   }else if(etapaInfo.resultado==='perda'){
@@ -2838,11 +2838,11 @@ async function moverCardParaEtapa(cardId,novaEtapa,dataAgendamento,horaAgendamen
     // Gera a tarefa correspondente na Agenda unificada, cobrindo movimentos diretos
     // (drag-and-drop ou seletor manual) que não passam por registrarContatoCard
     if(novaEtapa==='exp_agendada'&&patch.data_agendamento){
-      await criarTarefaAgendaCampanhas(card,'exp_agendada',`Experiência agendada — ${card.nome}`,patch.data_agendamento);
+      await criarTarefaAgendaCampanhas(card,'exp_agendada',`Experiência agendada, ${card.nome}`,patch.data_agendamento);
     }else if((novaEtapa==='agendada_matricula'||novaEtapa==='feedback_matricula')&&patch.data_agendamento){
-      await criarTarefaAgendaCampanhas(card,'visita_matricula',`Visita/Matrícula agendada — ${card.nome}`,patch.data_agendamento);
+      await criarTarefaAgendaCampanhas(card,'visita_matricula',`Visita/Matrícula agendada, ${card.nome}`,patch.data_agendamento);
     }else if(novaEtapa==='cadencia_futura'&&patch.proxima_acao_data){
-      await criarTarefaAgendaCampanhas(card,'cadencia',`Reativação — ${card.nome}`,patch.proxima_acao_data);
+      await criarTarefaAgendaCampanhas(card,'cadencia',`Reativação, ${card.nome}`,patch.proxima_acao_data);
     }
     await carregarCardsKanban();
     renderKanbanBoard();
@@ -2854,7 +2854,7 @@ async function moverCardParaEtapa(cardId,novaEtapa,dataAgendamento,horaAgendamen
 // INTEGRAÇÃO COM O MÓDULO EXPERIÊNCIAS
 // ══════════════════════════════════════════
 // Quando um card chega em "Experiência Agendada", cria automaticamente o card
-// espelho no módulo de Experiências — sem duplicar digitação. Vendas continua
+// espelho no módulo de Experiências, sem duplicar digitação. Vendas continua
 // trabalhando aqui (Campanhas); treinador passa a trabalhar lá (Experiências).
 // Ao fechar a experiência (convertida/não convertida), o módulo de Experiências
 // escreve de volta aqui, fechando o ciclo nos dois sistemas.
@@ -2916,7 +2916,7 @@ async function confirmarPerda(motivoKey){
   }catch(e){console.error(e);toast('Erro ao registrar perda',true);}
 }
 
-// Retoma uma campanha existente — se ainda estiver em "planejamento",
+// Retoma uma campanha existente, se ainda estiver em "planejamento",
 // descobre quais perfis já têm cards e continua o upload de onde parou.
 async function abrirCampanhaExistente(campId){
   try{
@@ -2939,7 +2939,7 @@ async function abrirCampanhaExistente(campId){
     if(!perfisRestantes.length){
       // todos os perfis já têm cards, só faltou ativar
       await sbPatch('cave_campanhas',camp.id,{status:'ativa',updated_at:Date.now()});
-      toast('Campanha já tinha todas as listas — ativada agora!');
+      toast('Campanha já tinha todas as listas, ativada agora!');
       await carregarCampanhas();
       return;
     }
@@ -2947,12 +2947,12 @@ async function abrirCampanhaExistente(campId){
     switchITab('nova');
     prepararProximoUpload();
     irParaStep(2);
-    toast(`Continuando "${camp.nome}" — falta subir: ${perfisRestantes.map(p=>PERFIL_LABEL[p]).join(', ')}`);
+    toast(`Continuando "${camp.nome}", falta subir: ${perfisRestantes.map(p=>PERFIL_LABEL[p]).join(', ')}`);
   }catch(e){console.error(e);toast('Erro ao abrir campanha',true);}
 }
 
 // ══════════════════════════════════════════
-// WIZARD — ESTADO
+// WIZARD, ESTADO
 // ══════════════════════════════════════════
 let wiz={campanhaId:null,perfisFila:[],perfilAtual:null,csvHeaders:[],csvRows:[],cardsProntos:[],bloqueados:0,alertas:[]};
 
@@ -3047,7 +3047,7 @@ function handleFile(file){
   const isExcel=nome.endsWith('.xlsx')||nome.endsWith('.xls');
 
   if(isExcel){
-    if(typeof XLSX==='undefined'){toast('Não foi possível carregar o leitor de Excel — tente novamente ou use um arquivo CSV.',true);return;}
+    if(typeof XLSX==='undefined'){toast('Não foi possível carregar o leitor de Excel, tente novamente ou use um arquivo CSV.',true);return;}
     const reader=new FileReader();
     reader.onload=e=>{
       try{
@@ -3059,7 +3059,7 @@ function handleFile(file){
         wiz.csvHeaders=linhasLimpas[0].map(h=>h.trim());
         wiz.csvRows=linhasLimpas.slice(1);
         renderMapeamento();
-      }catch(err){console.error(err);toast('Erro ao ler o arquivo Excel — confira se não está corrompido ou protegido por senha.',true);}
+      }catch(err){console.error(err);toast('Erro ao ler o arquivo Excel, confira se não está corrompido ou protegido por senha.',true);}
     };
     reader.readAsArrayBuffer(file);
     return;
@@ -3095,10 +3095,10 @@ function renderMapeamento(){
     CAMPOS_ESPERADOS.map(c=>{
       const guess=wiz.csvHeaders.findIndex(h=>c.guess.some(g=>h.toLowerCase().includes(g)));
       const opts=wiz.csvHeaders.map((h,i)=>`<option value="${i}" ${i===guess?'selected':''}>${h}</option>`).join('');
-      return `<tr><td>${c.lbl}</td><td><select class="fsel map-select" id="map-${c.k}" onchange="atualizarPreviaMapeamento()"><option value="-1">— não usar —</option>${opts}</select></td></tr>`;
+      return `<tr><td>${c.lbl}</td><td><select class="fsel map-select" id="map-${c.k}" onchange="atualizarPreviaMapeamento()"><option value="-1">- não usar -</option>${opts}</select></td></tr>`;
     }).join('')
   }</table><p style="font-size:12px;color:var(--texto2);margin-top:10px">${wiz.csvRows.length} linhas encontradas no arquivo.</p>
-  <h4 style="font-size:13.5px;margin:16px 0 8px">⚠️ Confira antes de continuar — 3 primeiras linhas como ficariam:</h4>
+  <h4 style="font-size:13.5px;margin:16px 0 8px">⚠️ Confira antes de continuar, 3 primeiras linhas como ficariam:</h4>
   <div id="previaMapeamento"></div>`;
   document.getElementById('mapArea').style.display='block';
   atualizarPreviaMapeamento();
@@ -3114,20 +3114,20 @@ function atualizarPreviaMapeamento(){
     <tr>${CAMPOS_ESPERADOS.map(c=>`<th>${c.lbl}</th>`).join('')}</tr>
     ${amostra.map(c=>`<tr>
       <td>${c.nome||'<span style="color:var(--vermelho)">vazio</span>'}</td>
-      <td>${c.codigo_matricula||'—'}</td>
-      <td>${c.telefone||'—'}</td>
-      <td>${c.idade||'—'}</td>
-      <td>${c.plano_atual||'—'}</td>
-      <td>${c.plano_inicio||'—'}</td>
-      <td>${c.plano_termino||'—'}</td>
-      <td>${c.ticket_medio?'R$'+c.ticket_medio.toLocaleString('pt-BR',{minimumFractionDigits:2}):'—'}</td>
-      <td>${c.consultor_nome_planilha||'—'}</td>
-      <td>${c.observacoes||'—'}</td>
+      <td>${c.codigo_matricula||'-'}</td>
+      <td>${c.telefone||'-'}</td>
+      <td>${c.idade||'-'}</td>
+      <td>${c.plano_atual||'-'}</td>
+      <td>${c.plano_inicio||'-'}</td>
+      <td>${c.plano_termino||'-'}</td>
+      <td>${c.ticket_medio?'R$'+c.ticket_medio.toLocaleString('pt-BR',{minimumFractionDigits:2}):'-'}</td>
+      <td>${c.consultor_nome_planilha||'-'}</td>
+      <td>${c.observacoes||'-'}</td>
     </tr>`).join('')}
   </table>`;
 }
 
-// Monta um card a partir de uma linha crua + o mapeamento de colunas escolhido — usada
+// Monta um card a partir de uma linha crua + o mapeamento de colunas escolhido, usada
 // tanto na prévia (3 linhas) quanto no processamento final (todas as linhas).
 function montarCard(row,idx){
   return{
@@ -3208,7 +3208,7 @@ async function rodarCrossCheckPerdas(cards){
   let cardsLiberados=cards.filter(c=>!bloquear.has(c.telefone));
 
   // Duplicidade dentro da própria campanha (ex: subindo uma lista adicional em cima de
-  // uma campanha já ativa) — quem já está cadastrado nesse funil NÃO vira card novo,
+  // uma campanha já ativa), quem já está cadastrado nesse funil NÃO vira card novo,
   // mantém o(a) consultor(a) responsável que já tinha. Casa por telefone (mais confiável)
   // e, na falta dele, por nome (normalizado).
   wiz.jaExistentesQtd=0;
@@ -3227,7 +3227,7 @@ async function rodarCrossCheckPerdas(cards){
   }
 
   // Se a planilha já veio com "Consultor(a) Responsável" preenchido, casa pelo nome
-  // (normalizado) com quem já está cadastrado — esses vão direto pra carteira certa,
+  // (normalizado) com quem já está cadastrado, esses vão direto pra carteira certa,
   // sem passar pela divisão por capacidade. Só quem não veio com nome (ou não bateu com
   // ninguém cadastrado) segue pro fluxo normal de ondas.
   const consPorNome={};
@@ -3249,19 +3249,19 @@ async function rodarCrossCheckPerdas(cards){
   el.style.display='block';
   el.innerHTML=`
     ${wiz.bloqueados>0?`<div class="alert-box">🚫 <b>${wiz.bloqueados}</b> pessoa(s) removida(s) automaticamente por já terem pedido não-contato.</div>`:''}
-    ${wiz.jaExistentesQtd>0?`<div class="warn-box" style="border-color:var(--azul);color:var(--azul)">🔗 <b>${wiz.jaExistentesQtd}</b> pessoa(s) já estavam nesta campanha — não viram card duplicado, o(a) consultor(a) responsável de cada uma foi mantido.</div>`:''}
-    ${wiz.cardsComConsultor.length>0?`<div class="warn-box" style="border-color:var(--verde);color:var(--verde)">🎯 <b>${wiz.cardsComConsultor.length}</b> pessoa(s) já vieram com consultor(a) definido(a) na planilha — vão direto pra carteira certa, sem passar pela divisão por capacidade.</div>`:''}
-    ${wiz.alertas.length>0?`<div class="warn-box">⚠️ <b>${wiz.alertas.length}</b> pessoa(s) já tiveram um card de Perdas antes (motivo diferente) — foram mantidas na lista, revise se quiser remover alguma manualmente depois.</div>`:''}
+    ${wiz.jaExistentesQtd>0?`<div class="warn-box" style="border-color:var(--azul);color:var(--azul)">🔗 <b>${wiz.jaExistentesQtd}</b> pessoa(s) já estavam nesta campanha, não viram card duplicado, o(a) consultor(a) responsável de cada uma foi mantido.</div>`:''}
+    ${wiz.cardsComConsultor.length>0?`<div class="warn-box" style="border-color:var(--verde);color:var(--verde)">🎯 <b>${wiz.cardsComConsultor.length}</b> pessoa(s) já vieram com consultor(a) definido(a) na planilha, vão direto pra carteira certa, sem passar pela divisão por capacidade.</div>`:''}
+    ${wiz.alertas.length>0?`<div class="warn-box">⚠️ <b>${wiz.alertas.length}</b> pessoa(s) já tiveram um card de Perdas antes (motivo diferente), foram mantidas na lista, revise se quiser remover alguma manualmente depois.</div>`:''}
     <p style="font-size:14px;margin-bottom:14px"><b>${wiz.cardsProntos.length}</b> pessoa(s) sem consultor(a) definido(a), prontas pra dividir por capacidade (perfil: ${PERFIL_LABEL[wiz.perfilAtual]}).</p>
     ${wiz.cardsProntos.length===0
       ?(wiz.cardsComConsultor.length>0
         ?`<button class="btn-primary" onclick="finalizarSoComConsultor()">Enviar direto pra carteira (${wiz.cardsComConsultor.length}) →</button>`
-        :`<button class="btn-gh" onclick="finalizarSemNovos()">Nenhuma novidade — voltar</button>`)
+        :`<button class="btn-gh" onclick="finalizarSemNovos()">Nenhuma novidade, voltar</button>`)
       :`<button class="btn-primary" onclick="irParaStep(3);renderOndaConfig();">Continuar para divisão em ciclos →</button>`}
   `;
 }
 // Quando 100% da lista já veio com consultor(a) definido, não existe divisão por
-// capacidade pra fazer — insere direto e finaliza.
+// capacidade pra fazer, insere direto e finaliza.
 async function finalizarSoComConsultor(){
   const etapaEntrada=(ETAPAS[wiz.perfilAtual]&&ETAPAS[wiz.perfilAtual][0]&&ETAPAS[wiz.perfilAtual][0].k)||'lista';
   const cardsParaInserir=wiz.cardsComConsultor.map(c=>({
@@ -3295,7 +3295,7 @@ function renderOndaConfig(){
   // Sucesso do Cliente decidir (pode ser trabalhado por consultor(a) ou treinador(a)).
   wiz.departamento = wiz.departamento || 'comercial';
   const optsLideranca = `
-    <option value="">— Selecione —</option>
+    <option value="">- Selecione -</option>
     <optgroup label="Gestão">${gestoresAcademia.map(g=>`<option value="gestor:${g.id}">${g.nome}</option>`).join('')}</optgroup>
     <optgroup label="Consultores(as)">${consultoras.map(c=>`<option value="consultor:${c.id}">${c.nome}</option>`).join('')}</optgroup>
     <optgroup label="Treinadores(as)">${treinadores.map(t=>`<option value="treinador:${t.id}">${t.nome}</option>`).join('')}</optgroup>
@@ -3371,7 +3371,7 @@ function renderOndasPreview(){
   const el=document.getElementById('ondasPreview');
   el.innerHTML=ondasCalc.map((o,oi)=>`
     <div class="onda-box">
-      <h4>Ciclo ${o.numero} <span style="color:var(--texto2);font-weight:400;font-size:12.5px">(dias ${(o.numero-1)*7+1}–${o.numero*7})</span></h4>
+      <h4>Ciclo ${o.numero} <span style="color:var(--texto2);font-weight:400;font-size:12.5px">(dias ${(o.numero-1)*7+1}-${o.numero*7})</span></h4>
       ${o.dist.map((d,di)=>`<div class="cons-row"><span>${d.nome}</span><input type="number" min="0" value="${d.qtd}" onchange="ondasCalc[${oi}].dist[${di}].qtd=parseInt(this.value)||0;atualizarTotalCheck()"></div>`).join('')}
     </div>`).join('')+`
     <div id="totalCheck" style="font-size:13px;color:var(--texto2);margin:10px 0 16px"></div>
@@ -3397,7 +3397,7 @@ async function confirmarOndasECards(){
       ondasSalvas.push({...o,onda_id:r[0].id});
     }
     // distribui os cards sequencialmente conforme a quantidade definida por onda/responsável
-    // etapa de entrada = primeira etapa REAL da jornada desse perfil (dinâmica — cada academia
+    // etapa de entrada = primeira etapa REAL da jornada desse perfil (dinâmica, cada academia
     // pode ter reordenado/renomeado, e Sucesso do Cliente nem tem a chave 'lista').
     const etapaEntrada=(ETAPAS[wiz.perfilAtual]&&ETAPAS[wiz.perfilAtual][0]&&ETAPAS[wiz.perfilAtual][0].k)||'lista';
     const ehTecnico=wiz.departamento==='tecnico';
@@ -3443,7 +3443,7 @@ async function confirmarOndasECards(){
   btn.disabled=false;btn.textContent='✅ Confirmar e Salvar';
 }
 
-// Ativa o funil sem nenhum card — pra academias que ainda não têm lista pronta
+// Ativa o funil sem nenhum card, pra academias que ainda não têm lista pronta
 // e vão adicionar oportunidades manualmente pelo Kanban (ver "+ Adicionar Card").
 async function pularUploadPerfil(){
   if(!confirm(`Ativar "${PERFIL_LABEL[wiz.perfilAtual]}" sem nenhuma lista por enquanto? Você poderá adicionar cards manualmente depois, pelo Kanban.`))return;
