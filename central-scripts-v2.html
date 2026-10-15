@@ -103,7 +103,11 @@ header .logo{color:#F5B800!important}
   const SB_URL='https://irwvagffrguiljaxrzmd.supabase.co';
   const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd3ZhZ2Zmcmd1aWxqYXhyem1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNDk5ODUsImV4cCI6MjEwNDkyNTk4NX0.YAApyaH6iIHEua_89fgCUpMzgXRIcWb_vNRkBQAoq5A';
   const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json'};
-  async function sbGet(t,p=''){const r=await fetch(`${SB_URL}/rest/v1/${t}?${p}`,{headers:H});if(!r.ok)throw new Error(await r.text());return r.json()}
+  let NOME_ACAD='RG Cave',NOME_USER='';
+  const _js=v=>JSON.stringify(v||'').slice(1,-1);
+  async function sbGet(t,p=''){const r=await fetch(`${SB_URL}/rest/v1/${t}?${p}`,{headers:H});if(!r.ok)throw new Error(await r.text());let tx=await r.text();
+    if(/scripts_/.test(t)){tx=tx.replace(/Academia Modelo|\[Nome da Academia\]|\[Academia\]/g,_js(NOME_ACAD));if(NOME_USER)tx=tx.replace(/\[Seu Nome\]/g,_js(NOME_USER));}
+    return JSON.parse(tx)}
 
   const params=new URLSearchParams(location.search);
   const uid=params.get('uid');
@@ -120,7 +124,7 @@ header .logo{color:#F5B800!important}
 
   async function init(){
     if(uid){
-      try{const g=await sbGet('cave_gestores',`id=eq.${uid}`);academiaId=g[0]?.academia_id;}catch(e){console.error(e);}
+      try{const g=await sbGet('cave_gestores',`id=eq.${uid}`);academiaId=g[0]?.academia_id;NOME_USER=g[0]?.nome||'';if(academiaId){const a=await sbGet('cave_academias',`id=eq.${academiaId}&select=nome`);if(a[0]&&a[0].nome)NOME_ACAD=a[0].nome;}}catch(e){console.error(e);}
     }
     renderMetodologia();
     renderFunilPicker();
