@@ -195,6 +195,7 @@ function aplicarConvite(){
   $('convite-de').textContent=nome+' liberou '+(pres.length===1?'um presente':pres.length+' presentes')+' para você';
   $('presentes').innerHTML=pres.map(p=>'<li>'+esc(p)+'</li>').join('');
   $('convite').classList.remove('hidden');
+  if(camp&&camp.capa_convidado){const capa=$('capa');capa.className='capa';capa.innerHTML='<img alt="Seus presentes" src="'+esc(camp.capa_convidado)+'">'}
   $('titulo').textContent='Retire seus presentes';
   $('subtitulo').textContent='Faça seu cadastro em menos de 1 minuto e a nossa equipe fala com você.';
   $('aceite-txt').textContent='Aceito receber contato da '+ACADEMIA_CURTA+' pelo WhatsApp para receber meus presentes.';

@@ -86,6 +86,15 @@ a.wa{color:var(--link);text-decoration:none;font-weight:600}
 .mrod{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
 #qr-box{display:grid;place-items:center;padding:16px;background:#fff;border-radius:12px}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:10px;z-index:99;display:none;font-weight:600}
+.slot{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;background:var(--bg)}
+.sl-prev{width:96px;height:96px;border-radius:10px;background:var(--card2);display:grid;place-items:center;overflow:hidden;border:1px dashed var(--line)}
+.sl-prev img{max-width:100%;max-height:100%;display:block}
+.sl-prev.vazio::after{content:"sem imagem";font-size:11px;color:var(--ink3)}
+.sl-info{display:grid;gap:4px;font-size:13px;color:var(--ink2)}
+.sl-info>b{font-size:14px;color:var(--ink)}
+.sl-bts{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.sl-url{width:100%;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12.5px;margin-top:4px}
+.sl-aviso{font-size:12px;color:var(--warn)}
 .login{max-width:420px;margin:60px auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;text-align:center}
 @media (max-width:640px){.filtros .busca{grid-column:span 1}.grid2{grid-template-columns:1fr}.brand small{display:none}}
 </style>
@@ -207,7 +216,27 @@ a.wa{color:var(--link);text-decoration:none;font-weight:600}
   <div class="f"><label>Título da página</label><input id="mc-tit" placeholder="Aulão Rosa · Movimento RG Cave"></div>
   <div class="f"><label>Frase de apoio</label><input id="mc-sub" placeholder="Leva menos de 1 minuto e você já concorre aos prêmios."></div>
   <div class="f"><label>Data, local e horário (aparece se não houver capa)</label><input id="mc-info" placeholder="Sábado, 31/10 · Parcão · 17h às 19h"></div>
-  <div class="f"><label>Imagem de capa</label><input id="mc-capa" placeholder="aulao-rosa-capa.jpg ou https://..."><div class="dica">Nome do arquivo no repositório da plataforma ou endereço da imagem.</div></div>
+  <details style="margin:10px 0" open><summary style="cursor:pointer;font-weight:700">Artes da campanha</summary>
+    <p class="dica" style="margin:6px 0 10px">Gere a arte em qualquer ferramenta de imagem (use "Copiar prompt"), baixe e envie aqui. JPG, PNG ou WebP, até 2 MB.</p>
+    <div class="slot" data-campo="capa_url" data-input="mc-capa" data-w="1080" data-h="1080" data-tipo="capa">
+      <div class="sl-prev"><img alt=""></div>
+      <div class="sl-info"><b>Capa da página</b><span>Topo da página de cadastro. <b>1080 × 1080 px</b> (quadrada) ou 1080 × 900.</span>
+        <div class="sl-bts"><label class="btn sm">Enviar imagem<input type="file" accept="image/jpeg,image/png,image/webp" hidden></label><button type="button" class="btn sm" data-prompt>Copiar prompt</button><button type="button" class="btn sm" data-limpar>Remover</button></div>
+        <input id="mc-capa" class="sl-url" placeholder="ou cole o endereço da imagem"></div>
+    </div>
+    <div class="slot" data-campo="capa_convidado" data-input="mc-capa2" data-w="1080" data-h="1080" data-tipo="convidado">
+      <div class="sl-prev"><img alt=""></div>
+      <div class="sl-info"><b>Capa do convidado</b><span>Topo da página de quem chega por indicação (presentes, mapeamento no celular, consultoria). <b>1080 × 1080 px</b>. Vazio = usa a capa da página.</span>
+        <div class="sl-bts"><label class="btn sm">Enviar imagem<input type="file" accept="image/jpeg,image/png,image/webp" hidden></label><button type="button" class="btn sm" data-prompt>Copiar prompt</button><button type="button" class="btn sm" data-limpar>Remover</button></div>
+        <input id="mc-capa2" class="sl-url" placeholder="ou cole o endereço da imagem"></div>
+    </div>
+    <div class="slot" data-campo="convite_img" data-input="mc-img" data-w="1080" data-h="1350" data-tipo="compartilhar">
+      <div class="sl-prev"><img alt=""></div>
+      <div class="sl-info"><b>Arte para compartilhar</b><span>Vai junto no "Compartilhar com a arte" do WhatsApp. <b>1080 × 1350 px</b> (vertical 4:5).</span>
+        <div class="sl-bts"><label class="btn sm">Enviar imagem<input type="file" accept="image/jpeg,image/png,image/webp" hidden></label><button type="button" class="btn sm" data-prompt>Copiar prompt</button><button type="button" class="btn sm" data-limpar>Remover</button></div>
+        <input id="mc-img" class="sl-url" placeholder="ou cole o endereço da imagem"></div>
+    </div>
+  </details>
   <label class="chk"><input type="checkbox" id="mc-sorteio"> Campanha com sorteio (libera a lista para imprimir)</label>
   <label class="chk"><input type="checkbox" id="mc-p-idade" checked> Perguntar idade</label>
   <label class="chk"><input type="checkbox" id="mc-p-treina" checked> Perguntar se treina (e há quanto tempo está parado)</label>
@@ -219,7 +248,6 @@ a.wa{color:var(--link);text-decoration:none;font-weight:600}
       <div class="f"><label>Chance extra no sorteio até</label><input id="mc-lim" type="datetime-local"></div>
     </div>
     <div class="f"><label>Presentes do convidado (um por linha)</label><textarea id="mc-pres" rows="3"></textarea></div>
-    <div class="f"><label>Arte para compartilhar</label><input id="mc-img" placeholder="aulao-rosa-convite.jpg"></div>
     <div class="grid2">
       <div class="f"><label>Faixa do evento: título</label><input id="mc-evt" placeholder="O Aulão Rosa está acontecendo agora"></div>
       <div class="f"><label>Faixa some em</label><input id="mc-evf" type="datetime-local"></div>
@@ -450,11 +478,11 @@ function abrirCampanha(id){
   $('mc-titulo').textContent=campAtual?'Editar link de captação':'Novo link de captação';
   $('mc-nome').value=c.nome||'';$('mc-slug').value=c.slug||'';$('mc-slug').disabled=!!campAtual;
   $('mc-origem').value=c.origem||'evento';$('mc-cor').value=c.cor||'#E6007E';
-  $('mc-tit').value=c.titulo||'';$('mc-sub').value=c.subtitulo||'';$('mc-info').value=c.info||'';$('mc-capa').value=c.capa_url||'';
+  $('mc-tit').value=c.titulo||'';$('mc-sub').value=c.subtitulo||'';$('mc-info').value=c.info||'';$('mc-capa').value=c.capa_url||'';$('mc-capa2').value=c.capa_convidado||'';
   $('mc-sorteio').checked=!!c.sorteio;$('mc-ativo').checked=c.ativo!==false;
   const pg=c.perguntas||{};$('mc-p-idade').checked=pg.idade!==false;$('mc-p-treina').checked=pg.treina!==false;
   const dl=v=>{if(!v)return'';const d=new Date(v);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)};
-  $('mc-ind').checked=!!c.indicacao;$('mc-sigla').value=c.codigo_sigla||'';$('mc-lim').value=dl(c.indicacao_limite);$('mc-pres').value=(c.presentes||[]).join('\n');$('mc-img').value=c.convite_img||'';
+  $('mc-ind').checked=!!c.indicacao;$('mc-sigla').value=c.codigo_sigla||'';$('mc-lim').value=dl(c.indicacao_limite);$('mc-pres').value=(c.presentes||[]).join('\n');$('mc-img').value=c.convite_img||'';atualizarSlots();
   $('mc-evt').value=c.evento_titulo||'';$('mc-evx').value=c.evento_texto||'';$('mc-map').value=c.evento_mapa||'';$('mc-evf').value=dl(c.evento_fim);
   $('mc-of').checked=!!c.oferta_ativa;$('mc-wa').value=c.whatsapp_academia||'';$('mc-oft').value=c.oferta_titulo||'';$('mc-ofx').value=c.oferta_texto||'';$('mc-ofm').value=c.oferta_mensagem||'';
   $('m-camp').classList.add('show');
@@ -462,7 +490,7 @@ function abrirCampanha(id){
 async function salvarCampanha(){
   const nome=$('mc-nome').value.trim(),slug=slugify($('mc-slug').value||nome);
   if(!nome||!slug){toast('Preencha o nome da campanha',true);return}
-  const b={nome,origem:$('mc-origem').value,cor:$('mc-cor').value,titulo:$('mc-tit').value.trim()||null,subtitulo:$('mc-sub').value.trim()||null,info:$('mc-info').value.trim()||null,capa_url:$('mc-capa').value.trim()||null,sorteio:$('mc-sorteio').checked,ativo:$('mc-ativo').checked,perguntas:{idade:$('mc-p-idade').checked,treina:$('mc-p-treina').checked,parado:$('mc-p-treina').checked},
+  const b={nome,origem:$('mc-origem').value,cor:$('mc-cor').value,titulo:$('mc-tit').value.trim()||null,subtitulo:$('mc-sub').value.trim()||null,info:$('mc-info').value.trim()||null,capa_url:$('mc-capa').value.trim()||null,capa_convidado:$('mc-capa2').value.trim()||null,sorteio:$('mc-sorteio').checked,ativo:$('mc-ativo').checked,perguntas:{idade:$('mc-p-idade').checked,treina:$('mc-p-treina').checked,parado:$('mc-p-treina').checked},
     indicacao:$('mc-ind').checked,codigo_sigla:$('mc-sigla').value.trim().toUpperCase()||null,indicacao_limite:$('mc-lim').value?new Date($('mc-lim').value).toISOString():null,
     presentes:$('mc-pres').value.split('\n').map(s=>s.trim()).filter(Boolean),convite_img:$('mc-img').value.trim()||null,
     evento_titulo:$('mc-evt').value.trim()||null,evento_texto:$('mc-evx').value.trim()||null,evento_mapa:$('mc-map').value.trim()||null,evento_fim:$('mc-evf').value?new Date($('mc-evf').value).toISOString():null,
@@ -513,6 +541,42 @@ function imprimirSorteio(id){
   <h1>Sorteio · ${esc(c.nome)}</h1><p>${nomes.length-extras} participantes + ${extras} chances extras por indicação · gerado em ${new Date().toLocaleString('pt-BR')} · recorte nas linhas pontilhadas</p>
   <div class="g">${nomes.map(n=>`<div class="n">${n}</div>`).join('')}</div></body></html>`);
   w.document.close();
+}
+// ---------- artes: upload no Supabase Storage (pasta pública "campanhas") ----------
+function urlImg(u){if(!u)return'';return /^https?:/.test(u)?u:baseCaptura().replace(/captura\.html$/,'')+u}
+function atualizarSlots(){document.querySelectorAll('.slot').forEach(s=>{const v=$(s.dataset.input).value.trim();const pv=s.querySelector('.sl-prev'),img=pv.querySelector('img');if(v){img.src=urlImg(v);img.hidden=false;pv.classList.remove('vazio')}else{img.removeAttribute('src');img.hidden=true;pv.classList.add('vazio')}})}
+document.querySelectorAll('.slot').forEach(s=>{
+  const inp=$(s.dataset.input);inp.addEventListener('input',atualizarSlots);
+  s.querySelector('[data-limpar]').onclick=()=>{inp.value='';atualizarSlots()};
+  s.querySelector('[data-prompt]').onclick=()=>copiarPrompt(s.dataset.tipo,+s.dataset.w,+s.dataset.h);
+  s.querySelector('input[type=file]').onchange=async ev=>{
+    const f=ev.target.files[0];ev.target.value='';if(!f)return;
+    s.querySelector('.sl-aviso')?.remove();
+    if(!/^image\/(jpeg|png|webp)$/.test(f.type)){toast('Use JPG, PNG ou WebP',true);return}
+    if(f.size>2*1024*1024){toast('A imagem passou de 2 MB. Exporte menor ou em JPG.',true);return}
+    const dim=await new Promise(r=>{const i=new Image();i.onload=()=>r([i.naturalWidth,i.naturalHeight]);i.onerror=()=>r([0,0]);i.src=URL.createObjectURL(f)});
+    const ideal=+s.dataset.w/+s.dataset.h, real=dim[1]?dim[0]/dim[1]:ideal;
+    const slug=slugify($('mc-slug').value||$('mc-nome').value||'campanha')||'campanha';
+    const nome=`${acad||'geral'}/${slug}/${s.dataset.tipo}-${Date.now()}.${f.type.split('/')[1].replace('jpeg','jpg')}`;
+    try{
+      toast('Enviando imagem...');
+      const r=await fetch(`${SB_URL}/storage/v1/object/campanhas/${nome}`,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':f.type,'x-upsert':'false'},body:f});
+      if(!r.ok)throw new Error(await r.text());
+      inp.value=`${SB_URL}/storage/v1/object/public/campanhas/${nome}`;atualizarSlots();toast('Imagem enviada. Clique em Salvar para aplicar.');
+      if(Math.abs(real-ideal)>0.08)s.querySelector('.sl-info').insertAdjacentHTML('beforeend',`<span class="sl-aviso">A imagem tem ${dim[0]} × ${dim[1]} px. O ideal é ${s.dataset.w} × ${s.dataset.h}: pode aparecer cortada ou com sobra.</span>`);
+    }catch(e){toast(String(e.message).includes('Bucket')||String(e.message).includes('not found')?'Rode o SQL da pasta de imagens (v3) no Supabase.':'Não enviou: '+e.message,true)}
+  };
+});
+function copiarPrompt(tipo,w,h){
+  const nome=$('mc-tit').value||$('mc-nome').value||'campanha',cor=$('mc-cor').value,info=$('mc-info').value,acadN=$('sel-acad').selectedOptions[0]?.textContent||'RG Cave Gym';
+  const pres=$('mc-pres').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const base=`Arte para academia de ginástica "${acadN}", campanha "${nome}". Formato ${w}x${h} px (${w===h?'quadrado 1:1':'vertical 4:5'}), para celular. Cor principal ${cor}, com preto e branco de apoio. Estilo fotográfico, moderno, energia positiva, pessoas reais treinando, alta qualidade, sem marcas d'água. Textos em português do Brasil, grandes e legíveis no celular, poucos textos. Deixe margem de segurança de 60 px nas bordas.`;
+  const p={
+    capa:`${base}\nConteúdo: título "${nome}"${info?`, informação "${info}"`:''}. É a capa de uma página de cadastro: o título deve ser o destaque e a parte de baixo da imagem pode ser mais limpa.`,
+    convidado:`${base}\nConteúdo: chamada "Você ganhou ${pres.length||3} presentes". Mostre ${pres.length?pres.map((x,i)=>`(${i+1}) ${x}`).join('; '):'(1) mapeamento completo de 15 áreas da saúde feito pelo celular; (2) consultoria com treinador especialista; (3) uma Experiência na academia'}. Inclua um mockup de celular mostrando um questionário de saúde com gráfico de 15 áreas, e uma foto de treinador conversando com aluno na academia. Visual de presente, acolhedor e premium.`,
+    compartilhar:`${base}\nConteúdo: convite para o WhatsApp. Topo com o nome do evento "${nome}"${info?` e "${info}"`:''}; meio com "Você ganhou ${pres.length||3} presentes" e a lista curta dos presentes; rodapé "Toque no link e retire os seus". Precisa chamar atenção na conversa do WhatsApp.`
+  }[tipo];
+  copiar(p);toast('Prompt copiado. Cole na ferramenta de imagem.');
 }
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
 iniciar();
