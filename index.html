@@ -343,6 +343,7 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
 
     <div class="nav-group-label">📈 Vendas</div>
     <div class="tab" data-tab="vendasmkt" onclick="switchTab('vendasmkt')">Vendas & Marketing</div>
+    <div class="tab" onclick="abrirCentralLeads()" title="Abre em nova aba, já logado">🎯 Central de Leads ↗</div>
     <div class="tab" data-tab="funis" onclick="switchTab('funis')">Funis & Indicadores</div>
     <div class="tab" data-tab="consultoras" onclick="switchTab('consultoras')">Equipe</div>
     <div class="tab" data-tab="relatorio" onclick="switchTab('relatorio')">Relatório</div>
@@ -1529,6 +1530,10 @@ function abrirCampanhasNoPerfil(perfil){
 function abrirExperiencias(){
   if(!sessao||!sessao.id){toast('Faça login primeiro.',true);return;}
   window.location.href=`controle-experiencias.html?uid=${encodeURIComponent(sessao.id)}`;
+}
+function abrirCentralLeads(){
+  if(!sessao||!sessao.id){toast('Faça login primeiro.',true);return;}
+  window.open(`central-leads.html?uid=${encodeURIComponent(sessao.id)}`,'_blank');
 }
 function abrirAgendaUnificada(){
   if(!sessao||!sessao.id){toast('Faça login primeiro.',true);return;}
