@@ -66,6 +66,10 @@ button.enviar:disabled{opacity:.6}
 .oferta h3{color:#fff}
 .oferta p{color:rgba(255,255,255,.85)}
 .selo{display:inline-block;background:var(--ac);color:#fff;font-family:var(--f-d);font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:4px 12px;margin-bottom:8px}
+.pular{display:block;margin:14px auto 0;background:transparent;border:0;color:var(--ink2);font:inherit;font-size:14px;cursor:pointer;text-decoration:underline}
+#t3{display:none;padding:28px 18px 40px}
+#t3 .oferta{margin-top:0}
+.ok-aviso{font-size:13.5px;color:var(--ink2);text-align:center;margin:10px 0 0}
 .novo{display:block;margin:22px auto 0;background:transparent;border:0;color:var(--ink2);text-decoration:underline;font:inherit;font-size:14px;cursor:pointer}
 .hidden{display:none!important}
 </style>
@@ -142,9 +146,10 @@ button.enviar:disabled{opacity:.6}
       <h3 id="ind-tit">Convide até 5 amigos</h3>
       <p id="ind-txt">Seus amigos ganham presentes especiais da Cave Gym.</p>
       <div class="codigo" id="meu-codigo"></div>
-      <a class="btn-g wa" id="btn-wa" target="_blank" rel="noopener">💬 Convidar pelo WhatsApp</a>
-      <button class="btn-g sec hidden" type="button" id="btn-share">📤 Compartilhar com a arte</button>
+      <button class="btn-g wa" type="button" id="btn-wa" onclick="convidar()">💬 Convidar amigos pelo WhatsApp</button>
+      <button class="pular hidden" type="button" id="btn-pular" onclick="irOferta(false)">Agora não</button>
     </div>
+
 
     <div class="bloco oferta hidden" id="b-oferta">
       <span class="selo">Desbloqueado</span>
@@ -152,7 +157,17 @@ button.enviar:disabled{opacity:.6}
       <p id="of-txt"></p>
       <a class="btn-g" id="btn-oferta" target="_blank" rel="noopener">Reservar minha vaga</a>
     </div>
+    <button class="novo" type="button" onclick="novoCadastro()">Fazer outro cadastro neste celular</button>
+  </div>
 
+  <div id="t3">
+    <div class="ok topo" style="display:block;padding:0 0 18px;text-align:center">
+      <div class="sel">🎉</div>
+      <h2 id="t3-tit">Parabéns!</h2>
+      <p id="t3-txt"></p>
+    </div>
+    <div id="t3-slot"></div>
+    <button class="pular" type="button" onclick="voltarConvite()">Convidar mais amigos</button>
     <button class="novo" type="button" onclick="novoCadastro()">Fazer outro cadastro neste celular</button>
   </div>
 </div>
@@ -338,8 +353,7 @@ function mostrarSucesso(lead){
       $('ind-txt').textContent='Seus amigos também ganham presentes especiais da '+ACADEMIA_CURTA+'.';
     }
     const txt=textoConvite(lead);
-    $('btn-wa').href='https://wa.me/?text='+encodeURIComponent(txt);
-    if(navigator.share){$('btn-share').classList.remove('hidden');$('btn-share').onclick=()=>compartilhar(txt)}
+    textoAtual=txt;prepararArte();
     $('b-indica').classList.remove('hidden');
   }
   // oferta do desafio
@@ -350,20 +364,44 @@ function mostrarSucesso(lead){
     const msg=(camp.oferta_mensagem||'Olá! Vim do cadastro do {evento} e quero garantir minha vaga com até 50% de desconto no Desafio de 21 dias.').replace('{evento}',ev)+(lead.codigo?' Meu código: '+lead.codigo:'');
     $('btn-oferta').href='https://wa.me/'+camp.whatsapp_academia.replace(/\D/g,'')+'?text='+encodeURIComponent(msg);
     $('b-oferta').classList.remove('hidden');
+    temOferta=true;
   }
+  // com indicação, a oferta fica para a tela 3 (depois do convite)
+  if(temOferta&&!$('b-indica').classList.contains('hidden')){$('t3-slot').appendChild($('b-oferta'));$('btn-pular').classList.remove('hidden')}
   window.scrollTo({top:0,behavior:'smooth'});
 }
-async function compartilhar(txt){
+let textoAtual='',arteFile=null,temOferta=false;
+const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+async function prepararArte(){
+  // baixa a arte antes do clique (o compartilhar do celular exige resposta imediata ao toque)
+  arteFile=null;
+  if(IOS||!navigator.share||!camp||!camp.convite_img)return;
   try{
-    let files=[];
-    if(camp&&camp.convite_img){
-      const b=await fetch(camp.convite_img).then(r=>r.blob());
-      const f=new File([b],'convite.jpg',{type:b.type||'image/jpeg'});
-      if(navigator.canShare&&navigator.canShare({files:[f]}))files=[f];
-    }
-    await navigator.share(files.length?{files,text:txt}:{text:txt});
-  }catch(e){if(e&&e.name!=='AbortError')location.href=$('btn-wa').href}
+    const b=await fetch(camp.convite_img).then(r=>r.blob());
+    const f=new File([b],'convite.jpg',{type:b.type||'image/jpeg'});
+    if(navigator.canShare&&navigator.canShare({files:[f],text:'x'}))arteFile=f;
+  }catch(_){}
 }
+function abrirWhatsTexto(){
+  const url='https://wa.me/?text='+encodeURIComponent(textoAtual);
+  const w=window.open(url,'_blank');if(!w)location.href=url;
+}
+async function convidar(){
+  // Android: arte + texto pelo compartilhar do celular. iPhone e computador: texto com o link (o link nunca se perde).
+  if(arteFile){
+    try{await navigator.share({files:[arteFile],text:textoAtual});depoisConvite();return}
+    catch(e){if(e&&e.name==='AbortError')return}
+  }
+  abrirWhatsTexto();
+  setTimeout(depoisConvite,800);
+}
+function depoisConvite(){if(temOferta&&$('t3-slot').contains($('b-oferta')))irOferta(true)}
+function irOferta(convidou){
+  $('t3-tit').textContent=convidou?'Parabéns por convidar seus amigos!':'Parabéns pela sua decisão!';
+  $('t3-txt').textContent=convidou?'Você está ajudando outras pessoas a cuidarem da saúde. E acabou de desbloquear uma condição exclusiva:':'Cuidar da saúde começa agora. Você acabou de desbloquear uma condição exclusiva:';
+  $('ok').style.display='none';$('t3').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+}
+function voltarConvite(){$('t3').style.display='none';$('ok').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
 
 $('f').addEventListener('submit',async ev=>{
   ev.preventDefault();
@@ -377,7 +415,8 @@ $('f').addEventListener('submit',async ev=>{
 });
 function novoCadastro(){
   $('f').reset();$('bloco-parado').classList.add('hidden');
-  ['b-indica','b-oferta'].forEach(id=>$(id).classList.add('hidden'));
+  ['b-indica','b-oferta','btn-pular'].forEach(id=>$(id).classList.add('hidden'));
+  $('ok').insertBefore($('b-oferta'),$('ok').querySelector('.novo'));temOferta=false;$('t3').style.display='none';
   $('ok').style.display='none';$('form-area').classList.remove('hidden');window.scrollTo({top:0});
 }
 carregar();filaEnviar();setInterval(filaEnviar,15000);
