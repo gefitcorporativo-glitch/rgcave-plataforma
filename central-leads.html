@@ -34,6 +34,10 @@ header.top{background:var(--top);color:var(--top-ink);position:sticky;top:0;z-in
 main{padding:22px 0 60px}
 section[hidden]{display:none}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.ck{width:18px;height:18px;cursor:pointer;accent-color:var(--ac,#E6007E)}
+tr.marcado td{background:rgba(230,0,126,.06)}
+tr.oc td{opacity:.6}
+.btn.alerta{border-color:#c0392b;color:#c0392b}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .kpi .v{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:32px;line-height:1}
 .kpi .l{font-size:12px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
@@ -140,19 +144,23 @@ a.wa{color:var(--link);text-decoration:none;font-weight:600}
         <div><label for="f-cons">Consultora</label><select id="f-cons"></select></div>
         <div><label for="f-treina">Perfil</label><select id="f-treina"></select></div>
         <div><label for="f-ind">Indicação</label><select id="f-ind"><option value="">Todos</option><option value="veio">Veio por indicação</option><option value="indicou">Indicou alguém</option></select></div>
+        <div><label for="f-oc">Ocultos</label><select id="f-oc"><option value="">Não mostrar</option><option value="so">Só os ocultos</option></select></div>
         <div><label for="f-de">De</label><input type="date" id="f-de"></div>
         <div><label for="f-ate">Até</label><input type="date" id="f-ate"></div>
       </div>
       <div class="acoes">
         <button class="btn" onclick="limparFiltros()">Limpar filtros</button>
         <button class="btn" onclick="carregarLeads()">↻ Atualizar</button>
+        <button class="btn" onclick="imprimirSorteioLeads()" title="Lista do sorteio para imprimir e recortar (sem ocultos e sem repetidos)">🖨 Imprimir sorteio</button>
         <button class="btn" onclick="exportarCSV()">⬇ Exportar planilha</button>
+        <button class="btn alerta hidden" id="btn-ocultar" onclick="ocultarSel(true)">🙈 Ocultar selecionados</button>
+        <button class="btn hidden" id="btn-reexibir" onclick="ocultarSel(false)">👁 Reexibir selecionados</button>
         <div class="sp"></div>
         <span class="cont" id="cont"></span>
       </div>
       <div class="tabela"><table>
         <thead><tr>
-          <th data-o="created_at">Chegou</th><th data-o="nome">Lead</th><th>WhatsApp</th><th>Perfil</th>
+          <th><input type="checkbox" class="ck" id="ck-todos" title="Selecionar todos do filtro" onclick="marcarTodos(this.checked)"></th><th data-o="created_at">Chegou</th><th data-o="nome">Lead</th><th>WhatsApp</th><th>Perfil</th>
           <th data-o="origem">Origem</th><th data-o="campanha">Campanha</th><th data-o="indicado_por_nome">Indicado por</th><th data-o="status">Status</th><th>Consultora</th><th></th>
         </tr></thead>
         <tbody id="tb"></tbody>
@@ -336,7 +344,7 @@ async function iniciar(){
   opts($('f-origem'),ORIGENS,'Todas');opts($('f-status'),STATUS,'Todos');opts($('f-treina'),TREINA,'Todos');
   opts($('ml-status'),STATUS);opts($('mc-origem'),ORIGENS);
   $('mq-o').innerHTML='<option value="">(a da campanha)</option>'+Object.entries(ORIGENS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
-  ['f-busca','f-origem','f-camp','f-status','f-cons','f-treina','f-ind','f-de','f-ate'].forEach(id=>$(id).addEventListener('input',render));
+  ['f-busca','f-origem','f-camp','f-status','f-cons','f-treina','f-ind','f-oc','f-de','f-ate'].forEach(id=>$(id).addEventListener('input',()=>{selecionados.clear();render()}));
   ['mq-o','mq-src','mq-med','mq-cont'].forEach(id=>$(id).addEventListener('input',atualizarLinkQR));
   $('mc-nome').addEventListener('input',()=>{if(!campAtual)$('mc-slug').value=slugify($('mc-nome').value)});
   document.querySelectorAll('th[data-o]').forEach(th=>th.onclick=()=>{const c=th.dataset.o;ordem=ordem.c===c?{c,d:-ordem.d}:{c,d:c==='created_at'?-1:1};render()});
@@ -357,16 +365,19 @@ async function carregarCamps(){
 async function carregarLeads(){
   try{
     const r=await fetch(`${SB_URL}/rest/v1/${P}leads?academia_id=eq.${encodeURIComponent(acad)}&select=*&order=created_at.desc`,{headers:{...H,'Range-Unit':'items','Range':'0-4999'}});
-    if(!r.ok)throw new Error(await r.text());leads=await r.json();
+    if(!r.ok)throw new Error(await r.text());leads=await r.json();todosLeads=leads;
   }catch(e){console.error(e);leads=[]}
   if(sessao.role==='consultor'&&sessao.consultora_id)leads=leads.filter(l=>!l.consultora_id||l.consultora_id===sessao.consultora_id);
+  todosLeads=leads;leads=todosLeads.filter(l=>!l.oculto);selecionados.clear();
   render();renderCards();
 }
 
 // ---------- leads ----------
+let todosLeads=[];const selecionados=new Set();
 function filtrados(){
   const fi=$('f-ind').value,indicaram=new Set(leads.map(l=>l.indicado_por_codigo).filter(Boolean));const b=$('f-busca').value.trim().toLowerCase(),bd=b.replace(/\D/g,''),o=$('f-origem').value,c=$('f-camp').value,s=$('f-status').value,co=$('f-cons').value,t=$('f-treina').value,de=$('f-de').value,ate=$('f-ate').value;
-  return leads.filter(l=>{
+  const so=$('f-oc').value==='so';
+  return (so?todosLeads.filter(l=>l.oculto):leads).filter(l=>{
     if(b&&!((l.nome||'').toLowerCase().includes(b)||(l.codigo||'').toLowerCase().includes(b)||(bd&&(l.whatsapp_norm||'').includes(bd))))return false;
     if(o&&l.origem!==o)return false;
     if(c==='__sem'&&l.campanha_id)return false; if(c&&c!=='__sem'&&l.campanha_id!==c)return false;
@@ -394,13 +405,15 @@ function render(){
   const po={};leads.forEach(l=>po[l.origem||'outro']=(po[l.origem||'outro']||0)+1);
   const oSel=$('f-origem').value;
   $('chips-origem').innerHTML=Object.entries(po).sort((a,b)=>b[1]-a[1]).map(([o,n])=>`<span class="chip ${oSel===o?'on':''}" onclick="filtrarOrigem('${o}')">${esc(ORIGENS[o]||o)}<b>${n}</b></span>`).join('');
-  $('cont').textContent=`${f.length} de ${leads.length} leads`;
-  if(!f.length){$('tb').innerHTML=`<tr><td colspan="10" class="vazio">${leads.length?'Nenhum lead com esses filtros.':'Ainda não chegou nenhum lead. Crie um link em "Links de captação".'}</td></tr>`;return}
+  $('cont').textContent=$('f-oc').value==='so'?`${f.length} ocultos`:`${f.length} de ${leads.length} leads`;
+  atualizarSel(f);
+  if(!f.length){$('tb').innerHTML=`<tr><td colspan="11" class="vazio">${leads.length?'Nenhum lead com esses filtros.':'Ainda não chegou nenhum lead. Crie um link em "Links de captação".'}</td></tr>`;return}
   $('tb').innerHTML=f.map(l=>{
     const perfil=(TREINA[l.treina]||'')+(l.tempo_parado?`<div class="sub">${PARADO[l.tempo_parado]||''}</div>`:'');
     const rep=l.whatsapp_norm&&cont[l.whatsapp_norm]>1?' <span class="tag rep">repetido</span>':'';
-    return `<tr>
-      <td>${dataBR(l.created_at)}</td>
+    return `<tr class="${selecionados.has(l.id)?'marcado':''} ${l.oculto?'oc':''}">
+      <td><input type="checkbox" class="ck" ${selecionados.has(l.id)?'checked':''} onclick="marcarLead('${l.id}',this.checked)"></td>
+      <td>${dataBR(l.created_at)}${l.oculto?'<div class="sub">oculto</div>':''}</td>
       <td><div class="nm">${esc(l.nome)}${rep}</div><div class="sub">${[l.idade?l.idade+' anos':'',l.codigo?esc(l.codigo):''].filter(Boolean).join(' · ')}</div></td>
       <td>${l.whatsapp_norm?`<a class="wa" target="_blank" rel="noopener" href="https://wa.me/${l.whatsapp_norm}">${esc(l.whatsapp)}</a>`:esc(l.whatsapp)}</td>
       <td>${perfil}</td>
@@ -412,15 +425,41 @@ function render(){
       <td><button class="btn sm" onclick="abrirLead('${l.id}')">${l.observacoes?'📝':'Abrir'}</button></td>
     </tr>`}).join('');
 }
+// ---------- selecionar e ocultar (nunca apaga) ----------
+function marcarLead(id,on){on?selecionados.add(id):selecionados.delete(id);render()}
+function marcarTodos(on){filtrados().forEach(l=>on?selecionados.add(l.id):selecionados.delete(l.id));render()}
+function atualizarSel(f){
+  const n=selecionados.size,so=$('f-oc').value==='so';
+  $('btn-ocultar').classList.toggle('hidden',!n||so);$('btn-reexibir').classList.toggle('hidden',!n||!so);
+  $('btn-ocultar').textContent='🙈 Ocultar selecionados ('+n+')';$('btn-reexibir').textContent='👁 Reexibir selecionados ('+n+')';
+  const ck=$('ck-todos');ck.checked=f.length>0&&f.every(l=>selecionados.has(l.id));
+}
+async function ocultarSel(ocultar){
+  const ids=[...selecionados];if(!ids.length)return;
+  if(ocultar&&!confirm('Ocultar '+ids.length+' lead(s)? Eles não são apagados: saem da lista, dos números e do sorteio. Para ver de novo, use o filtro "Ocultos".'))return;
+  try{
+    await sbPatch(P+'leads','id=in.('+ids.join(',')+')',{oculto:ocultar,updated_at:new Date().toISOString()});
+    todosLeads.forEach(l=>{if(selecionados.has(l.id))l.oculto=ocultar});
+    leads=todosLeads.filter(l=>!l.oculto);selecionados.clear();render();
+    toast((ocultar?'Ocultados: ':'Reexibidos: ')+ids.length);
+  }catch(e){toast(String(e.message||e).includes('oculto')?'Falta rodar o SQL do "ocultar" no Supabase.':'Não salvou: '+e.message,true)}
+}
+function imprimirSorteioLeads(){
+  const fc=$('f-camp').value, sorteios=camps.filter(c=>c.sorteio);
+  let c=fc?camps.find(x=>x.id===fc&&x.sorteio):null;
+  if(!c){const at=sorteios.filter(x=>x.ativo!==false);c=at.length===1?at[0]:(sorteios.length===1?sorteios[0]:null)}
+  if(!c){toast(sorteios.length?'Escolha a campanha do sorteio no filtro "Campanha".':'Nenhuma campanha com sorteio.',true);return}
+  imprimirSorteio(c.id);
+}
 function filtrarOrigem(o){$('f-origem').value=$('f-origem').value===o?'':o;render()}
-function limparFiltros(){filtroCodigo=null;['f-busca','f-origem','f-camp','f-status','f-cons','f-treina','f-ind','f-de','f-ate'].forEach(id=>$(id).value='');render()}
+function limparFiltros(){filtroCodigo=null;['f-busca','f-origem','f-camp','f-status','f-cons','f-treina','f-ind','f-oc','f-de','f-ate'].forEach(id=>$(id).value='');selecionados.clear();render()}
 async function mudar(id,campo,val){
-  const l=leads.find(x=>x.id===id);if(!l)return;const ant=l[campo];l[campo]=val;
+  const l=todosLeads.find(x=>x.id===id);if(!l)return;const ant=l[campo];l[campo]=val;
   try{await sbPatch(P+'leads','id=eq.'+id,{[campo]:val,updated_at:new Date().toISOString()});toast('Salvo');render()}
   catch(e){l[campo]=ant;render();toast('Não salvou: '+e.message,true)}
 }
 function abrirLead(id){
-  const l=leads.find(x=>x.id===id);if(!l)return;leadAtual=l;
+  const l=todosLeads.find(x=>x.id===id);if(!l)return;leadAtual=l;
   $('ml-nome').textContent=l.nome;
   $('ml-info').innerHTML=[dataBR(l.created_at),l.idade?l.idade+' anos':'',TREINA[l.treina]||'',PARADO[l.tempo_parado]||'',ORIGENS[l.origem]||'',nomeCamp(l.campanha_id),l.codigo?'código '+l.codigo:'',l.indicado_por_codigo?'indicado por '+nomeIndicador(l)+' ('+l.indicado_por_codigo+')':''].filter(Boolean).map(esc).join(' · ');
   $('ml-status').value=l.status||'novo';$('ml-cons').value=l.consultora_id||'';$('ml-obs').value=l.observacoes||'';
