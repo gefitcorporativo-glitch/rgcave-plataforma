@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Desafio ROI 21 Dias | RG Cave</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>window.ACADEMIA_CFG={nome:"RG Cave Gym",presente:"o mapeamento completo da sua saúde + uma consultoria com um treinador",cor:"#F5B800",corT:"#7A5800",corTexto:"#111111",escuro:"#111111",fundo:"#FAF8F2"};</script>
+<script src="ferramentas-academia.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
 :root{
@@ -323,7 +325,8 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
       <span id="user-chip" class="user-chip"></span>
       <button class="btn-gh btn-sm" id="btn-add-cons-top" onclick="if(!ac()){toast('Selecione uma academia no seletor acima.',true);return}openM('m-cons')" style="display:none">+ Consultor(a)</button>
       <button class="btn-or" id="btn-lancar-top" onclick="if(!ac()){toast('Selecione uma academia no seletor acima.',true);return}openM('m-lanc')" style="display:none">Lançar Dia</button>
-      <button class="btn-gh btn-sm" onclick="abrirCentralScripts()" title="Abre em nova aba, já logado">📚 Central de Scripts</button>
+      <button class="btn-gh btn-sm" onclick="abrirCentralScripts()" title="Metodologia e treinamento (Central de Scripts AQÚI)">🎓 Universidade Corporativa</button>
+      <button class="btn-gh btn-sm" onclick="abrirBibliotecaAcademia()" title="Scripts do dia a dia por funil: opção 1 e opção 2, objeções e rotina">💬 Biblioteca de scripts</button>
       <button class="btn-gh btn-sm" onclick="abrirCentralScriptsV2()" title="Versão nova, ainda em construção, só Objeções está completa" style="color:#b45309">🚧 Scripts v2 (beta)</button>
       <button class="btn-gh btn-sm" onclick="abrirCampanhas()" title="Abre em nova aba, já logado">📢 Campanhas</button>
       <button class="btn-gh btn-sm" onclick="abrirExperiencias()" title="Abre em nova aba, já logado">🎯 Experiências</button>
