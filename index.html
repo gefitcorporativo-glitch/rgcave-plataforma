@@ -2595,8 +2595,9 @@ async function abrirAcessoPessoa(tipo,pessoaId,pessoaNome){
   openM('m-acesso');
   const campoId=tipo==='consultor'?'consultora_id':'treinador_id';
   try{
-    const existentes=await sbGet('cave_gestores',`${campoId}=eq.${pessoaId}&select=id,nome,email,senha_hash,ativo,modulos_ativos`);
+    const existentes=await sbGet('cave_gestores',`${campoId}=eq.${pessoaId}&select=id,nome,email,senha_hash,ativo,modulos_ativos,academia_id`);
     const login=existentes[0];
+    if(login)acessoAberto={...login,nomePessoa:pessoaNome,tipo,pessoaId};
     if(login){
       el.innerHTML=`
         <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
@@ -2608,6 +2609,13 @@ async function abrirAcessoPessoa(tipo,pessoaId,pessoaNome){
         <div style="font-weight:600;color:var(--or-t);margin-bottom:14px">${login.email}</div>
         <div style="font-size:12px;color:var(--td);margin-bottom:6px">Senha atual</div>
         <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:10px 14px;font-family:monospace;color:var(--gr);margin-bottom:14px">${login.senha_hash}</div>
+        <div style="background:var(--or-d);border:1px solid var(--bdo);border-radius:8px;padding:12px;margin-bottom:16px">
+          <div style="font-size:12.5px;font-weight:600;margin-bottom:8px">📨 Mensagem pronta com o acesso</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-gh btn-sm" onclick="copiarMsgAcesso('${tipo}','${pessoaId}')">📋 Copiar mensagem</button>
+            <button class="btn-sm" style="background:#1FAF54;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer" onclick="whatsMsgAcesso('${tipo}','${pessoaId}')">💬 Enviar pelo WhatsApp</button>
+          </div>
+        </div>
         <div style="display:flex;gap:8px;margin-bottom:16px">
           <input class="fi" id="nova-senha-input" placeholder="Nova senha" style="flex:1">
           <button class="btn-or" onclick="resetSenha('${login.id}')">Salvar</button>
@@ -2656,8 +2664,8 @@ async function criarAcessoPessoa(tipo,pessoaId,pessoaNome){
       id:uid(),nome:pessoaNome,email,senha_hash:senha,academia_id:acId,
       role:tipo,ativo:true,[campoId]:pessoaId,modulos_ativos:modulos
     });
-    toast(`Acesso criado! Já pode entrar em: ${modulos.map(m=>(MODULOS_QG90.find(x=>x.key===m)||{}).label).join(', ')}.`);
-    closeM('m-acesso');
+    toast('Acesso criado! Agora é só enviar a mensagem pronta para a pessoa.');
+    await abrirAcessoPessoa(tipo,pessoaId,pessoaNome);
   }catch(e){console.error(e);toast('Erro ao criar acesso: '+String(e.message||e).slice(0,140),true);}
 }
 function renderModulosCheckboxPessoa(loginId,ativos){
@@ -3151,6 +3159,32 @@ async function abrirDetalheConsultora(consultoraId,consultoraNome){
 // e com seleção de módulos na hora da criação, corrigindo o bug antigo de não
 // conceder nenhum módulo por padrão.)
 
+// ══ MENSAGEM PRONTA COM O ACESSO (copiar ou enviar pelo WhatsApp) ══
+let acessoAberto=null;
+function msgAcesso(){
+  const a=acessoAberto;if(!a)return '';
+  const base=location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/,'');
+  const acad=((db&&db.acs&&db.acs[a.academia_id])||{}).nome||document.title.split(/[·|]/)[0].trim();
+  const mods=(a.modulos_ativos||[]).map(m=>(MODULOS_QG90.find(x=>x.key===m)||{}).label).filter(Boolean);
+  const primeiro=(a.nomePessoa||a.nome||'').trim().split(/\s+/)[0];
+  let t=`Olá, ${primeiro}! 👋\nAqui está o seu acesso à plataforma da ${acad}:\n\n🔗 Link: ${base}\n📧 E-mail: ${a.email}\n🔑 Senha: ${a.senha_hash}\n`;
+  if(mods.length)t+=`\n✅ Liberado para você: ${mods.join(', ')}\n`;
+  if(a.tipo==='treinador')t+=`\n🏋️ Planner e carteira de alunos: depois de entrar, abra "Área do Treinador" e toque em Conectar (esse login é outro e vai em uma mensagem separada).\n`;
+  t+=`\n📲 Dica: salve o link nos favoritos do celular para abrir rápido.`;
+  return t;
+}
+function copiarMsgAcesso(){
+  const t=msgAcesso();if(!t)return;
+  if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast('Mensagem copiada! É só colar no WhatsApp.')).catch(()=>prompt('Copie a mensagem:',t));
+  else prompt('Copie a mensagem:',t);
+}
+function whatsMsgAcesso(tipo,pessoaId){
+  const t=msgAcesso();if(!t)return;
+  let tel='';
+  try{const ac=db.acs[acessoAberto.academia_id]||{};const p=tipo==='treinador'?(ac.treinadores||{})[pessoaId]:(ac.consultoras||{})[pessoaId];tel=String((p&&(p.tel||p.telefone))||'').replace(/\D/g,'');}catch(e){}
+  if(tel&&tel.length<=11)tel='55'+tel;
+  window.open('https://wa.me/'+(tel||'')+'?text='+encodeURIComponent(t),'_blank');
+}
 async function resetSenha(gId){
   const nova=document.getElementById('nova-senha-input').value.trim();
   if(!nova||nova.length<4){toast('Informe uma senha com ao menos 4 caracteres',true);return}
@@ -3161,7 +3195,8 @@ async function resetSenha(gId){
     // atualiza cache
     const g=Object.values(gestoresDB).find(g=>g.id===gId);
     if(g)g.senha_hash=nova;
-    closeM('m-acesso');
+    if(acessoAberto&&acessoAberto.id===gId){const a=acessoAberto;await abrirAcessoPessoa(a.tipo,a.pessoaId,a.nomePessoa);}
+    else closeM('m-acesso');
   }catch(e){toast('Erro ao salvar',true);console.error(e)}
 }
 
