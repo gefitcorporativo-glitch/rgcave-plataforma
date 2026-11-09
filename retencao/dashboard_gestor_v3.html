@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script src="config.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RG Cave · Central de Inteligência</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg: #080810;
+  --bg2: #0D0D18;
+  --card: #11111E;
+  --card2: #161626;
+  --border: rgba(255,255,255,.06);
+  --border2: rgba(255,255,255,.1);
+  --orange: #F5B800;
+  --orange2: #FFD34D;
+  --orange-dim: rgba(245,184,0,.1);
+  --orange-glow: rgba(245,184,0,.25);
+  --text: #F0EEF8;
+  --text2: #9896B0;
+  --text3: #4A4860;
+  --green: #2DD4A0;
+  --green-dim: rgba(45,212,160,.1);
+  --red: #FF4D6D;
+  --red-dim: rgba(255,77,109,.1);
+  --yellow: #FFD166;
+  --yellow-dim: rgba(255,209,102,.1);
+  --blue: #7EB8FF;
+  --blue-dim: rgba(126,184,255,.1);
+  --purple: #B09FFF;
+  --purple-dim: rgba(176,159,255,.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: .4;
+}
+
+/* ── HEADER ── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,8,16,.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  padding: 0 32px;
+}
+.header-inner {
+  max-width: 1600px; margin: 0 auto;
+  height: 60px; display: flex; align-items: center; gap: 20px;
+}
+.logo-wrap { display: flex; align-items: center; gap: 12px; }
+.logo-img { width: 34px; height: 34px; border-radius: 10px; object-fit: cover; }
+.logo-text { }
+.logo-name { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800; line-height: 1; }
+.logo-sub { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .12em; margin-top: 2px; }
+
+.header-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--text2);
+  padding-left: 20px;
+  border-left: 1px solid var(--border2);
+}
+
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.live-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; color: var(--green);
+  padding: 4px 10px; border-radius: 20px;
+  background: var(--green-dim);
+  border: 1px solid rgba(45,212,160,.2);
+}
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+
+.period-btns { display: flex; gap: 3px; }
+.p-btn {
+  padding: 5px 12px; border-radius: 6px;
+  font-size: 11px; font-weight: 600;
+  border: 1px solid var(--border2);
+  background: transparent; color: var(--text2);
+  cursor: pointer; font-family: 'Barlow', sans-serif;
+  transition: all .15s;
+}
+.p-btn:hover { border-color: var(--orange); color: var(--orange); }
+.p-btn.active { background: var(--orange-dim); border-color: var(--orange); color: var(--orange); }
+
+.clock {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; color: var(--text3);
+}
+
+/* ── LAYOUT ── */
+.content { max-width: 1600px; margin: 0 auto; padding: 28px 32px 80px; position: relative; z-index: 1; }
+
+/* ── SECTION ── */
+.sec-hdr {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px; margin-top: 36px;
+}
+.sec-hdr:first-child { margin-top: 0; }
+.sec-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--text3);
+  border: 1px solid var(--border2);
+  border-radius: 4px; padding: 2px 7px;
+}
+.sec-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--text2);
+}
+.sec-line { flex: 1; height: 1px; background: var(--border); }
+
+/* ── GRID LAYOUTS ── */
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+.grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; }
+
+/* ── CARD BASE ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.card:hover { border-color: var(--border2); }
+.card.accent-top::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+}
+.card.orange::before { background: linear-gradient(90deg, var(--orange), transparent); }
+.card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+.card.blue::before { background: linear-gradient(90deg, var(--blue), transparent); }
+.card.purple::before { background: linear-gradient(90deg, var(--purple), transparent); }
+.card.yellow::before { background: linear-gradient(90deg, var(--yellow), transparent); }
+.card.red::before { background: linear-gradient(90deg, var(--red), transparent); }
+
+.card-label {
+  font-size: 10px; font-weight: 700;
+  color: var(--text3); text-transform: uppercase;
+  letter-spacing: .12em; margin-bottom: 10px;
+}
+.card-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 42px; font-weight: 800;
+  line-height: 1; margin-bottom: 4px;
+}
+.card-sub { font-size: 12px; color: var(--text2); }
+.card-delta {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 700;
+  margin-top: 8px; padding: 3px 8px; border-radius: 5px;
+}
+.delta-up { background: var(--green-dim); color: var(--green); }
+.delta-down { background: var(--red-dim); color: var(--red); }
+.delta-neutral { background: var(--border); color: var(--text2); }
+.badge-modelo {
+  display: inline-block; font-size: 9px; font-weight: 700;
+  padding: 1px 6px; border-radius: 4px; margin-left: 6px;
+  background: var(--yellow-dim); color: var(--yellow);
+  border: 1px solid rgba(255,209,102,.3); vertical-align: middle;
+}
+.badge-real {
+  display: inline-block; font-size: 9px; font-weight: 700;
+  padding: 1px 6px; border-radius: 4px; margin-left: 6px;
+  background: var(--green-dim); color: var(--green);
+  border: 1px solid rgba(45,212,160,.3); vertical-align: middle;
+}
+
+/* ── MACRO CARD (academia) ── */
+.macro-card {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 24px;
+  position: relative; overflow: hidden;
+}
+.macro-card::after {
+  content: '';
+  position: absolute; right: -40px; top: -40px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, var(--orange-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
+.macro-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 56px; font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.macro-label { font-size: 13px; color: var(--text2); margin-top: 4px; }
+.macro-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* ── VINCULAÇÃO RING ── */
+.ring-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+  display: flex; align-items: center; gap: 20px;
+}
+.ring-wrap { position: relative; flex-shrink: 0; }
+.ring-svg { transform: rotate(-90deg); }
+.ring-track { fill: none; stroke: var(--border2); stroke-width: 8; }
+.ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1.5s ease; }
+.ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.ring-pct { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; }
+.ring-lbl { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; }
+
+/* ── BAR CHART ── */
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-label { font-size: 11px; color: var(--text2); width: 100px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { flex: 1; height: 6px; background: var(--border2); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s ease; }
+.bar-val { font-size: 11px; font-weight: 700; width: 38px; text-align: right; flex-shrink: 0; font-family: 'DM Mono', monospace; }
+
+/* ── NPS GAUGE ── */
+.nps-big {
+  text-align: center;
+}
+.nps-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 52px; font-weight: 900; line-height: 1;
+}
+.nps-label { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.nps-bars { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.nps-bar-row { display: flex; align-items: center; gap: 8px; }
+.nps-bar-lbl { font-size: 10px; color: var(--text2); width: 62px; flex-shrink: 0; }
+.nps-bar-track { flex: 1; height: 5px; background: var(--border2); border-radius: 3px; overflow: hidden; }
+.nps-bar-fill { height: 100%; border-radius: 3px; }
+.nps-bar-pct { font-size: 10px; font-weight: 700; width: 30px; text-align: right; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+
+/* ── PERCEPCAO 2x2 ── */
+.perc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; }
+.perc-cell { background: var(--card); padding: 16px; }
+.perc-moment { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; color: var(--text3); }
+.perc-pct { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.perc-text { font-size: 11px; color: var(--text2); line-height: 1.45; }
+.gap-alert {
+  margin-top: 12px; padding: 10px 14px;
+  background: var(--yellow-dim);
+  border: 1px solid rgba(255,209,102,.2);
+  border-radius: 10px;
+  font-size: 11px; color: var(--yellow); line-height: 1.5;
+}
+
+/* ── TRAINER CARDS ── */
+.trainer-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.trainer-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  cursor: pointer; transition: all .2s;
+}
+.trainer-card:hover { border-color: var(--orange-glow); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.3); }
+.trainer-card.open { border-color: var(--orange); }
+.trainer-top { padding: 16px; }
+.trainer-avatar {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800;
+  color: #000; margin-bottom: 12px;
+}
+.trainer-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+.trainer-type { font-size: 10px; color: var(--text3); }
+.trainer-score-row { display: flex; align-items: flex-end; gap: 6px; margin-top: 12px; }
+.trainer-score { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 900; line-height: 1; }
+.trainer-score-lbl { font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+.trainer-medal { font-size: 18px; margin-bottom: 4px; }
+
+.trainer-mini-row {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border-top: 1px solid var(--border);
+}
+.trainer-mini-cell { padding: 10px 8px; text-align: center; border-right: 1px solid var(--border); }
+.trainer-mini-cell:last-child { border-right: none; }
+.trainer-mini-val { font-size: 13px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.trainer-mini-lbl { font-size: 8px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+
+.trainer-detail { display: none; padding: 14px 16px; border-top: 1px solid var(--border); background: var(--bg2); }
+.trainer-card.open .trainer-detail { display: block; }
+.detail-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.detail-row:last-child { border: none; padding-bottom: 0; }
+.detail-lbl { color: var(--text2); }
+.detail-val { font-weight: 700; font-family: 'DM Mono', monospace; }
+
+.eng-section { margin-top: 12px; }
+.eng-title { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+.eng-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.eng-lbl { font-size: 10px; color: var(--text2); width: 80px; flex-shrink: 0; }
+.eng-track { flex: 1; height: 5px; background: var(--border2); border-radius: 3px; overflow: hidden; }
+.eng-fill { height: 100%; border-radius: 3px; }
+.eng-val { font-size: 10px; font-weight: 700; width: 28px; text-align: right; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+
+/* ── DESAFIOS ── */
+.desafios-list { display: flex; flex-direction: column; gap: 6px; }
+.desafio-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 10px; transition: border-color .15s;
+}
+.desafio-row.risco { border-color: rgba(255,209,102,.25); background: rgba(255,209,102,.03); }
+.desafio-row.critico { border-color: rgba(255,77,109,.25); background: rgba(255,77,109,.03); }
+.desafio-av {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #000; flex-shrink: 0;
+}
+.desafio-info { flex: 1; min-width: 0; }
+.desafio-nome { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.desafio-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
+.desafio-prog { margin-top: 5px; height: 3px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+.desafio-prog-fill { height: 100%; border-radius: 2px; }
+.desafio-right { text-align: right; flex-shrink: 0; }
+.desafio-dia { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800; }
+.desafio-status { font-size: 9px; text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+.desafio-stats { font-size: 10px; color: var(--text3); margin-top: 3px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── INDICAÇÕES ── */
+.ind-big { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; line-height: 1; }
+.ind-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.ind-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+
+/* ── FILTER CHIPS ── */
+.chips { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.chip {
+  padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  border: 1px solid var(--border2); background: transparent; color: var(--text2);
+  cursor: pointer; font-family: 'Barlow', sans-serif; transition: all .15s;
+}
+.chip.active { background: var(--orange-dim); border-color: var(--orange); color: var(--orange); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--orange); color: #000; padding: 10px 20px;
+  border-radius: 20px; font-size: 13px; font-weight: 700;
+  z-index: 999; transition: transform .3s; max-width: 280px; text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── STATUS DROPDOWN ── */
+.status-wrap { position: relative; display: inline-block; }
+.status-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 10px; font-weight: 700;
+  cursor: pointer; border: 1px solid;
+  font-family: 'Barlow', sans-serif;
+  transition: all .15s; white-space: nowrap;
+}
+.status-btn .status-arrow { font-size: 8px; opacity: .7; }
+.status-dropdown {
+  display: none; position: absolute;
+  top: calc(100% + 4px); right: 0;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 4px;
+  min-width: 140px; z-index: 200;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.status-dropdown.open { display: block; }
+.status-option {
+  display: block; width: 100%;
+  padding: 7px 10px; border-radius: 5px;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; border: none;
+  background: transparent; text-align: left;
+  font-family: 'Barlow', sans-serif;
+  color: var(--text2); transition: background .1s;
+}
+.status-option:hover { background: var(--border); }
+.status-divider { height: 1px; background: var(--border); margin: 3px 4px; }
+.status-option.desfazer { color: var(--text3); font-size: 10px; }
+.score-high { color: var(--green); }
+.score-mid  { color: var(--orange); }
+.score-low  { color: var(--red); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:1200px) {
+  .trainer-grid { grid-template-columns: repeat(2,1fr); }
+  .grid-4 { grid-template-columns: repeat(2,1fr); }
+}
+@media(max-width:768px) {
+  .content { padding: 16px; }
+  .header-inner { padding: 0; }
+  .trainer-grid { grid-template-columns: 1fr; }
+  .grid-2,.grid-2-1,.grid-1-2 { grid-template-columns: 1fr; }
+  .perc-grid { grid-template-columns: 1fr; }
+}
+</style>
+<script src="gf-embed.js"></script>
+<link rel="stylesheet" href="theme-gefit.css">
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── HEADER ── -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <div id="academiaLogoBox" style="width:38px;height:38px;border-radius:10px;overflow:hidden;background:var(--card2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="Clique para trocar o logo" onclick="document.getElementById('logoUploadInput').click()">
+        <img id="academiaLogoImg" src="" alt="Logo" style="width:100%;height:100%;object-fit:cover;display:none">
+        <span id="academiaLogoLetter" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--orange)">A</span>
+        <input type="file" id="logoUploadInput" accept="image/*" style="display:none" onchange="loadAcademiaLogo(this)">
+      </div>
+      <div class="logo-text">
+        <div class="logo-name" id="academiaNome">Academia</div>
+        <div class="logo-sub">Depto. Técnico</div>
+      </div>
+    </div>
+    <div class="header-title">Central de Gestão · Depto. Técnico</div>
+    <div class="header-right">
+      <div class="live-badge"><div class="live-dot"></div>Ao vivo</div>
+      <button onclick="document.getElementById('secTreinadores').scrollIntoView({behavior:'smooth'})" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;white-space:nowrap">🖥️ Ver Treinadores</button>
+      <button onclick="document.getElementById('secEquipe').scrollIntoView({behavior:'smooth'})" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;white-space:nowrap">👥 Equipe</button>
+      <div class="period-btns">
+        <button class="p-btn active" onclick="setPeriod('semana',this)">Semana</button>
+        <button class="p-btn" onclick="setPeriod('mes',this)">Mês</button>
+        <button class="p-btn" onclick="setPeriod('trimestre',this)">Trim.</button>
+      </div>
+      <div class="clock" id="clock">--:--:--</div>
+      <button onclick="fazerLogoutGestor()" style="padding:6px 14px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;background:transparent;border:1px solid #2A2A2A;color:#888" onmouseover="this.style.borderColor='#EF4444';this.style.color='#EF4444'" onmouseout="this.style.borderColor='#2A2A2A';this.style.color='#888'">Sair</button>
+    </div>
+  </div>
+</header>
+
+<div class="content">
+
+<!-- ══════════════════════════════════════════════
+     BLOCO 1 — ACADEMIA · VISÃO MACRO
+══════════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <div class="sec-num">01</div>
+  <div class="sec-title">Academia — Visão Macro</div>
+  <div class="sec-line"></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1.6fr 1.4fr;gap:12px;margin-bottom:12px">
+
+  <!-- Alunos Ativos -->
+  <div class="macro-card accent-top orange">
+    <div class="card-label">Alunos Ativos</div>
+    <div class="macro-num" id="mAlunosAtivos">—</div>
+    <div class="macro-label">Total matriculados</div>
+    <div class="macro-sub" id="mAlunosAtivosSub">—</div>
+  </div>
+
+  <!-- Com Treinador / Planner -->
+  <div class="macro-card accent-top green" style="background:linear-gradient(135deg,var(--card),var(--card2))">
+    <div class="card-label">Com Treinador + Planner</div>
+    <div class="macro-num" id="mComPlanner" style="background:linear-gradient(135deg,var(--green),#7FFFD4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">—</div>
+    <div class="macro-label">Vinculados ao método</div>
+    <div class="macro-sub" id="mComPlannerSub">—</div>
+  </div>
+
+  <!-- Novos no mês + ativação -->
+  <div class="macro-card" style="background:linear-gradient(135deg,var(--card),var(--card2));border:1px solid var(--border)">
+    <div class="card-label">Novos Alunos no Mês</div>
+    <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:12px">
+      <div>
+        <div class="macro-num" id="mNovosMes" style="background:linear-gradient(135deg,var(--blue),#B0D4FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:48px">—</div>
+        <div class="macro-label">entraram este mês</div>
+      </div>
+      <div style="padding-bottom:4px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--green)" id="mNovosComPlanner">—</div>
+        <div style="font-size:11px;color:var(--text2)">já com planner</div>
+      </div>
+      <div style="padding-bottom:4px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--red)" id="mNovosSemPlanner">—</div>
+        <div style="font-size:11px;color:var(--text2)">sem planner ainda</div>
+      </div>
+    </div>
+    <!-- Barra de ativação -->
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Taxa de ativação dos novos</span>
+        <span style="font-size:11px;font-weight:700;color:var(--green)" id="mAtivacaoPct">—</span>
+      </div>
+      <div style="height:6px;background:var(--border2);border-radius:3px;overflow:hidden">
+        <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--green),#7FFFD4);border-radius:3px" id="mAtivacaoBar"></div>
+      </div>
+    </div>
+    <!-- Alerta se abaixo de 60% -->
+    <div style="font-size:11px;color:var(--green);display:flex;align-items:center;gap:5px" id="mAtivacaoAlerta">
+      <span>ℹ️</span><span>Carregando...</span>
+    </div>
+  </div>
+
+  <!-- Anel de vinculação -->
+  <div class="ring-card">
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="110" height="110" viewBox="0 0 110 110">
+        <circle class="ring-track" cx="55" cy="55" r="44"/>
+        <circle class="ring-fill" id="mRingFill" cx="55" cy="55" r="44"
+          stroke="url(#ringGrad)"
+          stroke-dasharray="276.5"
+          stroke-dashoffset="276.5"/>
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#F5B800"/>
+            <stop offset="100%" stop-color="#FFD34D"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-pct" style="color:var(--orange)" id="mRingPct">—</div>
+        <div class="ring-lbl">vinculados</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px">Índice de<br>Vinculação</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px" id="mRingDesc">Carregando dados...</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px">
+        <div style="height:4px;flex:1;background:var(--border2);border-radius:2px;overflow:hidden">
+          <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--orange),var(--orange2));border-radius:2px" id="mRingBar"></div>
+        </div>
+        <span style="color:var(--orange);font-weight:700">Meta: 70%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     BLOCO 1.5 — EVOLUÇÃO ANUAL
+══════════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <div class="sec-num">01.5</div>
+  <div class="sec-title">Evolução do Ano — Alunos & Retenção <span class="badge-modelo">🟡 modelo — sem histórico salvo ainda</span></div>
+  <div class="sec-line"></div>
+</div>
+
+<div class="card" style="margin-bottom:12px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--orange)"></div>Alunos Ativos</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--green)"></div>Com Treinador + Planner</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><div style="width:10px;height:4px;border-radius:2px;background:var(--blue)"></div>Novos no Mês</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><div style="width:10px;height:4px;border-radius:2px;background:var(--red)"></div>Não Renovados</div>
+    </div>
+    <div style="font-size:11px;color:var(--text3)">Ano vigente · 2026</div>
+  </div>
+  <canvas id="evolucaoChart" style="width:100%;height:220px"></canvas>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     BLOCO 2 — KPIs DO DEPTO. TÉCNICO
+══════════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <div class="sec-num">02</div>
+  <div class="sec-title">KPIs do Depto. Técnico</div>
+  <div class="sec-line"></div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 3fr;gap:12px;margin-bottom:12px">
+
+<!-- Coluna esquerda: cards KPI -->
+<div style="display:flex;flex-direction:column;gap:10px">
+
+  <!-- App + Planos a Renovar ficam aqui -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="card accent-top orange">
+      <div class="card-label">Ativos no App <span class="badge-modelo">🟡 modelo</span></div>
+      <div class="card-val" style="font-size:32px;color:var(--text3)">—</div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+        <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--text3)">🆕 Onboarding</span><span style="font-weight:700;color:var(--text3)">—</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--text3)">🔥 Desafio</span><span style="font-weight:700;color:var(--text3)">—</span></div>
+      </div>
+      <div class="card-delta delta-up">Sem rastreio de acesso ao app ainda</div>
+    </div>
+    <div class="card accent-top blue">
+      <div class="card-label">Consultorias</div>
+      <div class="card-val" style="font-size:32px;color:var(--blue)" id="kConsultorias">—</div>
+      <div class="card-sub" id="kConsultoriasSub">mês corrente</div>
+      <div class="card-delta delta-neutral" id="kConsultoriasDelta">—</div>
+    </div>
+    <div class="card accent-top purple">
+      <div class="card-label">Revisões</div>
+      <div class="card-val" style="font-size:32px;color:var(--purple)" id="kRevisoes">—</div>
+      <div class="card-sub" id="kRevisoesSub">semana corrente</div>
+      <div class="card-delta delta-up" id="kRevisoesDelta">—</div>
+    </div>
+    <div class="card accent-top yellow">
+      <div class="card-label">Experiências</div>
+      <div class="card-val" style="font-size:32px;color:var(--yellow)" id="kExperiencias">—</div>
+      <div class="card-sub" id="kExperienciasSub">mês corrente</div>
+      <div class="card-delta delta-up" id="kExperienciasDelta">—</div>
+    </div>
+  </div>
+
+  <div class="card accent-top red">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div><div class="card-label">Alunos em Risco <span class="badge-modelo">🟡 modelo</span></div><div class="card-val" style="font-size:32px;color:var(--text3)">—</div><div class="card-sub">sem treino há 3+ dias</div></div>
+      <div style="font-size:28px;opacity:.25">⚠️</div>
+    </div>
+    <div class="card-delta delta-down">Sem rastreio de frequência de treino ainda</div>
+  </div>
+
+</div>
+
+<!-- Coluna direita: gráfico engajamento -->
+<div class="card accent-top orange">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div class="card-label" style="margin-bottom:4px">Índice de Engajamento do Time <span class="badge-modelo">🟡 modelo</span></div>
+      <div style="font-size:12px;color:var(--text2)">Evolução semanal — últimas 8 semanas</div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2)"><div style="width:16px;height:2px;background:var(--orange);border-radius:1px"></div>Treinos</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2)"><div style="width:16px;height:2px;background:var(--blue);border-radius:1px"></div>Missões</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2)"><div style="width:16px;height:2px;background:var(--purple);border-radius:1px"></div>Nota do dia</div>
+    </div>
+  </div>
+  <canvas id="engajamentoChart" style="width:100%;height:200px"></canvas>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
+    <div style="text-align:center;padding:8px 0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:46px;font-weight:900;color:var(--text3);line-height:1">—</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px;text-transform:uppercase;letter-spacing:.08em">Treinos marcados</div>
+    </div>
+    <div style="text-align:center;padding:8px 0;border-left:1px solid var(--border);border-right:1px solid var(--border)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:46px;font-weight:900;color:var(--text3);line-height:1">—</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px;text-transform:uppercase;letter-spacing:.08em">Missões concluídas</div>
+    </div>
+    <div style="text-align:center;padding:8px 0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:46px;font-weight:900;color:var(--text3);line-height:1">—</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px;text-transform:uppercase;letter-spacing:.08em">Nota do dia</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Planos a Renovar + Lista (full width) -->
+<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:12px">
+<div>
+
+  <div class="card accent-top yellow" style="grid-column:1">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="card-label" style="margin-bottom:4px">Planos a Renovar <span class="badge-real">🟢 total real</span></div>
+        <div style="display:flex;gap:4px" id="cicloSelector">
+          <button class="chip active" onclick="setCiclo(30,this)" style="font-size:10px;padding:3px 10px">30 dias</button>
+          <button class="chip" onclick="setCiclo(60,this)" style="font-size:10px;padding:3px 10px">60 dias</button>
+          <button class="chip" onclick="setCiclo(90,this)" style="font-size:10px;padding:3px 10px">90 dias</button>
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px dashed rgba(255,209,102,.4);cursor:pointer;font-size:11px;color:var(--yellow);transition:all .15s" onmouseover="this.style.background='rgba(255,209,102,.08)'" onmouseout="this.style.background='transparent'">
+        📂 CSV
+        <input type="file" accept=".csv" style="display:none" onchange="uploadCicloCSV(this)">
+      </label>
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span id="cicloUploadStatus">Suba um CSV com uma lista de nomes pra filtrar só esses alunos no ciclo (cruza com o sistema de verdade)</span>
+      <button onclick="limparFiltroCiclo()" id="btnLimparCicloFiltro" style="display:none;padding:2px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:10px;cursor:pointer">✕ limpar filtro</button>
+    </div>
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:16px;align-items:center;margin-bottom:12px">
+      <div style="text-align:center;padding-right:16px;border-right:1px solid var(--border)">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;color:var(--yellow);line-height:1" id="cicloTotal">67</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px" id="cicloLabel">vencendo em 30 dias</div>
+      </div>
+      <div style="display:contents">
+        <div style="grid-column:1/-1;font-size:9px;color:var(--yellow);margin-bottom:-4px">🟡 quebra por app é estimativa — sem rastreio de uso ainda</div>
+        <div style="background:rgba(45,212,160,.06);border:1px solid rgba(45,212,160,.15);border-radius:8px;padding:7px 10px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span style="font-size:10px;color:var(--text2)">🔥 Com app ativo</span>
+            <span style="font-size:11px;font-weight:800;color:var(--green);font-family:'DM Mono',monospace"><span id="cicloComAppRenov">34</span><span style="color:var(--text3);font-weight:400">/<span id="cicloComApp">38</span></span></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px"><div style="flex:1;height:3px;background:rgba(45,212,160,.15);border-radius:2px;overflow:hidden"><div style="width:89%;height:100%;background:var(--green);border-radius:2px"></div></div><span style="font-size:9px;font-weight:700;color:var(--green)" id="cicloComAppPct">89%</span></div>
+        </div>
+        <div style="background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.15);border-radius:8px;padding:7px 10px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span style="font-size:10px;color:var(--text2)">👤 Sem app</span>
+            <span style="font-size:11px;font-weight:800;color:var(--yellow);font-family:'DM Mono',monospace"><span id="cicloSemAppRenov">11</span><span style="color:var(--text3);font-weight:400">/<span id="cicloSemApp">17</span></span></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px"><div style="flex:1;height:3px;background:rgba(255,209,102,.15);border-radius:2px;overflow:hidden"><div style="width:64%;height:100%;background:var(--yellow);border-radius:2px"></div></div><span style="font-size:9px;font-weight:700;color:var(--yellow)" id="cicloSemAppPct">64%</span></div>
+        </div>
+        <div style="background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.15);border-radius:8px;padding:7px 10px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span style="font-size:10px;color:var(--text2)">⚠️ Sem treinador</span>
+            <span style="font-size:11px;font-weight:800;color:var(--red);font-family:'DM Mono',monospace"><span id="cicloSemTreinadorRenov">5</span><span style="color:var(--text3);font-weight:400">/<span id="cicloSemTreinador">12</span></span></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px"><div style="flex:1;height:3px;background:rgba(255,77,109,.15);border-radius:2px;overflow:hidden"><div style="width:41%;height:100%;background:var(--red);border-radius:2px"></div></div><span style="font-size:9px;font-weight:700;color:var(--red)" id="cicloSemTreinadorPct">41%</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="height:5px;background:var(--border2);border-radius:3px;overflow:hidden;display:flex;gap:1px;margin-bottom:4px">
+      <div style="height:100%;background:var(--green);border-radius:3px 0 0 3px;transition:width .6s ease" id="barComApp"></div>
+      <div style="height:100%;background:var(--yellow);transition:width .6s ease" id="barSemApp"></div>
+      <div style="height:100%;background:var(--red);border-radius:0 3px 3px 0;transition:width .6s ease" id="barSemTreinador"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-bottom:10px">
+      <span id="barPct1">57% alto eng.</span><span id="barPct2">25% médio</span><span id="barPct3">18% sem vínculo</span>
+    </div>
+    <div style="padding:8px 12px;border-radius:8px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.2);font-size:10px;color:var(--red);display:flex;align-items:center;gap:5px" id="cicloAlert">
+      ⚠️ <span id="cicloAlertText">12 sem treinador em risco</span>
+    </div>
+  </div>
+
+  <!-- Lista colapsável -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleCicloLista()">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="card-label" style="margin:0">Lista do Ciclo de Renovação</div>
+        <span style="font-size:10px;padding:2px 8px;background:var(--yellow-dim);border:1px solid rgba(255,209,102,.3);border-radius:4px;color:var(--yellow);font-weight:700">67 alunos</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:11px;color:var(--text3)">Clique para expandir</span>
+        <div id="cicloChevron" style="font-size:16px;color:var(--text3);transition:transform .25s">▾</div>
+      </div>
+    </div>
+    <div id="cicloListaBody" style="display:none;margin-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <a href="importar_carteira.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid var(--orange-border);background:var(--orange-dim);color:var(--orange);font-size:11px;font-weight:700;text-decoration:none">📤 Importar planilha de alunos</a>
+        <span style="font-size:10px;color:var(--text3)">Sobe Excel/CSV com nome, vencimento e treinador — organiza a carteira pro ciclo de renovação</span>
+      </div>
+      <div id="barraReatribuirCiclo" style="display:none;align-items:center;gap:10px;background:var(--orange-dim);border:1px solid var(--orange-border);border-radius:8px;padding:8px 12px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:700;color:var(--orange)"><span id="qtdSelecionadosCiclo">0</span> selecionado(s)</span>
+        <select id="selTreinadorDestinoCiclo" style="flex:1;min-width:180px;max-width:260px;background:#111;border:1px solid var(--border2);border-radius:7px;padding:6px 10px;color:var(--text);font-size:12px"></select>
+        <button onclick="reatribuirCicloSelecionados()" style="padding:6px 14px;border-radius:7px;border:none;background:var(--orange);color:#000;font-size:12px;font-weight:700;cursor:pointer">Direcionar pro treinador</button>
+        <button onclick="limparSelecaoCiclo()" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:12px;cursor:pointer">Cancelar</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;gap:4px;flex-wrap:wrap" id="cicloListFilter">
+          <button class="chip active" onclick="filterCicloList('todos',this)" style="font-size:10px;padding:3px 10px">Todos</button>
+          <button class="chip" onclick="filterCicloList('a_renovar',this)" style="font-size:10px;padding:3px 10px">🟡 A Renovar</button>
+          <button class="chip" onclick="filterCicloList('vencido',this)" style="font-size:10px;padding:3px 10px">🔴 Vencido</button>
+          <button class="chip" onclick="filterCicloList('nao_renovado',this)" style="font-size:10px;padding:3px 10px">⚫ Não Renovado</button>
+          <button class="chip" onclick="filterCicloList('renovado',this)" style="font-size:10px;padding:3px 10px">🟢 Renovado</button>
+          <button class="chip" onclick="filterCicloList('rematricula',this)" style="font-size:10px;padding:3px 10px">🔵 Rematrícula</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--orange-dim);border:1px solid var(--orange-border);border-radius:6px;font-size:10px;color:var(--orange)">
+          🔐 <span id="perfilAtual" style="font-weight:700;cursor:pointer" onclick="event.stopPropagation();togglePerfil()">Gestor (somente leitura)</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:24px 2fr 1fr 1fr 1fr 1.2fr;gap:8px;padding:6px 12px;background:var(--card2);border-radius:8px;margin-bottom:6px;align-items:center">
+        <input type="checkbox" id="chkTodosCiclo" onchange="toggleTodosCiclo(this)">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Aluno</div>
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Treinador</div>
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Vencimento</div>
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">App</div>
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Status</div>
+      </div>
+      <div id="cicloListaAlunos" style="display:flex;flex-direction:column;gap:4px;max-height:500px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Carteira por treinador -->
+<div class="card" style="margin-bottom:12px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div class="card-label" style="margin:0">Carteira por Treinador(a) — % sobre total</div>
+    <div style="font-size:11px;color:var(--text3)">Total carteira: 146 alunos</div>
+  </div>
+  <div class="bar-chart" id="carteiraChart"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     BLOCO 3 — NPS & PERCEPÇÃO DE VALOR
+══════════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <div class="sec-num">03</div>
+  <div class="sec-title">NPS & Percepção de Valor</div>
+  <div class="sec-line"></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:12px;margin-bottom:12px">
+
+  <!-- NPS Dia 1 -->
+  <div class="card accent-top green">
+    <div class="nps-big">
+      <div class="card-label">NPS Pós-Consultoria · Dia 1 <span class="badge-real">🟢 real</span></div>
+      <div class="nps-num" style="color:var(--green)" id="npsD1Num">—</div>
+      <div class="nps-label">média do time</div>
+    </div>
+    <div class="nps-bars">
+      <div class="nps-bar-row">
+        <div class="nps-bar-lbl" style="color:var(--green)">Promotores</div>
+        <div class="nps-bar-track"><div class="nps-bar-fill" id="npsD1BarProm" style="width:0%;background:var(--green)"></div></div>
+        <div class="nps-bar-pct" style="color:var(--green)" id="npsD1PctProm">—</div>
+      </div>
+      <div class="nps-bar-row">
+        <div class="nps-bar-lbl" style="color:var(--yellow)">Neutros</div>
+        <div class="nps-bar-track"><div class="nps-bar-fill" id="npsD1BarNeut" style="width:0%;background:var(--yellow)"></div></div>
+        <div class="nps-bar-pct" style="color:var(--yellow)" id="npsD1PctNeut">—</div>
+      </div>
+      <div class="nps-bar-row">
+        <div class="nps-bar-lbl" style="color:var(--red)">Detratores</div>
+        <div class="nps-bar-track"><div class="nps-bar-fill" id="npsD1BarDet" style="width:0%;background:var(--red)"></div></div>
+        <div class="nps-bar-pct" style="color:var(--red)" id="npsD1PctDet">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NPS Dia 21 -->
+  <div class="card accent-top orange">
+    <div class="nps-big">
+      <div class="card-label">NPS Pós-Ciclo · Dia 21 <span class="badge-modelo">🟡 modelo</span></div>
+      <div class="nps-num" style="color:var(--text3)">—</div>
+      <div class="nps-label">média do time</div>
+    </div>
+    <div class="nps-bars">
+      <div class="nps-bar-row">
+        <div class="nps-bar-lbl" style="color:var(--green)">Promotores</div>
+        <div class="nps-bar-track"><div class="nps-bar-fill" style="width:0%;background:var(--green)"></div></div>
+        <div class="nps-bar-pct" style="color:var(--text3)">—</div>
+      </div>
+      <div class="nps-bar-row">
+        <div class="nps-bar-lbl" style="color:var(--yellow)">Neutros</div>
+        <div class="nps-bar-track"><div class="nps-bar-fill" style="width:0%;background:var(--yellow)"></div></div>
+        <div class="nps-bar-pct" style="color:var(--text3)">—</div>
+      </div>
+      <div class="nps-bar-row">
+        <div class="nps-bar-lbl" style="color:var(--red)">Detratores</div>
+        <div class="nps-bar-track"><div class="nps-bar-fill" style="width:0%;background:var(--red)"></div></div>
+        <div class="nps-bar-pct" style="color:var(--text3)">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Percepção 2x2 -->
+  <div class="card">
+    <div class="card-label" style="margin-bottom:12px">Percepção de Valor — Dia 1 vs Dia 21 <span class="badge-modelo">🟡 modelo</span></div>
+    <div class="perc-grid">
+      <div class="perc-cell">
+        <div class="perc-moment">📍 Dia 1 — Diferencial</div>
+        <div class="perc-pct" style="color:var(--text3)">—</div>
+        <div class="perc-text" style="color:var(--text3)">Sem pesquisa conectada ainda</div>
+      </div>
+      <div class="perc-cell">
+        <div class="perc-moment">📍 Dia 1 — Expectativa</div>
+        <div class="perc-pct" style="color:var(--text3)">—</div>
+        <div class="perc-text" style="color:var(--text3)">Sem pesquisa conectada ainda</div>
+      </div>
+      <div class="perc-cell">
+        <div class="perc-moment">🏁 Dia 21 — Validação</div>
+        <div class="perc-pct" style="color:var(--text3)">—</div>
+        <div class="perc-text" style="color:var(--text3)">Sem pesquisa conectada ainda</div>
+      </div>
+      <div class="perc-cell">
+        <div class="perc-moment">🏁 Dia 21 — Entrega</div>
+        <div class="perc-pct" style="color:var(--text3)">—</div>
+        <div class="perc-text" style="color:var(--text3)">Sem pesquisa conectada ainda</div>
+      </div>
+    </div>
+    <div class="gap-alert" style="color:var(--text3)">
+      🟡 Esse painel liga automaticamente quando a pesquisa Dia 21 for conectada a uma tabela real (hoje só existe o formulário no app do aluno, sem gravação no banco).
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     BLOCO 4 — RANKING DE TREINADORES
+══════════════════════════════════════════════ -->
+<div class="sec-hdr" id="secTreinadores">
+  <div class="sec-num">04</div>
+  <div class="sec-title">Ranking de Treinadores</div>
+  <div class="sec-line"></div>
+  <div style="font-size:11px;color:var(--text3)">Clique no card para expandir o detalhe</div>
+</div>
+
+<div class="trainer-grid" id="trainerGrid"></div>
+
+<!-- ══════════════════════════════════════════════
+     BLOCO 5 — DESAFIOS ATIVOS & INDICAÇÕES
+══════════════════════════════════════════════ -->
+<div class="sec-hdr">
+  <div class="sec-num">05</div>
+  <div class="sec-title">Desafios Ativos & Indicações</div>
+  <div class="sec-line"></div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
+
+  <!-- Desafios -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="card-label" style="margin:0">Status dos alunos em desafio</div>
+      <div class="chips" style="margin:0" id="desafioChips">
+        <button class="chip active" onclick="filterDesafios('todos',this)">Todos (8)</button>
+        <button class="chip" onclick="filterDesafios('risco',this)">⚠️ Em risco (2)</button>
+        <button class="chip" onclick="filterDesafios('critico',this)">🔴 Crítico (1)</button>
+        <button class="chip" onclick="filterDesafios('ok',this)">✅ No prazo (5)</button>
+      </div>
+    </div>
+    <div class="desafios-list" id="desafiosList"></div>
+  </div>
+
+  <!-- Indicações -->
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:10px;margin-bottom:-4px"><span class="badge-modelo">🟡 modelo — sem tabela de indicações ainda</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="card accent-top orange">
+        <div class="card-label">Gerados</div>
+        <div class="ind-big" style="color:var(--text3)">—</div>
+        <div class="ind-label">códigos ativos</div>
+      </div>
+      <div class="card accent-top green">
+        <div class="card-label">Convertidos</div>
+        <div class="ind-big" style="color:var(--text3)">—</div>
+        <div class="ind-label">novas matrículas</div>
+      </div>
+    </div>
+    <div class="card" style="flex:1">
+      <div class="card-label">Taxa de conversão</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:900;color:var(--text3);margin-bottom:6px">—</div>
+      <div style="height:6px;background:var(--border2);border-radius:3px;overflow:hidden;margin-bottom:14px">
+        <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--blue),#B0D4FF);border-radius:3px"></div>
+      </div>
+      <div class="card-label" style="margin-bottom:8px">Por treinador (indicações — 0 até existir rastreio real)</div>
+      <div id="indRankingList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     BLOCO 5 — EQUIPE
+══════════════════════════════════════════════ -->
+<div class="sec-hdr" id="secEquipe">
+  <div class="sec-num">05</div>
+  <div class="sec-title">Equipe</div>
+  <div class="sec-line"></div>
+  <button onclick="abrirModalNovoMembro()" style="padding:6px 14px;border-radius:8px;border:none;background:var(--orange);color:#000;font-size:12px;font-weight:800;cursor:pointer;font-family:'Barlow Condensed',sans-serif">+ Novo(a)</button>
+</div>
+<div class="card">
+  <div id="equipeAviso" style="display:none;background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.25);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--yellow)"></div>
+  <div id="equipeLista" style="display:flex;flex-direction:column;gap:8px">
+    <div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Carregando equipe...</div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- MODAL: NOVO MEMBRO DA EQUIPE -->
+<div id="modalNovoMembro" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:420px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800">+ Novo(a) da Equipe</div>
+      <button onclick="document.getElementById('modalNovoMembro').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button id="tipoTreinadorBtn" onclick="setTipoMembro('treinador')" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--orange-border,rgba(245,184,0,.4));background:var(--orange-dim,rgba(245,184,0,.12));color:var(--orange);font-size:12px;font-weight:700;cursor:pointer">🏋️ Treinador(a)</button>
+      <button id="tipoConsultorBtn" onclick="setTipoMembro('consultor')" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer">💬 Consultor(a)</button>
+    </div>
+    <input type="hidden" id="nmTipo" value="treinador">
+    <div id="nmTipoTreinadorWrap" style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+      <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Vínculo</label>
+      <select id="nmTipoTreinador" style="background:#111;border:1px solid var(--border2);border-radius:8px;padding:9px;color:var(--text);font-size:13px">
+        <option value="interno">Interno</option>
+        <option value="externo">Externo</option>
+      </select>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+      <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Nome completo *</label>
+      <input type="text" id="nmNome" style="background:#111;border:1px solid var(--border2);border-radius:8px;padding:9px;color:var(--text);font-size:13px">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+      <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">E-mail *</label>
+      <input type="email" id="nmEmail" style="background:#111;border:1px solid var(--border2);border-radius:8px;padding:9px;color:var(--text);font-size:13px">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:16px">
+      <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Senha inicial (mín. 8 caracteres) *</label>
+      <input type="text" id="nmSenha" style="background:#111;border:1px solid var(--border2);border-radius:8px;padding:9px;color:var(--text);font-size:13px">
+    </div>
+    <button id="btnCriarMembro" onclick="criarMembroEquipe()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--orange);color:#000;font-size:14px;font-weight:800;cursor:pointer">Criar acesso</button>
+  </div>
+</div>
+
+<!-- MODAL: REDEFINIR SENHA DA EQUIPE -->
+<div id="modalEditarEquipe" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:380px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800">✎ Editar cadastro</div>
+      <button onclick="document.getElementById('modalEditarEquipe').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px">✕</button>
+    </div>
+    <input type="hidden" id="edEqEmailAtual">
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
+      <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Nome</label>
+      <input type="text" id="edEqNome" style="background:#111;border:1px solid var(--border2);border-radius:8px;padding:9px;color:var(--text);font-size:13px">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:16px">
+      <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">E-mail de acesso</label>
+      <input type="email" id="edEqEmail" style="background:#111;border:1px solid var(--border2);border-radius:8px;padding:9px;color:var(--text);font-size:13px">
+    </div>
+    <button onclick="salvarEditarEquipe()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--orange);color:#000;font-size:14px;font-weight:800;cursor:pointer">Salvar</button>
+  </div>
+</div>
+<div id="modalSenhaEquipe" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:380px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800">🔑 Redefinir Senha</div>
+      <button onclick="document.getElementById('modalSenhaEquipe').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px" id="senhaEquipeNome"></div>
+    <input type="hidden" id="senhaEquipeEmail">
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:16px">
+      <label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Nova senha (mín. 8 caracteres)</label>
+      <input type="text" id="novaSenhaEquipe" style="background:#111;border:1px solid var(--border2);border-radius:8px;padding:9px;color:var(--text);font-size:13px">
+    </div>
+    <button onclick="confirmarResetSenhaEquipe()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--orange);color:#000;font-size:14px;font-weight:800;cursor:pointer">Redefinir</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── DATA (populado via Supabase em carregarDadosReais) ─────────
+let TREINADORES = [];
+let DESAFIOS = [];
+
+// ── SUPABASE ─────────────────────────────────────────────────
+const SUPABASE_URL  = APP_CONFIG.SUPABASE_URL;
+const SUPABASE_ANON = APP_CONFIG.SUPABASE_ANON;
+let sb, academiaId, academiaNome = 'Academia';
+let modoAdmin = false;
+
+function fazerLogoutGestor(){
+  if(modoAdmin){ window.close(); return; }
+  if(sb) sb.auth.signOut();
+  localStorage.removeItem('qg90_user');
+  sessionStorage.clear();
+  window.location.replace('index.html');
+}
+
+// ══════════════════════════════════════════════
+// EQUIPE — via Edge Function "gestor-equipe" (a service_role key nunca chega aqui)
+// ══════════════════════════════════════════════
+const EDGE_FUNCTION_URL = SUPABASE_URL + '/functions/v1/gestor-equipe';
+
+async function chamarEdgeFunction(payload){
+  const { data: { session } } = await sb.auth.getSession();
+  if(!session){ showToast('Sessão expirada — faça login novamente.'); return { error: 'Sem sessão' }; }
+  const resp = await fetch(EDGE_FUNCTION_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + session.access_token },
+    body: JSON.stringify(payload),
+  });
+  return await resp.json();
+}
+
+function renderEquipe(){
+  if(!modoAdmin && !EQUIPE_STATUS_LIDO){ EQUIPE_STATUS_LIDO=true; carregarStatusEquipe(); }
+  const el = document.getElementById('equipeLista');
+  const aviso = document.getElementById('equipeAviso');
+  if(modoAdmin){
+    aviso.style.display = 'block';
+    aviso.textContent = '🛡️ Modo Admin: criação de acesso e redefinição de senha ficam desabilitadas aqui — use o Painel Admin pra isso.';
+  } else {
+    aviso.style.display = 'none';
+  }
+
+  const treinadores = (window.TREINADORES_DB_RAW||[]).map(t => ({...t, tipoPapel:'Treinador(a)', sub: t.tipo==='externo'?'Externo':'Interno', cor:'var(--orange)'}));
+  const consultores = (window.CONSULTORES_DB||[]).map(c => ({...c, tipoPapel:'Consultor(a)', sub:'Vendas', cor:'var(--blue)'}));
+  const todos = [...treinadores, ...consultores];
+
+  if(!todos.length){
+    el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Nenhum treinador ou consultor(a) cadastrado ainda.</div>';
+    return;
+  }
+
+  el.innerHTML = todos.map(p => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px">
+      <div style="width:34px;height:34px;border-radius:50%;background:${p.cor};opacity:.15;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700">${p.nome}</div>
+        <div style="font-size:11px;color:var(--text3)">${p.email||'sem e-mail cadastrado'} · <span style="color:${p.cor}">${p.tipoPapel}</span> · ${p.sub}${EQUIPE_INATIVOS[(p.email||'').toLowerCase()]?' · <b style="color:#ff6b6b">INATIVO(A)</b>':''}</div>
+      </div>
+      ${modoAdmin ? '' : `<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+        <button onclick="abrirEditarEquipe('${(p.nome||'').replace(/'/g,"\\'")}','${p.email||''}')" style="${EQ_BTN}">✎ Editar</button>
+        <button onclick="abrirModalSenhaEquipe('${(p.nome||'').replace(/'/g,"\\'")}','${p.email||''}')" style="${EQ_BTN}">🔑 Senha</button>
+        <button onclick="ativarMembroEquipe('${p.email||''}',${EQUIPE_INATIVOS[(p.email||'').toLowerCase()]?'true':'false'})" style="${EQ_BTN}">${EQUIPE_INATIVOS[(p.email||'').toLowerCase()]?'▶ Reativar':'⏸ Inativar'}</button>
+        <button onclick="excluirMembroEquipe('${(p.nome||'').replace(/'/g,"\\'")}','${p.email||''}')" style="${EQ_BTN};color:#ff6b6b;border-color:rgba(255,107,107,.4)">🗑 Excluir</button>
+      </div>`}
+    </div>`).join('');
+}
+
+function abrirModalNovoMembro(){
+  document.getElementById('nmNome').value = '';
+  document.getElementById('nmEmail').value = '';
+  document.getElementById('nmSenha').value = '';
+  setTipoMembro('treinador');
+  document.getElementById('modalNovoMembro').style.display = 'flex';
+}
+
+function setTipoMembro(tipo){
+  document.getElementById('nmTipo').value = tipo;
+  const btnT = document.getElementById('tipoTreinadorBtn');
+  const btnC = document.getElementById('tipoConsultorBtn');
+  const wrap = document.getElementById('nmTipoTreinadorWrap');
+  if(tipo==='treinador'){
+    btnT.style.background='var(--orange-dim,rgba(245,184,0,.12))'; btnT.style.color='var(--orange)'; btnT.style.borderColor='var(--orange-border,rgba(245,184,0,.4))';
+    btnC.style.background='transparent'; btnC.style.color='var(--text3)'; btnC.style.borderColor='var(--border2)';
+    wrap.style.display = 'flex';
+  } else {
+    btnC.style.background='var(--blue-dim,rgba(126,184,255,.12))'; btnC.style.color='var(--blue)'; btnC.style.borderColor='var(--blue-border,rgba(126,184,255,.4))';
+    btnT.style.background='transparent'; btnT.style.color='var(--text3)'; btnT.style.borderColor='var(--border2)';
+    wrap.style.display = 'none';
+  }
+}
+
+async function criarMembroEquipe(){
+  const tipo = document.getElementById('nmTipo').value;
+  const nome = document.getElementById('nmNome').value.trim();
+  const email = document.getElementById('nmEmail').value.trim();
+  const senha = document.getElementById('nmSenha').value.trim();
+  const tipoTreinador = document.getElementById('nmTipoTreinador').value;
+
+  if(!nome || !email || !senha){ showToast('Preencha nome, e-mail e senha'); return; }
+  if(senha.length < 8){ showToast('Senha precisa ter no mínimo 8 caracteres'); return; }
+
+  const btn = document.getElementById('btnCriarMembro');
+  btn.disabled = true; btn.textContent = 'Criando...';
+
+  try {
+    const resp = await chamarEdgeFunction({ action:'criar_usuario', nome, email, senha, tipo, tipoTreinador });
+    if(resp.error){ showToast('Erro: '+resp.error); return; }
+    showToast('✅ ' + resp.message);
+    document.getElementById('modalNovoMembro').style.display = 'none';
+    await carregarDadosReais();
+  } catch(err){
+    console.error(err);
+    showToast('Erro ao criar acesso: '+err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Criar acesso';
+  }
+}
+
+function abrirModalSenhaEquipe(nome, email){
+  document.getElementById('senhaEquipeNome').textContent = `${nome} · ${email}`;
+  document.getElementById('senhaEquipeEmail').value = email;
+  document.getElementById('novaSenhaEquipe').value = '';
+  document.getElementById('modalSenhaEquipe').style.display = 'flex';
+}
+
+async function confirmarResetSenhaEquipe(){
+  const email = document.getElementById('senhaEquipeEmail').value;
+  const novaSenha = document.getElementById('novaSenhaEquipe').value.trim();
+  if(novaSenha.length < 8){ showToast('Senha precisa ter no mínimo 8 caracteres'); return; }
+
+  try {
+    const resp = await chamarEdgeFunction({ action:'resetar_senha', email, novaSenha });
+    if(resp.error){ showToast('Erro: '+resp.error); return; }
+    showToast('✅ ' + resp.message);
+    document.getElementById('modalSenhaEquipe').style.display = 'none';
+  } catch(err){
+    console.error(err);
+    showToast('Erro ao redefinir: '+err.message);
+  }
+}
+
+// ── Equipe: editar, inativar/reativar e excluir (Edge Function gestor-equipe) ──
+const EQ_BTN='padding:6px 10px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap';
+let EQUIPE_INATIVOS={}, EQUIPE_STATUS_LIDO=false;
+async function carregarStatusEquipe(){
+  try{
+    const r=await chamarEdgeFunction({action:'status_equipe'});
+    if(r&&r.lista){ EQUIPE_INATIVOS={}; r.lista.forEach(x=>{ if(x.inativo) EQUIPE_INATIVOS[String(x.email||'').toLowerCase()]=true; }); renderEquipe(); }
+  }catch(e){ console.warn('status da equipe', e); }
+}
+function abrirEditarEquipe(nome,email){
+  document.getElementById('edEqEmailAtual').value=email;
+  document.getElementById('edEqNome').value=nome;
+  document.getElementById('edEqEmail').value=email;
+  document.getElementById('modalEditarEquipe').style.display='flex';
+}
+async function salvarEditarEquipe(){
+  const email=document.getElementById('edEqEmailAtual').value;
+  const nome=document.getElementById('edEqNome').value.trim();
+  const novoEmail=document.getElementById('edEqEmail').value.trim().toLowerCase();
+  if(!nome||!novoEmail){ showToast('Preencha nome e e-mail'); return; }
+  const r=await chamarEdgeFunction({action:'editar_usuario', email, nome, novoEmail});
+  if(r.error){ showToast('Erro: '+r.error); return; }
+  showToast('✅ '+r.message+' Se o e-mail mudou, atualize também o acesso no Hub.');
+  document.getElementById('modalEditarEquipe').style.display='none';
+  await carregarDadosReais();
+}
+async function ativarMembroEquipe(email,estaInativo){
+  const ativar=!!estaInativo;
+  if(!confirm(ativar?'Reativar o acesso desta pessoa?':'Inativar esta pessoa? O login fica bloqueado, mas os alunos, planners e o histórico continuam guardados.')) return;
+  const r=await chamarEdgeFunction({action:'ativar_usuario', email, ativo:ativar});
+  if(r.error){ showToast('Erro: '+r.error); return; }
+  showToast('✅ '+r.message);
+  if(ativar) delete EQUIPE_INATIVOS[email.toLowerCase()]; else EQUIPE_INATIVOS[email.toLowerCase()]=true;
+  renderEquipe();
+}
+async function excluirMembroEquipe(nome,email){
+  const conf=prompt('Excluir de vez o cadastro de '+nome+'? Use só para cadastro errado.\nPara confirmar, digite o primeiro nome: '+String(nome).split(' ')[0]);
+  if(conf===null) return;
+  if(conf.trim().toLowerCase()!==String(nome).split(' ')[0].toLowerCase()){ showToast('Nome não confere. Nada foi excluído.'); return; }
+  const r=await chamarEdgeFunction({action:'excluir_usuario', email});
+  if(r.error){ showToast('⚠️ '+r.error); return; }
+  showToast('✅ '+r.message+' Se ela tinha acesso ao Hub, exclua lá também.');
+  await carregarDadosReais();
+}
+
+// Cores fixas para diferenciar treinadores nos gráficos
+const CORES_TREINADOR = ['#F5B800','#7EB8FF','#2DD4A0','#B09FFF','#FFD166','#FF4D6D','#FFD34D','#9AF0D0'];
+
+function diasEntre(a, b){ return Math.floor((b-a)/(1000*60*60*24)); }
+function mesAtualISO(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function inicioSemana(){
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const dia=hoje.getDay();
+  const seg=new Date(hoje); seg.setDate(hoje.getDate()-(dia===0?6:dia-1));
+  return seg;
+}
+
+async function carregarDadosReais(){
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, window.gfOpcoesAuth);
+
+    // ── MODO ADMIN: acesso direto vindo do painel admin, sem login ──
+    const urlParams = new URLSearchParams(window.location.search);
+    const adminAcademiaId = urlParams.get('admin_academia');
+
+    if(adminAcademiaId){
+      modoAdmin = true;
+      academiaId = adminAcademiaId;
+      const { data: academia } = await sb.from('academias').select('nome').eq('id', academiaId).single();
+      if(!academia){
+        document.querySelector('.content').innerHTML = '<div style="padding:60px;text-align:center;color:var(--text2)">Academia não encontrada.</div>';
+        return;
+      }
+      academiaNome = academia.nome;
+      document.getElementById('academiaNome').textContent = academiaNome;
+      document.getElementById('academiaLogoLetter').textContent = academiaNome.charAt(0).toUpperCase();
+      mostrarBannerModoAdmin();
+      await carregarDadosAcademia();
+      return;
+    }
+
+    const { data: { session } } = await sb.auth.getSession();
+    if(!session){ window.location.replace('index.html'); return; }
+
+    const { data: gestor } = await sb.from('gestores').select('*').eq('user_id', session.user.id).single();
+    if(!gestor){
+      document.querySelector('.content').innerHTML = '<div style="padding:60px;text-align:center;color:var(--text2)">Perfil de gestor não encontrado para este usuário.</div>';
+      return;
+    }
+    academiaId = gestor.academia_id;
+
+    const { data: academia } = await sb.from('academias').select('nome').eq('id', academiaId).single();
+    if(!(await gfConfereAcademia(sb, academia?.nome))) return;
+    academiaNome = academia?.nome || 'Academia';
+    document.getElementById('academiaNome').textContent = academiaNome;
+    document.getElementById('academiaLogoLetter').textContent = academiaNome.charAt(0).toUpperCase();
+    await carregarDadosAcademia();
+
+  } catch(err){
+    console.error('Erro ao carregar dados do dashboard:', err);
+    showToast('Erro ao carregar dados: '+err.message);
+  }
+}
+
+function mostrarBannerModoAdmin(){
+  const b = document.createElement('div');
+  b.style.cssText = 'position:sticky;top:0;z-index:200;background:#3B1F0A;border-bottom:2px solid var(--orange);color:var(--orange);font-size:12px;font-weight:700;padding:8px 16px;text-align:center;font-family:"Barlow",sans-serif';
+  b.innerHTML = '🛡️ MODO ADMIN — visualizando o dashboard deste gestor. Nenhuma senha foi usada. <button onclick="window.close()" style="margin-left:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--orange);background:transparent;color:var(--orange);font-weight:700;cursor:pointer;font-size:11px">Fechar aba</button>';
+  document.body.insertBefore(b, document.body.firstChild);
+}
+
+async function carregarDadosAcademia(){
+  try {
+    // ── Buscar dados-base em paralelo ──
+    const [alunosRes, treinadoresRes, plannersRes, expRes, consultoresRes] = await Promise.all([
+      sb.from('alunos').select('*').eq('academia_id', academiaId),
+      sb.from('treinadores').select('*').eq('academia_id', academiaId),
+      sb.from('planners').select('*').eq('academia_id', academiaId),
+      sb.from('experiencias').select('*').eq('academia_id', academiaId),
+      sb.from('consultores').select('*').eq('academia_id', academiaId),
+    ]);
+    const alunos = alunosRes.data || [];
+    const treinadoresDB = treinadoresRes.data || [];
+    const planners = plannersRes.data || [];
+    const experiencias = expRes.data || [];
+    window.CONSULTORES_DB = consultoresRes.data || [];
+    window.TREINADORES_DB_RAW = treinadoresDB;
+    renderEquipe();
+
+    // Diário do treinador — mês corrente (para consultorias/experiências/novos) e semana corrente (revisões)
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const inicioMes = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-01`;
+    const seg = inicioSemana();
+    const segStr = seg.toISOString().slice(0,10);
+
+    const { data: diariosMes } = await sb.from('diario_treinador').select('*')
+      .eq('academia_id', academiaId).gte('data', inicioMes);
+    const diarios = diariosMes || [];
+    const diariosSemana = diarios.filter(d => d.data >= segStr);
+
+    // NPS Dia 1 — filtra pelos alunos desta academia
+    const alunoIds = new Set(alunos.map(a=>a.id));
+    const { data: npsAll } = await sb.from('nps_dia1').select('*');
+    const nps = (npsAll||[]).filter(n => alunoIds.has(n.aluno_id));
+
+    // ── Academia — Visão Macro ──
+    const ativos = alunos.filter(a=>a.ativo);
+    const comPlanner = ativos.filter(a=>planners.some(p=>p.aluno_id===a.id));
+    const novosNoMes = ativos.filter(a=>a.criado_em && a.criado_em >= inicioMes);
+    const novosComPlanner = novosNoMes.filter(a=>planners.some(p=>p.aluno_id===a.id));
+    const ativacaoPct = novosNoMes.length ? Math.round(novosComPlanner.length/novosNoMes.length*100) : 0;
+    const vincPct = ativos.length ? Math.round(comPlanner.length/ativos.length*100) : 0;
+
+    document.getElementById('mAlunosAtivos').textContent = ativos.length;
+    document.getElementById('mAlunosAtivosSub').textContent = alunos[0]?.criado_em ? `${novosNoMes.length} novos este mês` : '(coluna criado_em não encontrada)';
+    document.getElementById('mComPlanner').textContent = comPlanner.length;
+    document.getElementById('mComPlannerSub').textContent = `${vincPct}% da carteira ativa`;
+    document.getElementById('mNovosMes').textContent = novosNoMes.length;
+    document.getElementById('mNovosComPlanner').textContent = novosComPlanner.length;
+    document.getElementById('mNovosSemPlanner').textContent = novosNoMes.length - novosComPlanner.length;
+    document.getElementById('mAtivacaoPct').textContent = ativacaoPct+'%';
+    document.getElementById('mAtivacaoBar').style.width = ativacaoPct+'%';
+    document.getElementById('mAtivacaoAlerta').innerHTML = novosNoMes.length===0
+      ? '<span>ℹ️</span><span>Sem novos alunos registrados este mês ainda</span>'
+      : (ativacaoPct>=60 ? '<span>✅</span><span>Ativação acima da meta (60%)</span>' : '<span>⚠️</span><span>Ativação abaixo da meta (60%)</span>');
+
+    document.getElementById('mRingPct').textContent = vincPct+'%';
+    document.getElementById('mRingDesc').textContent = `${vincPct}% dos alunos ativos estão no método`;
+    document.getElementById('mRingBar').style.width = Math.min(100,vincPct)+'%';
+    const circunf = 276.5;
+    document.getElementById('mRingFill').setAttribute('stroke-dashoffset', String(circunf - (circunf*Math.min(100,vincPct)/100)));
+
+    // ── Bloco 2 — KPIs Depto Técnico (mês/semana correntes, via Diário) ──
+    const somaCampo = (arr,campo)=>arr.reduce((s,d)=>s+(d[campo]||0),0);
+    const consultorias = somaCampo(diarios,'consultorias_realizadas');
+    const revisoesRealizadas = somaCampo(diariosSemana,'revisoes_realizadas');
+    const revisoesPrevistas = somaCampo(diariosSemana,'revisoes_previstas');
+
+    const expMes = experiencias.filter(e=>!e.criado_em || e.criado_em >= inicioMes);
+    const expConvertidas = expMes.filter(e=>e.status==='convertida').length;
+    const expTotal = expMes.length;
+
+    document.getElementById('kConsultorias').textContent = consultorias;
+    document.getElementById('kConsultoriasSub').textContent = 'somado do Diário — mês corrente';
+    document.getElementById('kConsultoriasDelta').textContent = '🟢 dado real';
+
+    document.getElementById('kRevisoes').textContent = revisoesRealizadas;
+    document.getElementById('kRevisoesSub').textContent = `de ${revisoesPrevistas} previstas — semana`;
+    document.getElementById('kRevisoesDelta').textContent = revisoesPrevistas ? Math.round(revisoesRealizadas/revisoesPrevistas*100)+'% 🟢 real' : '🟢 dado real';
+
+    document.getElementById('kExperiencias').textContent = expTotal;
+    document.getElementById('kExperienciasSub').textContent = `${expConvertidas} convertidas — mês`;
+    document.getElementById('kExperienciasDelta').textContent = expTotal ? Math.round(expConvertidas/expTotal*100)+'% conv. 🟢 real' : '🟢 dado real';
+
+    // ── NPS Dia 1 (real) ──
+    if(nps.length){
+      const media = (nps.reduce((s,n)=>s+(n.nps_nota||0),0)/nps.length);
+      const prom = nps.filter(n=>n.nps_nota>=9).length;
+      const det  = nps.filter(n=>n.nps_nota<=6).length;
+      const neu  = nps.length-prom-det;
+      document.getElementById('npsD1Num').textContent = media.toFixed(1);
+      const pP=Math.round(prom/nps.length*100), pN=Math.round(neu/nps.length*100), pD=Math.round(det/nps.length*100);
+      document.getElementById('npsD1BarProm').style.width=pP+'%'; document.getElementById('npsD1PctProm').textContent=pP+'%';
+      document.getElementById('npsD1BarNeut').style.width=pN+'%'; document.getElementById('npsD1PctNeut').textContent=pN+'%';
+      document.getElementById('npsD1BarDet').style.width=pD+'%';  document.getElementById('npsD1PctDet').textContent=pD+'%';
+    } else {
+      document.getElementById('npsD1Num').textContent = '—';
+    }
+
+    // ── Treinadores + Ranking (dados reais onde existem) ──
+    TREINADORES = treinadoresDB.map((t,i) => {
+      const carteira = ativos.filter(a=>a.treinador_id===t.id);
+      const carteiraPct = ativos.length ? Math.round(carteira.length/ativos.length*100) : 0;
+      const diariosT = diarios.filter(d=>d.treinador_id===t.id);
+      const diariosSemanaT = diariosSemana.filter(d=>d.treinador_id===t.id);
+      const cons = somaCampo(diariosT,'consultorias_realizadas');
+      const revR = somaCampo(diariosSemanaT,'revisoes_realizadas');
+      const revA = somaCampo(diariosSemanaT,'revisoes_previstas');
+      const expT = experiencias.filter(e=>e.treinador_id===t.id);
+      const expConvT = expT.filter(e=>e.status==='convertida').length;
+      const plannersT = planners.filter(p=>p.treinador_resp_id===t.id);
+      const desafiosAtivosT = plannersT.filter(p=>{
+        if(!p.inicio_desafio) return false;
+        const d = diasEntre(new Date(p.inicio_desafio+'T00:00:00'), hoje);
+        return d>=0 && d<=21;
+      }).length;
+      const npsT = nps.filter(n=>n.treinador_id===t.id);
+      const nps1 = npsT.length ? (npsT.reduce((s,n)=>s+(n.nps_nota||0),0)/npsT.length) : null;
+      const estrelas = npsT.length ? (npsT.reduce((s,n)=>s+(n.q3_estrelas||0),0)/npsT.length) : null;
+
+      // Score composto — só com métricas reais disponíveis (revisões%, conversão%, NPS)
+      const revPct = revA ? (revR/revA*100) : null;
+      const convPct = expT.length ? (expConvT/expT.length*100) : null;
+      const partes = [revPct, convPct, nps1!==null?nps1*10:null].filter(v=>v!==null);
+      const score = partes.length ? Math.round(partes.reduce((s,v)=>s+v,0)/partes.length) : 0;
+
+      return {
+        id: t.id, nome: t.nome, tipo: t.tipo==='externo'?'Externo':'Interno',
+        color: CORES_TREINADOR[i % CORES_TREINADOR.length], score,
+        kpis: {
+          carteira: carteira.length, carteiraPct,
+          desafios: desafiosAtivosT, onboarding: null, // onboarding: sem métrica própria ainda
+          consultorias: cons, meta: null,
+          revisoes: revR, revisoesAg: revA || 0,
+          retencao: null, // sem tracking de renovação vinculado ao treinador ainda
+          expAtend: expT.length, expConv: expConvT, expConvPct: expT.length?Math.round(expConvT/expT.length*100):0,
+          nps1: nps1!==null?Number(nps1.toFixed(1)):null, nps21: null,
+          estrelas: estrelas!==null?Number(estrelas.toFixed(1)):null, indicacoes: 0,
+          eng: { treinos:null, missoes:null, nota:null },
+        }
+      };
+    });
+
+    // ── Desafios ativos (real, via planners) ──
+    DESAFIOS = planners.filter(p=>p.inicio_desafio).map(p=>{
+      const d = diasEntre(new Date(p.inicio_desafio+'T00:00:00'), hoje);
+      const aluno = alunos.find(a=>a.id===p.aluno_id);
+      const treinador = treinadoresDB.find(t=>t.id===p.treinador_resp_id);
+      let status = 'ok';
+      if(d>21) status = null; // fora da janela — não exibir
+      else if(d>=18) status = 'risco';
+      return { nome: aluno?.nome||'—', treinador: treinador?.nome||null, dia: d,
+        status, prog: p.foco || p.area_foco || '—', treinos:null, missoes:null };
+    }).filter(d=>d.status);
+
+    // ── Planos a renovar (real, via alunos.vencimento) ──
+    CICLO_ALUNOS = alunos.filter(a=>a.vencimento).map(a=>{
+      const v = new Date(a.vencimento+'T00:00:00');
+      const diasAposVenc = diasEntre(v, hoje);
+      const treinador = treinadoresDB.find(t=>t.id===a.treinador_id);
+      let status = diasAposVenc<=0 ? 'a_renovar' : diasAposVenc<=31 ? 'vencido' : 'nao_renovado';
+      return { id:a.id, nome:a.nome, treinador: treinador?.nome||null, venc:a.vencimento, app:false, diasAposVenc, status };
+    });
+
+    // ── Renderizar tudo com dados carregados ──
+    renderCarteiraChart();
+    renderTrainers();
+    renderDesafios();
+    renderIndRanking();
+    renderCicloLista();
+    renderCiclo();
+    renderEvolucaoChart();  // segue ilustrativo — sem histórico mensal salvo
+    renderEngajamentoChart(); // segue ilustrativo — sem tracking de engajamento salvo
+
+  } catch(err){
+    console.error('Erro ao carregar dados do dashboard:', err);
+    showToast('Erro ao carregar dados: '+err.message);
+  }
+}
+
+// ── CLOCK ────────────────────────────────────────────────────
+function updateClock(){
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── CARTEIRA CHART ────────────────────────────────────────────
+function renderCarteiraChart(){
+  const c = document.getElementById('carteiraChart');
+  c.innerHTML = '';
+  if(!TREINADORES.length){ c.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">Nenhum treinador cadastrado ainda.</div>'; return; }
+  TREINADORES.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label">${t.nome.split(' ')[0]}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${t.kpis.carteiraPct}%;background:${t.color}"></div>
+      </div>
+      <div class="bar-val" style="color:${t.color}">${t.kpis.carteira}</div>
+      <div style="font-size:10px;color:var(--text3);width:32px;text-align:right;flex-shrink:0">${t.kpis.carteiraPct}%</div>`;
+    c.appendChild(row);
+  });
+}
+
+// ── TRAINER CARDS ─────────────────────────────────────────────
+function renderTrainers(){
+  const grid = document.getElementById('trainerGrid');
+  grid.innerHTML = '';
+  if(!TREINADORES.length){ grid.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">Nenhum treinador cadastrado ainda.</div>'; return; }
+  const sorted = [...TREINADORES].sort((a,b) => b.score - a.score);
+  const medals = ['🥇','🥈','🥉',''];
+
+  sorted.forEach((t, i) => {
+    const k = t.kpis;
+    const scoreColor = t.score >= 85 ? 'var(--green)' : t.score >= 70 ? 'var(--orange)' : 'var(--red)';
+    const estrelasVal = k.estrelas ?? 0;
+    const stars = [1,2,3,4,5].map(n =>
+      `<span style="font-size:12px">${estrelasVal >= n ? '⭐' : '☆'}</span>`
+    ).join('');
+    const nv = (v, suf='') => v===null||v===undefined ? '<span style="color:var(--text3)">— 🟡</span>' : v+suf;
+    const nvColor = (v, thresholds, colors) => {
+      if(v===null||v===undefined) return 'var(--text3)';
+      for(let idx=0; idx<thresholds.length; idx++) if(v>=thresholds[idx]) return colors[idx];
+      return colors[colors.length-1];
+    };
+
+    const div = document.createElement('div');
+    div.className = 'trainer-card';
+    div.id = 'tc-'+t.id;
+    div.innerHTML = `
+      <div class="trainer-top" onclick="toggleTrainer('${t.id}')">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between">
+          <div class="trainer-avatar" style="background:${t.color}">${t.nome.charAt(0)}</div>
+          <div class="trainer-medal">${medals[i]}</div>
+        </div>
+        <div class="trainer-name">${t.nome}</div>
+        <div class="trainer-type">${t.tipo} · ${k.carteira} alunos (${k.carteiraPct}%)</div>
+        <div class="trainer-score-row">
+          <div class="trainer-score" style="color:${scoreColor}">${t.score}</div>
+          <div class="trainer-score-lbl">score<br>composto</div>
+        </div>
+        <button onclick="event.stopPropagation();window.open('sistema_integrado_v3.html?admin_academia='+academiaId+'&admin_treinador='+'${t.id}','_blank')" style="margin-top:8px;width:100%;padding:6px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:10.5px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif">🖥️ Ver sistema deste(a) treinador(a)</button>
+      </div>
+      <div class="trainer-mini-row">
+        <div class="trainer-mini-cell">
+          <div class="trainer-mini-val" style="color:${nvColor(k.nps1,[8,6],['var(--green)','var(--yellow)','var(--red)'])}">${nv(k.nps1)}</div>
+          <div class="trainer-mini-lbl">NPS D1</div>
+        </div>
+        <div class="trainer-mini-cell">
+          <div class="trainer-mini-val" style="color:var(--text3)">${nv(k.nps21)}</div>
+          <div class="trainer-mini-lbl">NPS D21 🟡</div>
+        </div>
+        <div class="trainer-mini-cell">
+          <div class="trainer-mini-val" style="color:var(--orange)">${k.desafios}</div>
+          <div class="trainer-mini-lbl">🔥 Desafios</div>
+        </div>
+        <div class="trainer-mini-cell">
+          <div class="trainer-mini-val" style="color:var(--text3)">${nv(k.onboarding)}</div>
+          <div class="trainer-mini-lbl">🆕 Onboard 🟡</div>
+        </div>
+      </div>
+      <div class="trainer-detail">
+        <div class="detail-row"><span class="detail-lbl">Avaliação alunos${k.estrelas===null?' 🟡':''}</span><span>${stars} ${nv(k.estrelas,'/5')}</span></div>
+        <div class="detail-row"><span class="detail-lbl">🔥 Desafio em curso</span><span class="detail-val" style="color:var(--orange)">${k.desafios} alunos</span></div>
+        <div class="detail-row"><span class="detail-lbl">🆕 Em onboarding 🟡</span><span class="detail-val" style="color:var(--text3)">${nv(k.onboarding,' alunos')}</span></div>
+        <div class="detail-row"><span class="detail-lbl">Retenção 🟡</span><span class="detail-val" style="color:var(--text3)">${nv(k.retencao,'%')}</span></div>
+        <div class="detail-row"><span class="detail-lbl">Consultorias 🟢</span><span class="detail-val" style="color:var(--green)">${k.consultorias}${k.meta?'/'+k.meta:' (mês corrente)'}</span></div>
+        <div class="detail-row"><span class="detail-lbl">Revisões 🟢</span><span class="detail-val">${k.revisoes}/${k.revisoesAg} (${k.revisoesAg?Math.round(k.revisoes/k.revisoesAg*100):0}%)</span></div>
+        <div class="detail-row"><span class="detail-lbl">Experiências conv. 🟢</span><span class="detail-val" style="color:${k.expConvPct>=70?'var(--green)':'var(--yellow)'}">${k.expConv}/${k.expAtend} · ${k.expConvPct}%</span></div>
+        <div class="detail-row"><span class="detail-lbl">Indicações 🟡</span><span class="detail-val" style="color:var(--text3)">${k.indicacoes} (sem tabela ainda)</span></div>
+        <div class="eng-section">
+          <div class="eng-title">Índice de Engajamento dos Alunos <span class="badge-modelo">🟡 modelo</span></div>
+          <div class="eng-row">
+            <div class="eng-lbl">Treinos feitos</div>
+            <div class="eng-track"><div class="eng-fill" style="width:0%;background:var(--orange)"></div></div>
+            <div class="eng-val" style="color:var(--text3)">${nv(k.eng.treinos,'%')}</div>
+          </div>
+          <div class="eng-row">
+            <div class="eng-lbl">Missões</div>
+            <div class="eng-track"><div class="eng-fill" style="width:0%;background:var(--blue)"></div></div>
+            <div class="eng-val" style="color:var(--text3)">${nv(k.eng.missoes,'%')}</div>
+          </div>
+          <div class="eng-row">
+            <div class="eng-lbl">Nota do dia</div>
+            <div class="eng-track"><div class="eng-fill" style="width:0%;background:var(--purple)"></div></div>
+            <div class="eng-val" style="color:var(--text3)">${nv(k.eng.nota,'%')}</div>
+          </div>
+        </div>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+function toggleTrainer(id){
+  document.getElementById('tc-'+id).classList.toggle('open');
+}
+
+// ── DESAFIOS ─────────────────────────────────────────────────
+let currentFilter = 'todos';
+function renderDesafios(){
+  const c = document.getElementById('desafiosList'); c.innerHTML = '';
+  const filtered = DESAFIOS.filter(d => currentFilter === 'todos' || d.status === currentFilter);
+  const sc = {ok:'var(--green)',risco:'var(--yellow)',critico:'var(--red)'};
+  const sl = {ok:'No prazo',risco:'Em risco',critico:'Sem interação'};
+
+  // Atualiza contadores dos chips com dados reais
+  const totalC=DESAFIOS.length, riscoC=DESAFIOS.filter(d=>d.status==='risco').length,
+        criticoC=DESAFIOS.filter(d=>d.status==='critico').length, okC=DESAFIOS.filter(d=>d.status==='ok').length;
+  const chipsEl = document.getElementById('desafioChips');
+  if(chipsEl){
+    chipsEl.innerHTML = `
+      <button class="chip ${currentFilter==='todos'?'active':''}" onclick="filterDesafios('todos',this)">Todos (${totalC})</button>
+      <button class="chip ${currentFilter==='risco'?'active':''}" onclick="filterDesafios('risco',this)">⚠️ Em risco (${riscoC})</button>
+      <button class="chip ${currentFilter==='critico'?'active':''}" onclick="filterDesafios('critico',this)">🔴 Crítico (${criticoC})</button>
+      <button class="chip ${currentFilter==='ok'?'active':''}" onclick="filterDesafios('ok',this)">✅ No prazo (${okC})</button>`;
+  }
+
+  if(!filtered.length){ c.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--text3)">Nenhum desafio ativo neste filtro.</div>'; return; }
+
+  filtered.forEach(d => {
+    const pct = Math.round(d.dia/21*100);
+    const row = document.createElement('div');
+    row.className = 'desafio-row ' + (d.status !== 'ok' ? d.status : '');
+    row.innerHTML = `
+      <div class="desafio-av" style="background:${sc[d.status]}">${d.nome.charAt(0)}</div>
+      <div class="desafio-info">
+        <div class="desafio-nome">${d.nome}</div>
+        <div class="desafio-sub">${d.treinador||'Sem treinador'} · ${d.prog}</div>
+        <div class="desafio-prog"><div class="desafio-prog-fill" style="width:${pct}%;background:${sc[d.status]}"></div></div>
+      </div>
+      <div class="desafio-right">
+        <div class="desafio-dia" style="color:${sc[d.status]}">Dia ${d.dia}</div>
+        <div class="desafio-status" style="color:${sc[d.status]}">${sl[d.status]}</div>
+        <div class="desafio-stats" style="color:var(--text3)" title="Treinos/missões: sem rastreio ainda">💪— ✅— 🟡</div>
+      </div>
+      <div class="status-dot" style="background:${sc[d.status]}"></div>`;
+    c.appendChild(row);
+  });
+}
+
+function filterDesafios(f, btn){
+  currentFilter = f;
+  document.querySelectorAll('#desafioChips .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDesafios();
+}
+
+// ── INDICAÇÕES RANKING ────────────────────────────────────────
+function renderIndRanking(){
+  const c = document.getElementById('indRankingList');
+  c.innerHTML = '';
+  if(!TREINADORES.length){ c.innerHTML='<div style="font-size:11px;color:var(--text3)">Sem treinadores cadastrados.</div>'; return; }
+  [...TREINADORES].sort((a,b) => b.kpis.indicacoes - a.kpis.indicacoes).forEach(t => {
+    const pct = 0; // sem tabela de indicações ainda — todos zerados
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px';
+    row.innerHTML = `
+      <div style="font-size:11px;color:var(--text2);width:70px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.nome.split(' ')[0]}</div>
+      <div style="flex:1;height:5px;background:var(--border2);border-radius:3px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${t.color};border-radius:3px"></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;width:16px;text-align:right;flex-shrink:0;font-family:'DM Mono',monospace">${t.kpis.indicacoes}</div>`;
+    c.appendChild(row);
+  });
+}
+
+function toggleCicloLista(){
+  const body = document.getElementById('cicloListaBody');
+  const chevron = document.getElementById('cicloChevron');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  if(!isOpen) renderCicloLista();
+}
+
+// ── ENGAJAMENTO CHART ─────────────────────────────────────────
+function renderEngajamentoChart(){
+  const canvas = document.getElementById('engajamentoChart');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const semanas = ['S1','S2','S3','S4','S5','S6','S7','S8'];
+  const treinos =  [65, 70, 72, 75, 74, 78, 80, 78];
+  const missoes =  [42, 48, 52, 55, 53, 58, 62, 60];
+  const notaDia =  [30, 35, 40, 45, 42, 50, 55, 53];
+  const series = [
+    {data:treinos, color:'#F5B800', label:'Treinos'},
+    {data:missoes, color:'#7EB8FF', label:'Missões'},
+    {data:notaDia, color:'#B09FFF', label:'Nota do dia'},
+  ];
+
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.offsetWidth;
+  const H = 200;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  ctx.scale(dpr, dpr);
+
+  const pad = {top:14, right:16, bottom:28, left:36};
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const maxVal = 100;
+
+  // Grid & labels Y
+  ctx.textAlign = 'right';
+  [0,25,50,75,100].forEach(v => {
+    const y = pad.top + cH*(1 - v/maxVal);
+    ctx.strokeStyle = 'rgba(255,255,255,.05)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left+cW, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.25)';
+    ctx.font = '9px DM Mono';
+    ctx.fillText(v+'%', pad.left-4, y+3);
+  });
+
+  // Semana labels X
+  ctx.textAlign = 'center';
+  semanas.forEach((s,i) => {
+    const x = pad.left + (i/(semanas.length-1))*cW;
+    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    ctx.font = '9px DM Sans';
+    ctx.fillText(s, x, H-8);
+  });
+
+  // Area + Line per series
+  series.forEach(s => {
+    const pts = s.data.map((v,i) => ({
+      x: pad.left + (i/(semanas.length-1))*cW,
+      y: pad.top + cH*(1 - v/maxVal)
+    }));
+
+    // Area fill
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pad.top+cH);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[pts.length-1].x, pad.top+cH);
+    ctx.closePath();
+    ctx.fillStyle = s.color.replace('#','') === s.color.replace('#','') ?
+      s.color + '18' : s.color;
+    // Parse hex to rgba
+    const r = parseInt(s.color.slice(1,3),16);
+    const g = parseInt(s.color.slice(3,5),16);
+    const b = parseInt(s.color.slice(5,7),16);
+    ctx.fillStyle = `rgba(${r},${g},${b},0.08)`;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    pts.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Dots
+    pts.forEach((p,i) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+      ctx.fillStyle = s.color;
+      ctx.fill();
+    });
+
+    // Last value label
+    const lp = pts[pts.length-1];
+    ctx.fillStyle = s.color;
+    ctx.font = 'bold 10px DM Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(s.data[s.data.length-1]+'%', lp.x+5, lp.y+3);
+  });
+}
+
+// ── EVOLUÇÃO ANUAL ────────────────────────────────────────────
+function renderEvolucaoChart(){
+  const canvas = document.getElementById('evolucaoChart');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const ativos =       [480,485,492,498,505,512,518,522,525,528,530,null];
+  const comTreinador = [210,218,225,234,242,250,255,259,262,264,265,null];
+  const novos =        [18, 22, 20, 24, 28, 32, 0,  0,  0,  0,  0,  null];
+  const naoRenovados = [12, 10, 14, 8,  11, 9,  0,  0,  0,  0,  0,  null];
+
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = 220;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+
+  const pad = { top:16, right:20, bottom:32, left:48 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const maxVal = 560;
+  const maxBar = 35;
+  const months = 6; // só até junho (dados disponíveis)
+  const barW = (cW / meses.length) * 0.35;
+  const barGap = barW * 0.15;
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,.05)';
+  ctx.lineWidth = 1;
+  [0,.25,.5,.75,1].forEach(p => {
+    const y = pad.top + cH * (1-p);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cW, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.25)';
+    ctx.font = '10px DM Mono';
+    ctx.fillText(Math.round(maxVal * p), 4, y + 4);
+  });
+
+  // Month labels
+  meses.forEach((m, i) => {
+    const x = pad.left + (i + 0.5) * (cW / meses.length);
+    ctx.fillStyle = i < months ? 'rgba(255,255,255,.5)' : 'rgba(255,255,255,.2)';
+    ctx.font = '10px DM Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText(m, x, H - 8);
+  });
+
+  // Draw bars (Novos e Não Renovados) — lado a lado
+  for(let i = 0; i < months; i++){
+    const xBase = pad.left + (i + 0.5) * (cW / meses.length) - barW - barGap/2;
+    // Novos
+    if(novos[i]){
+      const barH = (novos[i] / maxBar) * (cH * 0.5);
+      const y = pad.top + cH - barH;
+      ctx.fillStyle = 'rgba(126,184,255,.5)';
+      ctx.beginPath();
+      ctx.roundRect(xBase, y, barW, barH, [3,3,0,0]);
+      ctx.fill();
+    }
+    // Não Renovados
+    if(naoRenovados[i]){
+      const barH = (naoRenovados[i] / maxBar) * (cH * 0.5);
+      const y = pad.top + cH - barH;
+      ctx.fillStyle = 'rgba(255,77,109,.5)';
+      ctx.beginPath();
+      ctx.roundRect(xBase + barW + barGap, y, barW, barH, [3,3,0,0]);
+      ctx.fill();
+    }
+  }
+
+  // Draw lines (Ativos e Com Treinador)
+  const drawLine = (data, color, filled) => {
+    ctx.beginPath();
+    let started = false;
+    data.forEach((v, i) => {
+      if(v === null) return;
+      const x = pad.left + (i + 0.5) * (cW / meses.length);
+      const y = pad.top + cH * (1 - v / maxVal);
+      if(!started){ ctx.moveTo(x, y); started = true; }
+      else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.setLineDash([]);
+    ctx.stroke();
+
+    // Dots
+    data.forEach((v, i) => {
+      if(v === null) return;
+      const x = pad.left + (i + 0.5) * (cW / meses.length);
+      const y = pad.top + cH * (1 - v / maxVal);
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5, 0, Math.PI*2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      // Value label on last point
+      if(i === months-1){
+        ctx.fillStyle = color;
+        ctx.font = 'bold 11px DM Mono';
+        ctx.textAlign = 'right';
+        ctx.fillText(v, x-6, y-6);
+      }
+    });
+  };
+
+  drawLine(ativos, '#F5B800', false);
+  drawLine(comTreinador, '#2DD4A0', false);
+}
+
+// ── TOGGLE DROPDOWN ───────────────────────────────────────────
+let CICLO_ALUNOS = [];
+
+let cicloListaFiltro = 'todos';
+let modoConsultora = false;
+
+function togglePerfil(){
+  modoConsultora = !modoConsultora;
+  const el = document.getElementById('perfilAtual');
+  el.textContent = modoConsultora ? 'Consultora (pode editar)' : 'Gestor (somente leitura)';
+  document.getElementById('perfilAtual').parentElement.style.background = modoConsultora ? 'rgba(34,197,94,.1)' : 'var(--orange-dim)';
+  document.getElementById('perfilAtual').parentElement.style.borderColor = modoConsultora ? 'rgba(34,197,94,.3)' : 'var(--orange-border)';
+  document.getElementById('perfilAtual').parentElement.style.color = modoConsultora ? 'var(--green)' : 'var(--orange)';
+  renderCicloLista();
+  showToast(modoConsultora ? '🔓 Modo Consultora — pode atualizar status' : '🔒 Modo Gestor — somente leitura');
+}
+
+function filterCicloList(f, btn){
+  cicloListaFiltro = f;
+  document.querySelectorAll('#cicloListFilter .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCicloLista();
+}
+
+function renderCicloLista(){
+  const c = document.getElementById('cicloListaAlunos');
+  c.innerHTML = '';
+
+  // Status automático baseado nos dias
+  CICLO_ALUNOS.forEach(a => {
+    if(a.status === 'renovado' || a.status === 'rematricula') return; // já resolvido
+    if(a.diasAposVenc <= 0)       a.status = 'a_renovar';
+    else if(a.diasAposVenc <= 31) a.status = 'vencido';
+    else                           a.status = 'nao_renovado';
+  });
+
+  const filtered = CICLO_ALUNOS.filter(a =>
+    (cicloListaFiltro === 'todos' || a.status === cicloListaFiltro) &&
+    (!cicloUploadNomes || cicloUploadNomes.has(normalizarNome(a.nome)))
+  );
+
+  if(!filtered.length){
+    c.innerHTML = '<div style="text-align:center;padding:16px;font-size:12px;color:var(--text3)">Nenhum aluno neste filtro</div>';
+    return;
+  }
+
+  const statusCfg = {
+    a_renovar:   { label:'A Renovar',    bg:'rgba(255,209,102,.12)', border:'rgba(255,209,102,.3)',  color:'var(--yellow)' },
+    vencido:     { label:'Vencido',      bg:'rgba(255,77,109,.12)',  border:'rgba(255,77,109,.3)',   color:'var(--red)' },
+    nao_renovado:{ label:'Não Renovado', bg:'rgba(80,80,100,.2)',    border:'rgba(120,120,150,.3)',  color:'var(--text3)' },
+    renovado:    { label:'Renovado',     bg:'rgba(45,212,160,.12)',  border:'rgba(45,212,160,.3)',   color:'var(--green)' },
+    rematricula: { label:'Rematrícula',  bg:'rgba(126,184,255,.12)', border:'rgba(126,184,255,.3)',  color:'var(--blue)' },
+  };
+
+  filtered.forEach((a, idx) => {
+    const vencDate = new Date(a.venc);
+    const vencStr = vencDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+    const sc = statusCfg[a.status];
+
+    // Dropdown de status — só consultora vê as opções
+    const realIdx = CICLO_ALUNOS.indexOf(a);
+    let dropdownOpts = '';
+    if(modoConsultora){
+      const opts = {
+        a_renovar:   [{label:'✓ Marcar como Renovado', val:'renovado', color:'var(--green)'}],
+        vencido:     [{label:'✓ Marcar como Renovado', val:'renovado', color:'var(--green)'}],
+        nao_renovado:[{label:'↩ Marcar Rematrícula',   val:'rematricula', color:'var(--blue)'}],
+        renovado:    [{label:'↩ Desfazer',              val:'a_renovar', color:'var(--text3)', cls:'desfazer'}],
+        rematricula: [{label:'↩ Desfazer',              val:'a_renovar', color:'var(--text3)', cls:'desfazer'}],
+      };
+      const opcoes = opts[a.status] || [];
+      dropdownOpts = opcoes.map(o =>
+        `<button class="status-option ${o.cls||''}" style="color:${o.color}" onclick="event.stopPropagation();updateStatus(${realIdx},'${o.val}')">${o.label}</button>`
+      ).join('');
+    }
+
+    const statusCol = modoConsultora && dropdownOpts ? `
+      <div class="status-wrap" onclick="event.stopPropagation()">
+        <button class="status-btn" style="background:${sc.bg};border-color:${sc.border};color:${sc.color}"
+          onclick="toggleDropdown(this)">
+          ${sc.label} <span class="status-arrow">▾</span>
+        </button>
+        <div class="status-dropdown">
+          ${dropdownOpts}
+        </div>
+      </div>` :
+      `<span style="padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;background:${sc.bg};border:1px solid ${sc.border};color:${sc.color}">${sc.label}</span>`;
+
+    const row = document.createElement('div');
+    row.style.cssText = `display:grid;grid-template-columns:24px 2fr 1fr 1fr 1fr 1.2fr;gap:8px;padding:8px 12px;border-radius:8px;background:var(--card2);border:1px solid ${['renovado','rematricula'].includes(a.status)?sc.border:'var(--border)'};align-items:center;transition:all .15s`;
+    row.innerHTML = `
+      <input type="checkbox" data-aluno-id="${a.id}" ${cicloSelecionados.has(a.id)?'checked':''} onchange="toggleCicloSelecionado('${a.id}',this.checked)" onclick="event.stopPropagation()">
+      <div>
+        <div style="font-size:12px;font-weight:600">${a.nome}</div>
+        ${!a.treinador ? '<div style="font-size:10px;color:var(--red);margin-top:1px">⚠️ Sem treinador</div>' : ''}
+      </div>
+      <div style="font-size:11px;color:var(--text2)">${a.treinador || '—'}</div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:${a.diasAposVenc>31?'var(--text3)':a.diasAposVenc>0?'var(--red)':'var(--text)'}">${vencStr}</div>
+        <div style="font-size:10px;color:var(--text3)">${a.diasAposVenc>0?a.diasAposVenc+'d vencido':Math.abs(a.diasAposVenc)+'d restantes'}</div>
+      </div>
+      <div style="font-size:12px">${a.app?'<span style="color:var(--green)">🔥 Ativo</span>':'<span style="color:var(--text3)">— Inativo</span>'}</div>
+      <div>${statusCol}</div>`;
+    c.appendChild(row);
+  });
+}
+
+// ── SELEÇÃO E REATRIBUIÇÃO EM MASSA (Ciclo de Renovação) ────────
+let cicloSelecionados = new Set();
+
+function toggleCicloSelecionado(id, marcado){
+  if(marcado) cicloSelecionados.add(id);
+  else cicloSelecionados.delete(id);
+  atualizarBarraCiclo();
+}
+
+function toggleTodosCiclo(chk){
+  document.querySelectorAll('#cicloListaAlunos input[type=checkbox]').forEach(c=>{
+    c.checked = chk.checked;
+    if(chk.checked) cicloSelecionados.add(c.dataset.alunoId);
+    else cicloSelecionados.delete(c.dataset.alunoId);
+  });
+  atualizarBarraCiclo();
+}
+
+function limparSelecaoCiclo(){
+  cicloSelecionados.clear();
+  document.querySelectorAll('#cicloListaAlunos input[type=checkbox]').forEach(c=>c.checked=false);
+  const chkTodos = document.getElementById('chkTodosCiclo');
+  if(chkTodos) chkTodos.checked = false;
+  atualizarBarraCiclo();
+}
+
+function atualizarBarraCiclo(){
+  const barra = document.getElementById('barraReatribuirCiclo');
+  const qtd = cicloSelecionados.size;
+  document.getElementById('qtdSelecionadosCiclo').textContent = qtd;
+  barra.style.display = qtd > 0 ? 'flex' : 'none';
+  if(qtd === 0) return;
+  const sel = document.getElementById('selTreinadorDestinoCiclo');
+  sel.innerHTML = '<option value="">Escolher treinador(a)...</option>'
+    + TREINADORES.map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
+}
+
+async function reatribuirCicloSelecionados(){
+  const treinadorId = document.getElementById('selTreinadorDestinoCiclo').value;
+  if(!treinadorId){ showToast('Escolha o treinador de destino'); return; }
+  const ids = [...cicloSelecionados];
+  if(!ids.length) return;
+
+  try {
+    const { error } = await sb.from('alunos').update({ treinador_id: treinadorId }).in('id', ids);
+    if(error) throw new Error(error.message);
+    const nomeTreinador = TREINADORES.find(t=>t.id===treinadorId)?.nome || 'treinador(a)';
+    ids.forEach(id => { const a = CICLO_ALUNOS.find(x=>x.id===id); if(a) a.treinador = nomeTreinador; });
+    showToast(`✅ ${ids.length} aluno(s) direcionado(s) para ${nomeTreinador}`);
+    limparSelecaoCiclo();
+    renderCicloLista();
+  } catch(err){
+    console.error(err);
+    showToast('Erro ao direcionar: '+err.message);
+  }
+}
+
+function toggleDropdown(btn){
+  // Close all other dropdowns first
+  document.querySelectorAll('.status-dropdown.open').forEach(d => {
+    if(d !== btn.nextElementSibling) d.classList.remove('open');
+  });
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', () => {
+  document.querySelectorAll('.status-dropdown.open').forEach(d => d.classList.remove('open'));
+});
+
+async function updateStatus(realIdx, novoStatus){
+  if(realIdx < 0 || realIdx >= CICLO_ALUNOS.length) return;
+  const aluno = CICLO_ALUNOS[realIdx];
+  document.querySelectorAll('.status-dropdown.open').forEach(d => d.classList.remove('open'));
+
+  if(novoStatus === 'renovado'){
+    const novaDataStr = prompt(`Renovação de ${aluno.nome}\n\nNova data de vencimento (dd/mm/aaaa):`, '');
+    if(!novaDataStr) return;
+    const m = novaDataStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if(!m){ showToast('Data inválida — use o formato dd/mm/aaaa'); return; }
+    const novaVencISO = `${m[3]}-${m[2]}-${m[1]}`;
+    try {
+      const { error } = await sb.from('alunos').update({ vencimento: novaVencISO }).eq('id', aluno.id);
+      if(error) throw new Error(error.message);
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      aluno.venc = novaVencISO;
+      aluno.diasAposVenc = diasEntre(new Date(novaVencISO+'T00:00:00'), hoje);
+      aluno.status = 'renovado';
+      renderCicloLista();
+      showToast(`✅ ${aluno.nome} renovado(a) — novo vencimento gravado no sistema`);
+    } catch(err){
+      console.error(err);
+      showToast('Erro ao gravar renovação: '+err.message);
+    }
+    return;
+  }
+
+  // Rematrícula / desfazer — ainda sem campo próprio no banco, fica só nesta tela por enquanto
+  CICLO_ALUNOS[realIdx].status = novoStatus;
+  renderCicloLista();
+  const labels = {rematricula:'Rematrícula 🔵', a_renovar:'Reaberto 🟡'};
+  showToast(`${aluno.nome} → ${labels[novoStatus]||novoStatus} (marcado só nesta tela, ainda não grava no sistema)`);
+}
+
+// ── CICLO RENOVAÇÃO ───────────────────────────────────────────
+// total e semTreinador vêm de dados reais (alunos.vencimento / treinador_id).
+// A quebra "com app / sem app" ainda é estimada (🟡 sem rastreio de uso do app).
+function calcularCicloData(dias){
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const janela = CICLO_ALUNOS.filter(a => {
+    const v = new Date(a.venc+'T00:00:00');
+    const diff = Math.floor((v-hoje)/(1000*60*60*24));
+    return diff <= 0 ? Math.abs(diff) <= dias : diff <= dias; // vencidos recentes + a vencer dentro da janela
+  });
+  const total = janela.length;
+  const semTreinador = janela.filter(a=>!a.treinador).length;
+  const comTreinador = total - semTreinador;
+  // Estimativa proporcional (sem dado real de uso do app ainda)
+  const comApp = Math.round(comTreinador*0.55);
+  const semApp = comTreinador - comApp;
+  const renovados = janela.filter(a=>a.status==='renovado').length;
+  const propRenov = total ? renovados/total : 0;
+  return {
+    total, semTreinador,
+    comApp, comAppRenov: Math.round(comApp*Math.min(1,propRenov+0.1)),
+    semApp, semAppRenov: Math.round(semApp*propRenov),
+    semTreinadorRenov: Math.round(semTreinador*Math.max(0,propRenov-0.15)),
+  };
+}
+
+let cicloAtual = 30;
+let cicloCustom = null;
+
+function setCiclo(dias, btn){
+  cicloAtual = dias;
+  document.querySelectorAll('#cicloSelector .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCiclo();
+}
+
+function renderCiclo(){
+  const data = cicloCustom || calcularCicloData(cicloAtual);
+  const total = data.total || 0;
+  if(!total){
+    document.getElementById('cicloTotal').textContent = '0';
+    document.getElementById('cicloLabel').textContent = `vencendo em ${cicloAtual} dias`;
+    return;
+  }
+  const totalRenov = data.comAppRenov + data.semAppRenov + data.semTreinadorRenov;
+  const p1 = Math.round(data.comApp/total*100);
+  const p2 = Math.round(data.semApp/total*100);
+  const p3 = Math.round(data.semTreinador/total*100);
+  const r1 = data.comApp ? Math.round(data.comAppRenov/data.comApp*100) : 0;
+  const r2 = data.semApp ? Math.round(data.semAppRenov/data.semApp*100) : 0;
+  const r3 = data.semTreinador ? Math.round(data.semTreinadorRenov/data.semTreinador*100) : 0;
+
+  document.getElementById('cicloTotal').textContent = total;
+  document.getElementById('cicloLabel').textContent = `vencendo em ${cicloAtual} dias`;
+
+  document.getElementById('cicloComApp').textContent = data.comApp;
+  document.getElementById('cicloComAppRenov').textContent = data.comAppRenov;
+  document.getElementById('cicloComAppPct').textContent = r1+'% retenção';
+
+  document.getElementById('cicloSemApp').textContent = data.semApp;
+  document.getElementById('cicloSemAppRenov').textContent = data.semAppRenov;
+  document.getElementById('cicloSemAppPct').textContent = r2+'% retenção';
+
+  document.getElementById('cicloSemTreinador').textContent = data.semTreinador;
+  document.getElementById('cicloSemTreinadorRenov').textContent = data.semTreinadorRenov;
+  document.getElementById('cicloSemTreinadorPct').textContent = r3+'% retenção';
+
+  document.getElementById('barComApp').style.width = p1+'%';
+  document.getElementById('barSemApp').style.width = p2+'%';
+  document.getElementById('barSemTreinador').style.width = p3+'%';
+  document.getElementById('barPct1').textContent = p1+'% alto eng.';
+  document.getElementById('barPct2').textContent = p2+'% médio';
+  document.getElementById('barPct3').textContent = p3+'% sem vínculo';
+
+  document.getElementById('cicloAlertText').textContent =
+    `${data.semTreinador} alunos sem treinador em risco · ${data.semTreinadorRenov} renovaram (${r3}%) — prioridade de contato`;
+}
+
+let cicloUploadNomes = null; // Set de nomes normalizados vindos do CSV, ou null = sem filtro
+
+function normalizarNome(s){
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function uploadCicloCSV(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const linhas = e.target.result.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    if(linhas.length < 1){ showToast('Arquivo vazio'); return; }
+
+    // Primeira coluna de cada linha = nome. Ignora cabeçalho se parecer texto tipo "nome"
+    let dataLines = linhas;
+    const primeiraCol = linhas[0].split(',')[0].replace(/"/g,'').trim().toLowerCase();
+    if(['nome','aluno','cliente','name'].includes(primeiraCol)) dataLines = linhas.slice(1);
+
+    const nomesCsv = dataLines.map(l => l.split(',')[0].replace(/"/g,'').trim()).filter(Boolean);
+    const nomesNorm = new Set(nomesCsv.map(normalizarNome));
+
+    // Cruza de verdade com os alunos reais do sistema (CICLO_ALUNOS)
+    const encontrados = CICLO_ALUNOS.filter(a => nomesNorm.has(normalizarNome(a.nome)));
+    const encontradosNomes = new Set(encontrados.map(a=>normalizarNome(a.nome)));
+    const naoEncontrados = nomesCsv.filter(n => !encontradosNomes.has(normalizarNome(n)));
+
+    if(!encontrados.length){
+      document.getElementById('cicloUploadStatus').textContent = `⚠️ Nenhum dos ${nomesCsv.length} nomes do arquivo bateu com alunos cadastrados no sistema`;
+      document.getElementById('cicloUploadStatus').style.color = 'var(--red)';
+      showToast('Nenhum nome do arquivo foi encontrado no sistema — confira a grafia dos nomes.');
+      return;
+    }
+    document.getElementById('btnLimparCicloFiltro').style.display = 'inline-block';
+
+    // Filtra a lista de trabalho pra só esses alunos, com contagem real (não estimada)
+    cicloUploadNomes = nomesNorm;
+    const total = encontrados.length;
+    const semTreinador = encontrados.filter(a=>!a.treinador).length;
+    const comTreinador = total - semTreinador;
+    const comApp = Math.round(comTreinador*0.55);
+    const semApp = comTreinador - comApp;
+    const renovados = encontrados.filter(a=>a.status==='renovado').length;
+    const propRenov = total ? renovados/total : 0;
+    cicloCustom = {
+      total, semTreinador,
+      comApp, comAppRenov: Math.round(comApp*Math.min(1,propRenov+0.1)),
+      semApp, semAppRenov: Math.round(semApp*propRenov),
+      semTreinadorRenov: Math.round(semTreinador*Math.max(0,propRenov-0.15)),
+    };
+
+    let msg = `✅ ${encontrados.length} de ${nomesCsv.length} nomes encontrados no sistema`;
+    if(naoEncontrados.length) msg += ` · ${naoEncontrados.length} não encontrados`;
+    document.getElementById('cicloUploadStatus').textContent = msg;
+    document.getElementById('cicloUploadStatus').style.color = naoEncontrados.length ? 'var(--yellow)' : 'var(--green)';
+
+    renderCiclo();
+    renderCicloLista();
+    showToast(naoEncontrados.length
+      ? `${encontrados.length} carregados · ${naoEncontrados.length} não encontrados: ${naoEncontrados.slice(0,3).join(', ')}${naoEncontrados.length>3?'...':''}`
+      : `✅ ${encontrados.length} planos carregados e cruzados com o sistema`);
+  };
+  reader.readAsText(file);
+}
+
+function limparFiltroCiclo(){
+  cicloUploadNomes = null;
+  cicloCustom = null;
+  document.getElementById('cicloUploadStatus').textContent = 'Suba um CSV com uma lista de nomes pra filtrar só esses alunos no ciclo (cruza com o sistema de verdade)';
+  document.getElementById('cicloUploadStatus').style.color = '';
+  document.getElementById('btnLimparCicloFiltro').style.display = 'none';
+  renderCiclo();
+  renderCicloLista();
+}
+
+// ── PERIOD ────────────────────────────────────────────────────
+function setPeriod(p, btn){
+  document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  showToast('🟡 Seletor de período ainda não filtra os dados — Consultorias/Experiências usam mês corrente e Revisões usa semana corrente fixos.');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', carregarDadosReais);
+</script>
+
+<!-- ── FOOTER ── -->
+<footer style="
+  position:fixed;bottom:0;left:0;right:0;
+  height:36px;
+  background:rgba(8,8,16,.95);
+  border-top:1px solid rgba(255,255,255,.05);
+  backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:100;
+">
+  <!-- Esquerdo: QG.90 -->
+  <div style="display:flex;align-items:center;gap:8px">
+    <img class="gf-logo" src="logo-cave.png" alt="RG Cave" style="height:28px">
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:.08em">RG Cave</span>
+    <span style="font-size:10px;color:rgba(255,255,255,.12);letter-spacing:.06em">· Método de Retenção</span>
+  </div>
+  <!-- Direito: GeFit -->
+  <div style="display:flex;align-items:center;gap:7px">
+    <span style="font-size:9px;color:rgba(255,255,255,.15);text-transform:uppercase;letter-spacing:.12em">powered by</span>
+    <img class="gf-logo" src="logo-cave.png" alt="RG Cave" style="height:28px">
+  </div>
+</footer>
+
+<script>
+function loadAcademiaLogo(input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('academiaLogoImg');
+    const letter = document.getElementById('academiaLogoLetter');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    letter.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+</body>
+</html>

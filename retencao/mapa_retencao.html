@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RG Cave | Mapa do Sistema de Retenção</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fundo:#0A0A0A;--fundo2:#0D1526;--fundo3:#131D33;
+  --laranja:#F5B800;--texto:#E8E4DC;--texto2:#9A9488;
+  --verde:#3DBA7A;--vermelho:#E05252;--azul:#4A9FE0;--roxo:#B57BEE;
+  --borda:rgba(232,228,220,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--fundo);color:var(--texto);font-family:'Barlow',sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4,button{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--borda);border-radius:4px;}
+
+#shell{display:flex;min-height:100vh;}
+#sidebar{
+  width:300px;flex-shrink:0;background:var(--fundo2);border-right:1px solid var(--borda);
+  padding:22px 16px;overflow-y:auto;position:sticky;top:0;height:100vh;
+}
+.side-logo{font-weight:800;font-size:26px;color:var(--laranja);letter-spacing:1px;margin-bottom:2px;}
+.side-sub{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--texto2);margin-bottom:16px;}
+.side-search{
+  width:100%;background:var(--fundo3);border:1px solid var(--borda);border-radius:8px;
+  padding:9px 12px;color:var(--texto);font-size:13px;margin-bottom:16px;font-family:'Barlow',sans-serif;
+}
+.side-search::placeholder{color:var(--texto2);}
+.side-group-label{
+  font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--texto2);
+  margin:16px 0 6px 10px;font-weight:700;
+}
+.side-group-label:first-of-type{margin-top:0;}
+.step-nav-item{
+  display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;
+  margin-bottom:2px;transition:background .15s;
+}
+.step-nav-item:hover{background:var(--fundo3);}
+.step-nav-item.active{background:rgba(245,184,0,.12);}
+.step-nav-item.hidden{display:none;}
+.step-num{
+  width:22px;height:22px;border-radius:6px;background:var(--fundo3);color:var(--texto2);
+  display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;
+  border:1px solid var(--borda);
+}
+.step-nav-item.active .step-num{background:var(--laranja);color:#0A0A0A;border-color:var(--laranja);}
+.step-nav-label{font-size:13.5px;color:var(--texto2);padding-top:2px;line-height:1.3;}
+.step-nav-item.active .step-nav-label{color:var(--texto);font-weight:600;}
+
+#main{flex:1;padding:36px 48px;max-width:900px;overflow-y:auto;}
+.step-eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--laranja);font-weight:700;margin-bottom:8px;}
+.step-title{font-size:34px;font-weight:700;margin-bottom:6px;line-height:1.1;}
+.step-sub{color:var(--texto2);font-size:15px;margin-bottom:28px;}
+
+.block{background:var(--fundo2);border:1px solid var(--borda);border-radius:14px;padding:20px 24px;margin-bottom:16px;}
+.block h4{font-size:16px;color:var(--laranja);margin-bottom:12px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
+.block.expect h4{color:var(--verde);}
+.block.warn{border-color:rgba(224,82,82,.4);background:rgba(224,82,82,.06);}
+.block.warn h4{color:var(--vermelho);}
+.block.tip{border-color:rgba(74,159,224,.4);background:rgba(74,159,224,.06);}
+.block.tip h4{color:var(--azul);}
+
+.click-list{list-style:none;counter-reset:click;}
+.click-list li{counter-increment:click;position:relative;padding:8px 0 8px 34px;font-size:15px;border-bottom:1px solid var(--borda);}
+.click-list li:last-child{border-bottom:none;}
+.click-list li::before{
+  content:counter(click);position:absolute;left:0;top:8px;
+  width:22px;height:22px;background:var(--fundo3);border:1px solid var(--laranja);color:var(--laranja);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+  font-family:'Barlow Condensed',sans-serif;
+}
+.click-list strong{color:var(--texto);}
+.plain-list{list-style:none;padding-left:0;}
+.plain-list li{padding:6px 0 6px 20px;font-size:14.5px;border-bottom:1px solid var(--borda);position:relative;}
+.plain-list li:last-child{border-bottom:none;}
+.plain-list li::before{content:'•';position:absolute;left:0;color:var(--laranja);}
+code{background:var(--fundo3);border:1px solid var(--borda);border-radius:5px;padding:2px 7px;font-family:monospace;font-size:13.5px;color:var(--laranja);}
+.fill-table{width:100%;border-collapse:collapse;margin-top:4px;}
+.fill-table td{padding:8px 0;font-size:14.5px;border-bottom:1px solid var(--borda);}
+.fill-table td:first-child{color:var(--texto2);width:38%;}
+.fill-table tr:last-child td{border-bottom:none;}
+.quote-line{font-style:italic;color:var(--texto2);border-left:2px solid var(--laranja);padding:8px 14px;margin-top:10px;font-size:14px;}
+
+.step-footer{display:flex;justify-content:space-between;margin-top:30px;padding-bottom:60px;}
+.nav-btn{background:var(--fundo3);border:1px solid var(--borda);color:var(--texto);padding:12px 22px;border-radius:9px;font-family:'Barlow',sans-serif;font-weight:600;font-size:14.5px;cursor:pointer;transition:.15s;}
+.nav-btn:hover{border-color:var(--laranja);}
+.nav-btn.primary{background:var(--laranja);color:#0A0A0A;border-color:var(--laranja);}
+.nav-btn.primary:hover{background:#FFD34D;}
+.nav-btn:disabled{opacity:.3;cursor:default;}
+
+.ref-table{width:100%;border-collapse:collapse;margin-top:8px;}
+.ref-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--texto2);padding:8px 10px;border-bottom:1px solid var(--borda);font-weight:700;}
+.ref-table td{padding:11px 10px;border-bottom:1px solid var(--borda);font-size:14px;}
+
+.mod-badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.mod-roi{background:rgba(245,184,0,.15);color:var(--laranja);}
+.mod-camp{background:rgba(181,123,238,.15);color:var(--roxo);}
+.mod-exp{background:rgba(74,159,224,.15);color:var(--azul);}
+.mod-scripts{background:rgba(61,186,122,.15);color:var(--verde);}
+.mod-geral{background:rgba(154,148,136,.15);color:var(--texto2);}
+.mod-treinador{background:rgba(245,184,0,.15);color:var(--laranja);}
+.mod-vendas{background:rgba(74,159,224,.15);color:var(--azul);}
+.mod-gestor{background:rgba(181,123,238,.15);color:var(--roxo);}
+.mod-admin{background:rgba(224,82,82,.15);color:var(--vermelho);}
+.mod-aluno{background:rgba(61,186,122,.15);color:var(--verde);}
+
+@media(max-width:860px){
+  #shell{flex-direction:column;}
+  #sidebar{width:100%;height:auto;position:relative;max-height:none;}
+  #main{padding:24px 18px;}
+  .step-title{font-size:26px;}
+}
+</style>
+<script src="gf-embed.js"></script>
+<link rel="stylesheet" href="theme-gefit.css">
+</head>
+<body>
+
+<div id="shell">
+  <nav id="sidebar">
+    <div class="side-logo"><img class="gf-logo" src="logo-cave.png" alt="RG Cave" style="height:34px"></div>
+    <div class="side-sub">Mapa do Sistema de Retenção</div>
+    <input class="side-search" id="sideSearch" placeholder="🔍 Buscar um tema..." oninput="filtrarNav(this.value)">
+    <div id="stepNavList"></div>
+  </nav>
+
+  <main id="main"></main>
+</div>
+
+<script>
+const steps = [
+{
+  grupo:"Antes de Começar",
+  eyebrow:"Comece por aqui",
+  title:"O que é o RG Cave Retenção",
+  sub:"A metodologia por trás do sistema, em uma frase",
+  badge:"mod-geral",
+  blocks:[
+    {type:'expect', title:'A verdade central', text:'<strong>"Marketing traz o cliente. O Técnico faz ele ficar."</strong> Retenção não é problema de vendas — é processo técnico, executado pelo Departamento Técnico (os treinadores) de cada academia.'},
+    {type:'expect', title:'O ciclo de 21 dias', text:'A unidade atômica de todo o método. Cada aluno que entra passa por um ciclo de 21 dias: cria hábito, gera vínculo, mantém engajado. Três ciclos formam a jornada completa de 12 semanas (onboarding).'},
+    {type:'expect', title:'Instrutor vs. Treinador', text:'A distinção de identidade mais importante do método: <strong>Instrutor</strong> espera ser chamado (passivo). <strong>Treinador</strong> antecipa a necessidade, conduz a jornada, cria valor (ativo). O sistema é desenhado pra empurrar todo mundo pro segundo papel.'},
+    {type:'tip', title:'Multi-academia (white-label)', text:'Um sistema único atende várias academias-clientes ao mesmo tempo. Cada academia só vê os próprios dados — nunca dados de outra academia.'}
+  ]
+},
+{
+  grupo:"Antes de Começar",
+  eyebrow:"Fundamental pro onboarding",
+  title:"Papéis de login — quem vê o quê",
+  sub:"4 tipos de acesso, cada um com sua tela e seu papel na jornada",
+  badge:"mod-geral",
+  blocks:[
+    {type:'fill', title:'Treinador(a) (time técnico)', rows:[
+      ['Quem usa','Quem atende o aluno no dia a dia'],
+      ['Tela principal','sistema_integrado_v3.html — Home + Agenda + Planner'],
+      ['O que faz','Confirma experiências, monta Planner, acompanha carteira, agenda e realiza consultorias/avaliações/revisões']
+    ]},
+    {type:'fill', title:'Gestor(a) (dono/líder da academia)', rows:[
+      ['Quem usa','Dono(a) ou gerente da academia'],
+      ['Tela principal','dashboard_gestor_v3.html'],
+      ['O que faz','Acompanha indicadores da academia inteira: retenção, % encarteirado, ranking de treinadores, planos a renovar']
+    ]},
+    {type:'fill', title:'Consultor(a) (vendas)', rows:[
+      ['Quem usa','Time comercial que capta e converte leads'],
+      ['Tela principal','painel_vendas.html'],
+      ['O que faz','Agenda experiências, faz follow-up, acompanha conversão de leads']
+    ]},
+    {type:'fill', title:'Admin (você)', rows:[
+      ['Quem usa','Equipe de suporte da plataforma'],
+      ['Tela principal','admin_painel.html (login fixo, fora do login unificado)'],
+      ['O que faz','Cria e gerencia todas as academias-clientes, cria usuários, acessa qualquer conta ao vivo sem senha']
+    ]},
+    {type:'warn', title:'Uma porta de entrada, três perfis', text:'Treinador, Gestor e Consultor(a) entram todos pelo mesmo link (<code>index.html</code>) e escolhem o próprio perfil na tela de login. O Admin tem link e senha separados.'}
+  ]
+},
+{
+  grupo:"Antes de Começar",
+  eyebrow:"A jornada completa",
+  title:"Do lead ao aluno retido — 6 fases",
+  sub:"Qual tela cuida de cada momento da jornada",
+  badge:"mod-geral",
+  blocks:[
+    {type:'click', title:'As 6 fases, em ordem', items:[
+      '<strong>1. Captação</strong> — Consultor(a) agenda a experiência (painel_vendas.html)',
+      '<strong>2. Experiência (5/10/12 dias)</strong> — Treinador(a) confirma "Fui eu que atendi" no Dia 1 (Home do treinador)',
+      '<strong>3. Consultoria Técnica</strong> — Mapeamento de Sintomas, definição da área foco, criação do Planner',
+      '<strong>4. Jornada de 21 dias</strong> — ciclo de hábito, acompanhado no Diário e na Agenda',
+      '<strong>5. Acompanhamento contínuo</strong> — revisões, novas consultorias, avaliações agendadas na Minha Agenda',
+      '<strong>6. Retenção/Renovação</strong> — acompanhado pelo Gestor(a) no Dashboard, plano a plano'
+    ]},
+    {type:'tip', title:'O momento mais importante do sistema todo', text:'A confirmação de "Fui eu que atendi" no Dia 1 da experiência. É o clique que faz o lead sair do funil de vendas e entrar oficialmente na responsabilidade do time técnico.'}
+  ]
+},
+{
+  grupo:"Treinador(a) — Home & Agenda",
+  eyebrow:"Painel Principal",
+  title:"Home — Visão Geral",
+  sub:"A tela que abre ao logar como treinador(a)",
+  badge:"mod-treinador",
+  blocks:[
+    {type:'expect', title:'KPIs do topo', text:'Carteira (total de alunos), Desafios ativos (dentro da janela de 21 dias), Revisões da semana, Experiências em andamento/convertidas, % de conversão.'},
+    {type:'expect', title:'Tarefas pendentes', text:'Avisos de ajustes necessários no sistema da academia (ex: aluno sem treinador atribuído).'},
+    {type:'expect', title:'Experiências em andamento', text:'Lista de leads que já estão no meio da experiência — mostra o dia atual, % do perfil (95%/5%) e se falta atribuir um treinador responsável.'},
+    {type:'expect', title:'Desafios ativos (21 dias)', text:'Alunos com Planner cuja janela de 21 dias ainda está correndo.'},
+    {type:'click', title:'Ações rápidas do topo', items:[
+      '<strong>+ Aluno</strong> — cadastra manualmente ou sobe um CSV rápido',
+      '<strong>📅 Agendar</strong> — marca uma consultoria, avaliação ou revisão pra qualquer aluno da carteira',
+      '<strong>+ Planner</strong> — abre a tela de montagem do Planner de treino',
+      '<strong>⚡ Nova Exp.</strong> — cadastra uma experiência manualmente (fora do fluxo de vendas)',
+      '<strong>📝 Diário</strong> — abre o relatório diário de contadores',
+      '<strong>📋 Revisão</strong> — abre o assistente técnico completo de revisão de treino',
+      '<strong>📊 Pesquisa</strong> — vê o relatório consolidado de NPS Dia 1'
+    ]}
+  ]
+},
+{
+  grupo:"Treinador(a) — Home & Agenda",
+  eyebrow:"O momento-chave",
+  title:"Nova Experiência & Confirmar Atendimento",
+  sub:"O Dia 1 — onde a responsabilidade técnica começa",
+  badge:"mod-treinador",
+  blocks:[
+    {type:'click', title:'Cadastrar uma experiência manual', items:[
+      'Botão "⚡ Nova Exp." na Home',
+      'Nome do lead, telefone',
+      'Duração: 5 dias (perfil 5%) · 10 dias (perfil 95%) · 12 dias (perfil 95%)',
+      'Data de início',
+      'Link do Mapeamento de Sintomas (se já respondido)',
+      '"Iniciar experiência" — grava com status "comparecida" (já iniciada)'
+    ]},
+    {type:'expect', title:'Quando vem do funil de vendas', text:'Se a experiência foi agendada pela consultora (painel_vendas.html), ela chega pra você já como "agendada" — você só precisa clicar em <strong>"Fui eu que atendi"</strong> pra confirmar o Dia 1 e assumir a responsabilidade.'},
+    {type:'warn', title:'Converter ou não converter', text:'Ao final da experiência, marque <strong>Converteu</strong> (cria o aluno automaticamente na carteira) ou <strong>Não converteu</strong> (encerra sem criar aluno). Essa decisão fecha o ciclo da experiência.'}
+  ]
+},
+{
+  grupo:"Treinador(a) — Home & Agenda",
+  eyebrow:"Compromissos",
+  title:"Minha Agenda",
+  sub:"Experiências, consultorias, avaliações e revisões — tudo num só lugar",
+  badge:"mod-treinador",
+  blocks:[
+    {type:'expect', title:'O quick-strip do topo', text:'Contadores de: Experiências agendadas, Consultorias agendadas, Avaliações agendadas, Revisões agendadas, Atrasados, Hoje.'},
+    {type:'tip', title:'Duas visões', text:'Alterne entre <strong>📋 Lista</strong> (agrupada por urgência: Atrasados → Hoje → Essa Semana → Realizados) e <strong>🗓️ Semana</strong> (calendário navegável).'},
+    {type:'click', title:'Agendar um novo compromisso', items:[
+      'Botão "📅 Agendar" no topo da Home',
+      'Escolha o tipo: Consultoria, Avaliação física, ou Revisão de treino',
+      'Selecione o aluno da carteira',
+      'Data, hora (opcional) e observação',
+      '"Agendar" — já aparece na Agenda'
+    ]},
+    {type:'expect', title:'Marcar como realizado', text:'Cada compromisso agendado tem um botão "✓ Realizado" — atualiza o status na hora.'},
+    {type:'tip', title:'Revisão automática pelo Planner', text:'Quando você define uma data de revisão dentro do Planner de treino, o compromisso de "Revisão" já aparece sozinho na Agenda — não precisa agendar duas vezes.'}
+  ]
+},
+{
+  grupo:"Treinador(a) — Home & Agenda",
+  eyebrow:"Carteira",
+  title:"Adicionar Aluno",
+  sub:"Manual, um por um, ou em massa por planilha",
+  badge:"mod-treinador",
+  blocks:[
+    {type:'click', title:'Cadastro manual', items:[
+      'Botão "+ Aluno" → aba "Manual"',
+      'Nome, matrícula, plano, vencimento, idade, telefone'
+    ]},
+    {type:'click', title:'Cadastro em massa (CSV)', items:[
+      'Botão "+ Aluno" → aba "CSV"',
+      'Formato rápido: nome, matrícula, plano, vencimento, idade, telefone',
+      'Pra planilhas maiores, com e-mail, status (Ativo/Lead/Ex-Aluno) e treinador responsável, use o link "Importador completo" — abre o <code>importar_carteira.html</code>'
+    ]},
+    {type:'tip', title:'Baixe o modelo pronto', text:'Dentro do importador completo tem um link "📥 Baixe o modelo de planilha" — já vem com as colunas certas e exemplos preenchidos.'}
+  ]
+},
+{
+  grupo:"Planner & Acompanhamento",
+  eyebrow:"Marco Zero",
+  title:"Consultoria Técnica & Planner",
+  sub:"Onde a jornada de 21 dias é estruturada de verdade",
+  badge:"mod-treinador",
+  blocks:[
+    {type:'expect', title:'Mapeamento de Sintomas', text:'O treinador abre as 15 áreas de saúde mapeadas junto com o aluno (na TV da sala de avaliação, se disponível) e define <strong>1 área foco</strong> — sem meta clara, não tem acompanhamento.'},
+    {type:'expect', title:'O Planner registra', text:'Aluno vinculado, treinador responsável, área foco, data de início do desafio de 21 dias, data da próxima revisão, testes musculares (membro superior/inferior).'},
+    {type:'tip', title:'Projeto Exclusivo', text:'A consultoria é o momento certo de apresentar o upsell de alto ticket (2,5×–3,5× o plano regular) — vale tanto pro perfil 5% quanto pro 95%.'}
+  ]
+},
+{
+  grupo:"Planner & Acompanhamento",
+  eyebrow:"Rotina diária",
+  title:"Diário do Treinador",
+  sub:"Contadores do dia — o que foi feito hoje",
+  badge:"mod-treinador",
+  blocks:[
+    {type:'expect', title:'O que registra', text:'Experiências iniciadas, novos alunos (1º planner), inseridos na carteira, revisões previstas/realizadas, consultorias realizadas, avaliações físicas, observações do dia.'},
+    {type:'warn', title:'Diferença pra Minha Agenda', text:'O Diário é um <strong>contador agregado do dia</strong> (só números). A Minha Agenda registra <strong>compromissos individuais</strong> (nome do aluno + data). Hoje eles não estão sincronizados automaticamente — é bom preencher os dois com atenção pra não ficarem com números diferentes.'},
+    {type:'tip', title:'Navegação retroativa', text:'Dá pra voltar e preencher um dia anterior que ficou em branco, e ver o resumo da semana no fim da tela.'}
+  ]
+},
+{
+  grupo:"Planner & Acompanhamento",
+  eyebrow:"Assistente técnico",
+  title:"Revisão de Treino",
+  sub:"O passo a passo completo de uma revisão técnica",
+  badge:"mod-treinador",
+  blocks:[
+    {type:'expect', title:'O que cobre', text:'Escolha dos métodos de treino, cadastro de exercícios, cálculo de índices neuromusculares, definição da próxima data de revisão, e resumo final pra salvar.'},
+    {type:'tip', title:'Onde abrir', text:'Botão "📋 Revisão" na Home do treinador — abre em aba nova.'}
+  ]
+},
+{
+  grupo:"Vendas — Painel de Vendas",
+  eyebrow:"Funil comercial",
+  title:"Captação e Follow-up",
+  sub:"De onde vem o lead, antes de virar experiência",
+  badge:"mod-vendas",
+  blocks:[
+    {type:'expect', title:'Etapas do funil', text:'Agendada → Comparecida → Reagendada / Não Compareceu → Convertida / Não Convertida.'},
+    {type:'expect', title:'3 follow-ups programados', text:'F1 (dia seguinte à experiência), F2 (durante a semana, já pode apresentar o Projeto Exclusivo se o lead compareceu 2x+), F3 (último dia da experiência, fechamento).'},
+    {type:'warn', title:'Depois que o treinador confirma o Dia 1', text:'A experiência passa a status "Comparecida" — a consultora ainda acompanha a conversão, mas a responsabilidade operacional já é do time técnico.'}
+  ]
+},
+{
+  grupo:"App do Aluno",
+  eyebrow:"Sem login — via QR Code",
+  title:"Desafio 21 Dias & Pesquisa NPS",
+  sub:"O que o próprio aluno vê e preenche",
+  badge:"mod-aluno",
+  blocks:[
+    {type:'expect', title:'NPS Dia 1', text:'Pesquisa rápida logo após a consultoria — avalia clareza, diferencial percebido, e dá uma nota de 0 a 10 (NPS) e de 1 a 5 estrelas pro treinador.'},
+    {type:'expect', title:'Desafio e missões', text:'O aluno acompanha o próprio progresso dentro dos 21 dias — hoje essas missões ficam só no navegador dele (ainda não são salvas no banco de dados).'},
+    {type:'tip', title:'Ponto de integração futura', text:'É aqui que o módulo Desafio ROI 21 Dias (de outro sistema) vai se conectar — substituindo ou complementando essas missões locais por algo persistente e gamificado.'}
+  ]
+},
+{
+  grupo:"Gestor(a) — Dashboard",
+  eyebrow:"Painel Principal",
+  title:"Visão Macro da Academia",
+  sub:"A tela que abre ao logar como gestor(a)",
+  badge:"mod-gestor",
+  blocks:[
+    {type:'expect', title:'Bloco 1 — Academia', text:'Alunos Ativos, Com Treinador+Planner (vinculados ao método), Novos no mês, Índice de Vinculação (% no método, meta 70%).'},
+    {type:'expect', title:'Bloco 2 — KPIs do Depto. Técnico', text:'Consultorias, Revisões (semana), Experiências (mês) — todos com dado real. Ativos no App, Alunos em Risco e Índice de Engajamento ainda aparecem marcados <strong>🟡 modelo</strong> — sem fonte de dado real conectada ainda.'},
+    {type:'warn', title:'Seletor de período (Semana/Mês/Trim.)', text:'Ainda não filtra os dados de verdade — Consultorias e Experiências sempre mostram o mês corrente, Revisões sempre a semana corrente.'}
+  ]
+},
+{
+  grupo:"Gestor(a) — Dashboard",
+  eyebrow:"Pessoas",
+  title:"Ranking de Treinadores",
+  sub:"Comparação de performance — e acesso direto ao sistema de cada um",
+  badge:"mod-gestor",
+  blocks:[
+    {type:'expect', title:'Score composto', text:'Calculado só com métricas conectadas de verdade: % de revisões realizadas, % de conversão de experiências, e NPS Dia 1. Campos como Retenção %, NPS D21 e Engajamento aparecem 🟡 porque ainda não têm dado real por trás.'},
+    {type:'click', title:'Ver o sistema de um treinador específico', items:[
+      'Clique no botão "🖥️ Ver Sistema (Treinadores)" no topo do Dashboard, ou',
+      'Dentro do card de qualquer treinador no Ranking, clique em "🖥️ Ver sistema deste(a) treinador(a)"',
+      'Abre a Home dele(a) direto, sem pedir senha — mostra uma faixa "MODO ADMIN" no topo'
+    ]}
+  ]
+},
+{
+  grupo:"Gestor(a) — Dashboard",
+  eyebrow:"Renovação",
+  title:"Planos a Renovar",
+  sub:"Trabalhar a carteira que está vencendo",
+  badge:"mod-gestor",
+  blocks:[
+    {type:'expect', title:'Filtro por janela de dias', text:'30 / 60 / 90 dias — mostra quantos planos estão vencendo e quantos alunos estão sem treinador atribuído (dado real, direto do banco).'},
+    {type:'click', title:'Trabalhar uma lista específica (upload de CSV)', items:[
+      'Botão "📂 CSV" ao lado do filtro de dias',
+      'Suba um arquivo com uma coluna de nomes (ex: uma lista que veio do seu sistema de gestão)',
+      'O sistema cruza esses nomes com os alunos reais cadastrados',
+      'A lista de trabalho fica filtrada só pra esses nomes — clique em "✕ limpar filtro" pra voltar a ver todos'
+    ]},
+    {type:'click', title:'Marcar um aluno como Renovado', items:[
+      'Na lista detalhada, clique no status do aluno (ex: "A Renovar")',
+      'Escolha "✓ Marcar como Renovado"',
+      'Informe a nova data de vencimento (dd/mm/aaaa)',
+      'Grava direto na ficha do aluno no banco de dados'
+    ]},
+    {type:'warn', title:'"Rematrícula" ainda não grava no banco', text:'Marcar um aluno como Rematrícula muda o status só nesta tela — ainda não existe um campo próprio no sistema pra isso. Só a Renovação (com nova data) é persistida de verdade.'}
+  ]
+},
+{
+  grupo:"Admin",
+  eyebrow:"Gestão de clientes",
+  title:"Academias",
+  sub:"Criar, editar, inativar e acessar qualquer academia-cliente",
+  badge:"mod-admin",
+  blocks:[
+    {type:'expect', title:'KPIs globais', text:'Academias ativas, Treinadores, Alunos ativos (total), Matrícula direta × Agregador (Wellhub/TotalPass), % Encarteirados (meta 75–85%), Em Desafio 21 dias, Planners gerados, Receita mensal.'},
+    {type:'click', title:'Ações por academia', items:[
+      '<strong>Plano</strong> — muda o plano contratado (Piloto/Básico/Pro)',
+      '<strong>Editar</strong> — nome, cidade, estado',
+      '<strong>🔧 Módulos</strong> — libera/bloqueia funcionalidades por academia',
+      '<strong>Ver</strong> — expande e mostra usuários, encarteiramento, matrícula×agregador',
+      '<strong>🖥️ Acessar</strong> — abre o Dashboard do gestor(a) direto, sem senha',
+      '<strong>⏸️ Inativar / 🗑️ Excluir</strong> — a exclusão pede confirmação digitando o nome exato da academia'
+    ]}
+  ]
+},
+{
+  grupo:"Admin",
+  eyebrow:"Pessoas",
+  title:"Usuários e Acessos",
+  sub:"Criar login, redefinir senha, e entrar como qualquer pessoa",
+  badge:"mod-admin",
+  blocks:[
+    {type:'click', title:'Dentro do "Ver" de uma academia', items:[
+      'Cada usuário (Treinador/Gestor/Consultor) aparece com 3 botões',
+      '<strong>🖥️ Acessar</strong> — abre o sistema dessa pessoa direto, sem senha',
+      '<strong>🔑 Senha</strong> — redefine a senha e já mostra um texto pronto pra enviar ao cliente',
+      '<strong>📤 Enviar</strong> — gera e-mail + link de acesso pra reenviar (sem mexer na senha)'
+    ]},
+    {type:'warn', title:'O sistema nunca guarda a senha original', text:'Por segurança, não dá pra "ver" a senha de alguém depois de criada. Se o cliente esqueceu, use 🔑 Senha pra gerar uma nova.'}
+  ]
+},
+{
+  grupo:"Admin",
+  eyebrow:"Dados em massa",
+  title:"Importação de Planilha",
+  sub:"Subir a carteira inteira de uma academia de uma vez",
+  badge:"mod-admin",
+  blocks:[
+    {type:'click', title:'Fluxo completo', items:[
+      'Abra <code>importar_carteira.html</code>',
+      'Baixe o modelo se ainda não tiver um arquivo pronto',
+      'Suba o CSV — o sistema detecta as colunas automaticamente',
+      'Confirme o mapeamento (nome, matrícula, status, plano, vencimento, idade, telefone, e-mail, treinador)',
+      'Revise as estatísticas (quantos com plano, vencidos, matrícula×agregador, ativo×lead×ex-aluno)',
+      'Escolha o modo: Adicionar, Atualizar existentes, ou Substituir tudo',
+      'Importar'
+    ]},
+    {type:'tip', title:'Status detectado automaticamente', text:'Palavras como "lead", "visitante", "cancelado", "ex-aluno" na coluna de status já classificam a linha certa sem precisar mapear manualmente.'}
+  ]
+},
+{
+  grupo:"Referência Rápida",
+  eyebrow:"Consulta",
+  title:"Mapa de arquivos do sistema",
+  sub:"Cada tela e pra quem ela serve",
+  badge:"mod-geral",
+  blocks:[
+    {type:'reftable', title:'Arquivo → Perfil → Função', headers:['Arquivo','Perfil','Função'], rows:[
+      ['index.html','Todos','Login unificado — Treinador/Gestor/Consultor(a)'],
+      ['admin_painel.html','Admin','Gestão de todas as academias-clientes'],
+      ['sistema_integrado_v3.html','Treinador(a)','Home + Agenda + Planner'],
+      ['dashboard_gestor_v3.html','Gestor(a)','Indicadores da academia'],
+      ['painel_vendas.html','Consultor(a)','Funil de leads e experiências'],
+      ['app_aluno.html','Aluno (QR Code)','Desafio 21 dias, NPS'],
+      ['diario_treinador.html','Treinador(a)','Contadores diários'],
+      ['revisao_treino.html','Treinador(a)','Assistente técnico de revisão'],
+      ['pesquisa_consultoria.html','Treinador/Gestor','Relatório de NPS Dia 1'],
+      ['importar_carteira.html','Treinador/Gestor/Admin','Importação de planilha em massa']
+    ]}
+  ]
+},
+{
+  grupo:"Referência Rápida",
+  eyebrow:"Dúvidas comuns",
+  title:"Perguntas Frequentes",
+  sub:"O que fazer quando algo não aparece do jeito esperado",
+  badge:"mod-geral",
+  blocks:[
+    {type:'warn', title:'"A experiência não aparece na Minha Agenda do treinador"', text:'Confira se ela está com status "agendada" ou "comparecida" — outros status (convertida/não convertida) saem da Agenda porque já foram encerrados.'},
+    {type:'warn', title:'"Marquei Renovado mas não sei se salvou"', text:'Só a Renovação (com nova data de vencimento) grava no banco de dados de verdade. Rematrícula e Desfazer ainda são só locais nesta tela.'},
+    {type:'warn', title:'"O botão Acessar do admin não funciona"', text:'Confirme que o link tem <code>?admin_academia=...</code> na URL — sem isso, a tela pede login normal.'},
+    {type:'warn', title:'"Os números do Diário não batem com a Agenda"', text:'Os dois ainda não são sincronizados — o Diário é contador manual do dia, a Agenda é compromisso individual por aluno. Preencha os dois com atenção.'},
+    {type:'tip', title:'Indicadores marcados 🟡', text:'Sempre que você vir a etiqueta 🟡 "modelo" numa tela, significa que aquele número ainda é estimado ou ilustrativo — não existe uma fonte de dado real conectada por trás dele ainda.'},
+    {type:'tip', title:'Ainda com dúvida?', text:'Fale com o suporte da plataforma.'}
+  ]
+}
+];
+let current = 0;
+let filtro = '';
+
+function renderSidebar(){
+  const el = document.getElementById('stepNavList');
+  let html = '';
+  let grupoAtual = null;
+  steps.forEach((s,i)=>{
+    const bate = !filtro || (s.title+' '+s.sub+' '+s.grupo).toLowerCase().includes(filtro);
+    if(s.grupo!==grupoAtual){
+      grupoAtual=s.grupo;
+      html += `<div class="side-group-label">${grupoAtual}</div>`;
+    }
+    html += `<div class="step-nav-item ${i===current?'active':''} ${bate?'':'hidden'}" onclick="goTo(${i})">
+      <div class="step-num">${s.eyebrow==='Comece por aqui'?'★':'·'}</div>
+      <div class="step-nav-label">${s.title}</div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+function filtrarNav(v){ filtro = v.trim().toLowerCase(); renderSidebar(); }
+
+function blockHtml(b){
+  if(b.type==='click'){
+    return `<div class="block"><h4>▸ ${b.title}</h4><ul class="click-list">${b.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;
+  }
+  if(b.type==='expect'){
+    return `<div class="block expect"><h4>✓ ${b.title}</h4><div>${b.text}</div></div>`;
+  }
+  if(b.type==='warn'){
+    return `<div class="block warn"><h4>⚠ ${b.title}</h4><div>${b.text}</div></div>`;
+  }
+  if(b.type==='tip'){
+    return `<div class="block tip"><h4>💡 ${b.title}</h4><div class="quote-line">${b.text}</div></div>`;
+  }
+  if(b.type==='fill'){
+    return `<div class="block"><h4>✎ ${b.title}</h4><table class="fill-table">${b.rows.map(r=>`<tr><td>${r[0]}</td><td><strong>${r[1]}</strong></td></tr>`).join('')}</table></div>`;
+  }
+  if(b.type==='reftable'){
+    return `<div class="block"><h4>${b.title}</h4><table class="ref-table"><tr>${b.headers.map(h=>`<th>${h}</th>`).join('')}</tr>${b.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>`;
+  }
+  return '';
+}
+
+function renderMain(){
+  const s = steps[current];
+  const el = document.getElementById('main');
+  el.innerHTML = `
+    <span class="mod-badge ${s.badge}">${s.grupo}</span>
+    <div class="step-eyebrow">${s.eyebrow}</div>
+    <div class="step-title">${s.title}</div>
+    <div class="step-sub">${s.sub}</div>
+    ${s.blocks.map(blockHtml).join('')}
+    <div class="step-footer">
+      <button class="nav-btn" onclick="goTo(${current-1})" ${current===0?'disabled':''}>← Anterior</button>
+      <button class="nav-btn primary" onclick="goTo(${current+1})" ${current===steps.length-1?'disabled':''}>Próximo →</button>
+    </div>
+  `;
+  window.scrollTo(0,0);
+  el.scrollTop = 0;
+}
+
+function goTo(i){
+  if(i<0||i>=steps.length) return;
+  current = i;
+  renderSidebar();
+  renderMain();
+}
+
+renderSidebar();
+renderMain();
+
+document.addEventListener('keydown', e=>{
+  if(document.activeElement===document.getElementById('sideSearch'))return;
+  if(e.key==='ArrowRight') goTo(current+1);
+  if(e.key==='ArrowLeft') goTo(current-1);
+});
+</script>
+</body>
+</html>

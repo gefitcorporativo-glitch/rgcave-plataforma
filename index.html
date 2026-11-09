@@ -267,7 +267,31 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
 .tab:hover{background:#222!important;color:#fff!important}
 .tab.active{background:#222!important;color:#F5B800!important;border-left-color:#F5B800!important}
 .nav-group-label{color:#F5B800!important;opacity:.85!important}
-</style></head>
+/* ÁREA DO TREINADOR (módulos do sistema de Retenção) */
+.at-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.at-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px;text-align:left;cursor:pointer;color:var(--tx);font-family:'Barlow',sans-serif;transition:border-color .15s,transform .15s}
+.at-card:hover{border-color:var(--bdo);transform:translateY(-1px)}
+.at-card .at-ic{font-size:22px;height:28px;line-height:28px;margin-bottom:8px}
+.at-card h4{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;margin-bottom:4px}
+.at-card p{font-size:12.5px;color:var(--td);line-height:1.4}
+.at-card .at-who{display:inline-block;margin-top:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--or)}
+.at-status{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--tm)}
+.at-dot{width:9px;height:9px;border-radius:50%;background:var(--am);flex-shrink:0}
+.at-dot.on{background:var(--gr)}
+.menu-ferr{position:relative}
+.menu-ferr>.btn-gh{color:var(--tm)}
+.menu-ferr .dd{display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:6px;min-width:250px;box-shadow:0 14px 34px rgba(0,0,0,.45);z-index:300}
+.menu-ferr.open .dd{display:block}
+.menu-ferr .dd button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:transparent;border:0;color:var(--tx);padding:9px 10px;border-radius:7px;font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer}
+.menu-ferr .dd button:hover{background:var(--s2)}
+.menu-ferr .dd .dd-sep{border-top:1px solid var(--bd);margin:5px 4px}
+.menu-ferr .dd .dd-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--td);padding:6px 10px 2px}
+.menu-ferr .dd .admin-ac-row{padding:4px 10px 8px}.menu-ferr .dd .admin-ac-row.show{flex-direction:column;align-items:stretch;gap:4px}.menu-ferr .dd .admin-ac-row select{width:100%}
+.topbar .menu-ferr .dd button{color:var(--tx)!important}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="retencao/config.js"></script>
+</head>
 <body>
 
 <div class="loading-ov hide" id="loading-ov"><div class="spinner"></div><div class="loading-txt">Carregando...</div></div>
@@ -355,6 +379,7 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
     <div class="nav-group-label">🤝 Retenção</div>
     <div class="tab" data-tab="retencao" onclick="switchTab('retencao')">Retenção</div>
     <div class="tab" data-tab="alunos" onclick="switchTab('alunos')">Alunos</div>
+    <div class="tab" data-tab="areatreinador" onclick="switchTab('areatreinador')">🏋️ Área do Treinador</div>
 
     <div class="nav-group-label">⚙️ Sistema</div>
     <div class="tab tab-admin" id="tab-admin" data-tab="admin" onclick="switchTab('admin')">⚡ Todas as Academias</div>
@@ -363,6 +388,20 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
   </div>
 
   <div class="main">
+
+    <!-- ÁREA DO TREINADOR -->
+    <div id="pan-areatreinador" class="panel">
+      <div style="margin-bottom:14px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--or);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Área do Treinador</div>
+        <div style="font-size:13px;color:var(--td)">Sistema de Retenção RG Cave: planner, diário, revisão de treino e gestão da carteira. Cada módulo abre em uma nova aba.</div>
+      </div>
+      <div class="at-status"><span class="at-dot" id="at-dot"></span><span id="at-status-txt">Verificando acesso à Retenção...</span>
+        <button class="btn-gh" id="at-btn-conectar" style="margin-left:auto;display:none" onclick="atPedirSenha(null)">Conectar</button>
+        <button class="btn-gh" id="at-btn-trocar" style="margin-left:auto;display:none" onclick="atTrocarConta()">Trocar conta</button>
+      </div>
+      <div class="at-grid" id="at-grid"></div>
+    </div>
+
 
     <!-- PAINEL -->
     <div id="pan-geral" class="panel active">
@@ -1318,6 +1357,22 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
   </div><!-- /main -->
 </div><!-- /app -->
 
+  <!-- MODAL ACESSO À RETENÇÃO -->
+  <div class="modal-ov" id="m-ret">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-hd"><h3>Acesso à Retenção</h3><button class="btn-x" onclick="closeM('m-ret')">×</button></div>
+      <div style="font-size:13px;color:var(--tm);margin-bottom:14px;line-height:1.5">Entre com o e-mail e a senha do sistema de Retenção. É só uma vez: depois os módulos abrem direto neste navegador.</div>
+      <div class="fg" style="margin-bottom:10px"><label class="fl">E-mail</label><input class="fi" type="email" id="ret-email" autocomplete="username"></div>
+      <div class="fg" style="margin-bottom:6px"><label class="fl">Senha da Retenção</label><input class="fi" type="password" id="ret-senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')atConfirmarSenha()"></div>
+      <div class="auth-err" id="ret-err" style="margin-top:10px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn-gh" onclick="closeM('m-ret')">Cancelar</button>
+        <button class="btn-or" id="ret-ok" onclick="atConfirmarSenha()">Entrar</button>
+      </div>
+    </div>
+  </div>
+
+
 <!-- MODAL ACESSO ACADEMIA -->
 <div class="modal-ov" id="m-acesso">
   <div class="modal" style="max-width:460px">
@@ -1484,13 +1539,14 @@ async function doLogin(){
     if(!res||!res.length){err.textContent='E-mail ou senha incorretos.';err.classList.add('show');btn.disabled=false;btn.textContent='Entrar';return}
     sessao=res[0];
     sessionStorage.setItem('qg90_sessao_roi',JSON.stringify(sessao));
+    await atConectar(email,senha); // login único: abre também a sessão da Retenção
     document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('active'));
     document.getElementById('app').classList.add('show');
     await iniciarApp();
   }catch(e){err.textContent='Erro de conexão.';err.classList.add('show');console.error(e)}
   btn.disabled=false;btn.textContent='Entrar';
 }
-function doLogout(){sessionStorage.removeItem('qg90_sessao_roi');sessao=null;acId=null;db={acs:{}};document.getElementById('app').classList.remove('show');document.getElementById('login-email').value='';document.getElementById('login-senha').value='';showScreen('screen-login')}
+function doLogout(){try{const c=atClient();if(c)c.auth.signOut()}catch(e){}sessionStorage.removeItem('qg90_sessao_roi');sessao=null;acId=null;db={acs:{}};document.getElementById('app').classList.remove('show');document.getElementById('login-email').value='';document.getElementById('login-senha').value='';showScreen('screen-login')}
 
 // Ao carregar a página: se já tem sessão salva neste navegador, REVALIDA no Supabase
 // (garante que suspensão de acesso continua valendo) e pula a tela de login direto
@@ -3584,8 +3640,8 @@ function exportCSV(){
 }
 
 // TABS / MODAIS / TOAST
-const TABS=['geral','vendasmkt','retencao','painel','alunos','briefing','planejamento','diagnostico','funis','consultoras','relatorio','ranking','admin','ferramentas','ajuda'];
-function switchTab(t){TABS.forEach(x=>{document.getElementById('pan-'+x).classList.toggle('active',x===t)});document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===t));if(t==='ferramentas')renderFerramentas();if(t==='planejamento')initPlanejamento();if(t==='diagnostico')initDiagnostico();if(t==='alunos')carregarAlunos();if(t==='geral')carregarGeral();if(t==='vendasmkt')carregarVendasMkt();if(t==='retencao')carregarRetencao();if(t==='briefing')initBriefing();}
+const TABS=['geral','vendasmkt','retencao','painel','alunos','areatreinador','briefing','planejamento','diagnostico','funis','consultoras','relatorio','ranking','admin','ferramentas','ajuda'];
+function switchTab(t){TABS.forEach(x=>{document.getElementById('pan-'+x).classList.toggle('active',x===t)});document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===t));if(t==='ferramentas')renderFerramentas();if(t==='planejamento')initPlanejamento();if(t==='diagnostico')initDiagnostico();if(t==='alunos')carregarAlunos();if(t==='areatreinador')renderAreaTreinador();if(t==='geral')carregarGeral();if(t==='vendasmkt')carregarVendasMkt();if(t==='retencao')carregarRetencao();if(t==='briefing')initBriefing();}
 
 // ══════════════════════════════════════
 // BRIEFING DO NEGÓCIO
@@ -4990,6 +5046,82 @@ function openM(id){
 }
 function closeM(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+// ══ ÁREA DO TREINADOR (Retenção) ══
+// O sistema de Retenção usa outro projeto Supabase, com login próprio (Supabase Auth).
+// No login da plataforma usamos o mesmo e-mail e senha para abrir a sessão de lá também;
+// ela fica salva neste navegador e os módulos abrem direto. Se a senha for diferente,
+// pedimos uma vez só.
+const AT_MODULOS=[
+  {ic:'📅',nome:'Planner do Treinador',url:'retencao/sistema_integrado_v3.html',quem:'Treinador(a)',desc:'Home, agenda, carteira e consultoria técnica com o aluno.'},
+  {ic:'✍️',nome:'Diário do Treinador',url:'retencao/diario_treinador.html',quem:'Treinador(a)',desc:'Relatório diário de atividades e resultados.'},
+  {ic:'✅',nome:'Revisão de Treino',url:'retencao/revisao_treino.html',quem:'Treinador(a)',desc:'Checklist guiado da revisão de treino.'},
+  {ic:'📊',nome:'Gestão da Retenção',url:'retencao/dashboard_gestor_v3.html',quem:'Gestor(a)',desc:'Indicadores, equipe, renovações e carteiras.'},
+  {ic:'🗂️',nome:'Atualizar Carteira',url:'retencao/importar_carteira.html',quem:'Gestor(a)',desc:'Suba a planilha de alunos e distribua a carteira.'},
+  {ic:'📈',nome:'Painel de Vendas',url:'retencao/painel_vendas.html',quem:'Consultor(a) e Gestor(a)',desc:'Funil de experiências e follow-ups.'},
+  {ic:'🧭',nome:'Mapa do Sistema',url:'retencao/mapa_retencao.html',quem:'Todos',desc:'Como cada tela funciona, passo a passo.'}
+];
+let atSb=null,atPendente=null;
+function atClient(){
+  if(!atSb&&window.supabase&&window.APP_CONFIG)atSb=window.supabase.createClient(APP_CONFIG.SUPABASE_URL,APP_CONFIG.SUPABASE_ANON,window.gfOpcoesAuth);
+  return atSb;
+}
+async function atSessao(){
+  const c=atClient();if(!c)return null;
+  try{const{data:{session}}=await c.auth.getSession();return session}catch(e){return null}
+}
+async function atConectar(email,senha){
+  const c=atClient();if(!c)return false;
+  try{
+    const ses=await atSessao();
+    if(ses&&(ses.user.email||'').toLowerCase()===String(email).toLowerCase())return true;
+    if(ses)await c.auth.signOut();
+    const{error}=await Promise.race([
+      c.auth.signInWithPassword({email,password:senha}),
+      new Promise(r=>setTimeout(()=>r({error:{message:'timeout'}}),6000))]);
+    return !error;
+  }catch(e){return false}
+}
+async function renderAreaTreinador(){
+  const grid=document.getElementById('at-grid');
+  grid.innerHTML=AT_MODULOS.map((m,i)=>`<button class="at-card" onclick="atAbrir(${i})"><div class="at-ic">${m.ic}</div><h4>${m.nome}</h4><p>${m.desc}</p><span class="at-who">${m.quem}</span></button>`).join('');
+  const ses=await atSessao();
+  document.getElementById('at-dot').classList.toggle('on',!!ses);
+  document.getElementById('at-status-txt').textContent=ses?('Conectado à Retenção como '+(ses.user.email||'')):'Ainda não conectado à Retenção neste navegador.';
+  document.getElementById('at-btn-conectar').style.display=ses?'none':'';
+  document.getElementById('at-btn-trocar').style.display=ses?'':'none';
+}
+async function atAbrir(i){
+  const ses=await atSessao();
+  if(!ses){atPedirSenha(i);return}
+  window.open(AT_MODULOS[i].url,'_blank');
+}
+function atPedirSenha(i){
+  atPendente=i;
+  document.getElementById('ret-email').value=(sessao&&sessao.email)||'';
+  document.getElementById('ret-senha').value='';
+  document.getElementById('ret-err').classList.remove('show');
+  openM('m-ret');
+  setTimeout(()=>document.getElementById('ret-senha').focus(),50);
+}
+async function atConfirmarSenha(){
+  const email=document.getElementById('ret-email').value.trim();
+  const senha=document.getElementById('ret-senha').value;
+  const err=document.getElementById('ret-err');err.classList.remove('show');
+  if(!email||!senha){err.textContent='Preencha e-mail e senha.';err.classList.add('show');return}
+  const b=document.getElementById('ret-ok');b.disabled=true;b.textContent='Verificando...';
+  const ok=await atConectar(email,senha);
+  b.disabled=false;b.textContent='Entrar';
+  if(!ok){err.textContent='E-mail ou senha da Retenção incorretos.';err.classList.add('show');return}
+  closeM('m-ret');
+  await renderAreaTreinador();
+  if(atPendente!==null){const m=AT_MODULOS[atPendente];atPendente=null;window.open(m.url,'_blank');}
+}
+async function atTrocarConta(){
+  try{const c=atClient();if(c)await c.auth.signOut()}catch(e){}
+  await renderAreaTreinador();
+  atPedirSenha(null);
+}
+
 // ══ EQUIPE: editar, inativar e excluir + cadastro único com a Área do Treinador (Retenção) ══
 // A Retenção tem login próprio. Quem está conectado a ela como gestor(a) sincroniza tudo daqui,
 // pela Edge Function "gestor-equipe" (a chave secreta nunca vem para o navegador).

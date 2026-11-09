@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script src="config.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RG Cave · Pesquisa de Consultoria</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A;--card:#111111;--card2:#1A1A1A;--border:#1E1E1E;--border2:#2A2A2A;
+  --orange:#F5B800;--orange-dim:rgba(245,184,0,.1);--orange-border:rgba(245,184,0,.25);
+  --text:#F0F0F0;--muted:#555;--dim:#222;
+  --green:#22C55E;--green-dim:rgba(34,197,94,.1);--green-border:rgba(34,197,94,.25);
+  --red:#EF4444;--red-dim:rgba(239,68,68,.1);
+  --yellow:#EAB308;--yellow-dim:rgba(234,179,8,.1);
+  --blue:#60A5FA;--blue-dim:rgba(96,165,250,.1);
+  --purple:#A78BFA;--purple-dim:rgba(167,139,250,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;padding-bottom:60px}
+
+.header{background:rgba(10,10,10,.97);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:50;backdrop-filter:blur(16px)}
+.header-inner{max-width:900px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:var(--orange)}
+.logo-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:1px}
+.back-btn{font-size:12px;color:var(--muted);text-decoration:none;padding:6px 12px;border:1px solid var(--border2);border-radius:7px;transition:all .15s}
+.back-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+.wrap{max-width:900px;margin:0 auto;padding:24px 20px}
+
+/* RESUMO TOPO */
+.resumo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+@media(max-width:600px){.resumo-grid{grid-template-columns:repeat(2,1fr)}}
+.resumo-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.resumo-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:500}
+.resumo-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+
+/* PERGUNTAS GRID */
+.perguntas-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.perguntas-grid{grid-template-columns:1fr}}
+
+.pergunta-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+.pergunta-num{font-size:9px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
+.pergunta-texto{font-size:13px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:14px}
+
+/* BARRAS */
+.opcao-row{margin-bottom:8px}
+.opcao-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.opcao-label{font-size:12px;color:var(--text);font-weight:500}
+.opcao-nums{display:flex;gap:8px;align-items:center}
+.opcao-pct{font-size:12px;font-weight:700;font-family:'DM Mono',monospace}
+.opcao-abs{font-size:10px;color:var(--muted)}
+.barra-track{height:6px;background:var(--border2);border-radius:3px;overflow:hidden}
+.barra-fill{height:100%;border-radius:3px;transition:width .6s ease}
+
+/* ESTRELAS */
+.estrelas-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.estrela-num{font-size:12px;color:var(--muted);width:12px;text-align:right;flex-shrink:0}
+.estrelas-track{flex:1;height:6px;background:var(--border2);border-radius:3px;overflow:hidden}
+.estrelas-fill{height:100%;border-radius:3px;background:var(--yellow);transition:width .6s ease}
+.estrela-pct{font-size:11px;font-weight:700;font-family:'DM Mono',monospace;color:var(--yellow);width:34px;text-align:right}
+.estrela-abs{font-size:10px;color:var(--muted);width:28px}
+.media-estrelas{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px 12px;background:var(--card2);border-radius:8px}
+.media-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--yellow)}
+.media-label{font-size:11px;color:var(--muted)}
+
+/* NPS */
+.nps-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:12px}
+.nps-header{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.nps-nota-grande{font-family:'DM Mono',monospace;font-size:48px;font-weight:500;line-height:1}
+.nps-titulo{font-size:13px;font-weight:600;margin-bottom:4px}
+.nps-sub{font-size:11px;color:var(--muted)}
+.nps-categorias{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.nps-cat{background:var(--card2);border-radius:8px;padding:10px;text-align:center}
+.nps-cat-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:500}
+.nps-cat-label{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.nps-dist{display:flex;gap:4px;height:8px;border-radius:4px;overflow:hidden;margin-top:8px}
+.nps-dist-seg{border-radius:0}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;min-height:40vh;flex-direction:column;gap:12px}
+.spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--orange);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.sec-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin:24px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* FILTROS */
+.filtros{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.filtro-select{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:12px;outline:none;font-family:'Barlow',sans-serif}
+
+.sem-dados{text-align:center;padding:40px;color:var(--muted);font-size:13px;background:var(--card);border-radius:12px;border:1px solid var(--border)}
+</style>
+<script src="gf-embed.js"></script>
+<link rel="stylesheet" href="theme-gefit.css">
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="logo">RG Cave · Pesquisa de Consultoria</div>
+      <div class="logo-sub">Respostas do App do Aluno — Dia 1</div>
+    </div>
+    <a href="sistema_integrado_v3.html" class="back-btn">← Voltar</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="mainContent">
+    <div class="loading"><div class="spinner"></div><div style="font-size:13px;color:var(--muted)">Carregando respostas...</div></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL  = APP_CONFIG.SUPABASE_URL;
+const SB_ANON = APP_CONFIG.SUPABASE_ANON;
+
+let sb, respostas = [];
+
+// Definição das perguntas e opções
+const PERGUNTAS = [
+  {
+    key: 'q1_diferencial',
+    num: '1 de 5',
+    tema: 'Diferencial percebido',
+    texto: 'Antes de vir aqui, você já teve um plano de treino assim — com dias definidos, área de saúde e metas?',
+    tipo: 'opcoes',
+    opcoes: [
+      { val:'nunca_tive',    label:'Nunca tive nada parecido', cor:'#22C55E' },
+      { val:'algo_similar',  label:'Tive algo similar',        cor:'#EAB308' },
+      { val:'ja_tive',       label:'Sim, já tive antes',       cor:'#60A5FA' },
+    ]
+  },
+  {
+    key: 'q2_clareza',
+    num: '2 de 5',
+    tema: 'Clareza do plano',
+    texto: 'Saindo daqui, você sabe exatamente o que vai fazer nos próximos 21 dias?',
+    tipo: 'opcoes',
+    opcoes: [
+      { val:'muito_claro',    label:'Sim, tenho tudo claríssimo', cor:'#22C55E' },
+      { val:'mais_ou_menos',  label:'Mais ou menos',               cor:'#EAB308' },
+      { val:'tenho_duvidas',  label:'Ainda tenho dúvidas',         cor:'#EF4444' },
+    ]
+  },
+  {
+    key: 'q3_estrelas',
+    num: '3 de 5',
+    tema: 'Avaliação do treinador',
+    texto: 'Como você avalia o profissionalismo e o conhecimento do seu treinador nessa consultoria?',
+    tipo: 'estrelas',
+    max: 5,
+  },
+  {
+    key: 'q4_acompanhado',
+    num: '4 de 5',
+    tema: 'Sentimento de acompanhamento',
+    texto: 'Você se sente acompanhado — como se não fosse treinar sozinho nesse desafio?',
+    tipo: 'opcoes',
+    opcoes: [
+      { val:'totalmente',  label:'Sim, totalmente',      cor:'#22C55E' },
+      { val:'um_pouco',    label:'Um pouco',              cor:'#EAB308' },
+      { val:'ainda_nao',   label:'Ainda não sei dizer',  cor:'#60A5FA' },
+    ]
+  },
+  {
+    key: 'q5_expectativa',
+    num: '5 de 5',
+    tema: 'Expectativa de resultado',
+    texto: 'Esse formato te dá mais confiança de que vai ter resultado?',
+    tipo: 'opcoes',
+    opcoes: [
+      { val:'mais_confianca', label:'Sim, me dá mais confiança', cor:'#22C55E' },
+      { val:'um_pouco',       label:'Um pouco',                  cor:'#EAB308' },
+      { val:'nao_sei',        label:'Ainda não sei',             cor:'#60A5FA' },
+    ]
+  },
+];
+
+window.addEventListener('DOMContentLoaded', async () => {
+  sb = window.supabase.createClient(SB_URL, SB_ANON, window.gfOpcoesAuth);
+
+  // Verificar sessão
+  const { data:{ session } } = await sb.auth.getSession();
+
+  // Buscar respostas — sem filtro de academia por ora (RLS desativado)
+  const { data, error } = await sb.from('nps_dia1').select('*');
+  if(error){ document.getElementById('mainContent').innerHTML = `<div class="sem-dados">Erro ao carregar: ${error.message}</div>`; return; }
+
+  respostas = data || [];
+  renderTudo();
+});
+
+function renderTudo(){
+  const total = respostas.length;
+
+  if(total === 0){
+    document.getElementById('mainContent').innerHTML = `
+      <div class="sem-dados">
+        <div style="font-size:32px;margin-bottom:12px">📊</div>
+        <div style="font-weight:600;margin-bottom:6px">Nenhuma resposta ainda</div>
+        <div>As respostas aparecem aqui quando os alunos respondem a pesquisa no app após a consultoria.</div>
+      </div>`;
+    return;
+  }
+
+  // Calcular NPS
+  const npsVals = respostas.map(r=>r.nps_nota).filter(v=>v!==null&&v!==undefined);
+  const npsMedia = npsVals.length ? (npsVals.reduce((a,b)=>a+b,0)/npsVals.length).toFixed(1) : '—';
+  const promotores = npsVals.filter(v=>v>=9).length;
+  const neutros    = npsVals.filter(v=>v>=7&&v<=8).length;
+  const detratores = npsVals.filter(v=>v<=6).length;
+  const npsScore   = npsVals.length ? Math.round(((promotores-detratores)/npsVals.length)*100) : null;
+
+  // Calcular média estrelas
+  const estVals = respostas.map(r=>r.q3_estrelas).filter(v=>v!==null&&v!==undefined);
+  const estMedia = estVals.length ? (estVals.reduce((a,b)=>a+b,0)/estVals.length).toFixed(1) : '—';
+
+  let html = '';
+
+  // RESUMO TOPO
+  html += `
+    <div class="resumo-grid">
+      <div class="resumo-card">
+        <div class="resumo-val" style="color:var(--orange)">${total}</div>
+        <div class="resumo-label">Pesquisas respondidas</div>
+      </div>
+      <div class="resumo-card">
+        <div class="resumo-val" style="color:${parseFloat(estMedia)>=4?'var(--green)':parseFloat(estMedia)>=3?'var(--yellow)':'var(--red)'}">${estMedia}★</div>
+        <div class="resumo-label">Média avaliação treinador</div>
+      </div>
+      <div class="resumo-card">
+        <div class="resumo-val" style="color:${parseFloat(npsMedia)>=8?'var(--green)':parseFloat(npsMedia)>=6?'var(--yellow)':'var(--red)'}">${npsMedia}</div>
+        <div class="resumo-label">NPS médio (0–10)</div>
+      </div>
+      <div class="resumo-card">
+        <div class="resumo-val" style="color:${npsScore>=50?'var(--green)':npsScore>=0?'var(--yellow)':'var(--red)'}">${npsScore!==null?npsScore+'%':'—'}</div>
+        <div class="resumo-label">Score NPS</div>
+      </div>
+    </div>`;
+
+  // PERGUNTAS
+  html += `<div class="sec-title">Respostas por pergunta</div>`;
+  html += `<div class="perguntas-grid">`;
+
+  PERGUNTAS.forEach(p => {
+    const resps = respostas.map(r=>r[p.key]).filter(v=>v!==null&&v!==undefined);
+    const qtd = resps.length;
+
+    html += `<div class="pergunta-card">
+      <div class="pergunta-num">${p.num} · ${p.tema}</div>
+      <div class="pergunta-texto">${p.texto}</div>`;
+
+    if(p.tipo === 'opcoes'){
+      p.opcoes.forEach(op => {
+        const count = resps.filter(v=>v===op.val).length;
+        const pct = qtd > 0 ? Math.round(count/qtd*100) : 0;
+        html += `
+          <div class="opcao-row">
+            <div class="opcao-header">
+              <div class="opcao-label">${op.label}</div>
+              <div class="opcao-nums">
+                <div class="opcao-pct" style="color:${op.cor}">${pct}%</div>
+                <div class="opcao-abs">${count} resp.</div>
+              </div>
+            </div>
+            <div class="barra-track">
+              <div class="barra-fill" style="width:${pct}%;background:${op.cor}"></div>
+            </div>
+          </div>`;
+      });
+      html += `<div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:right">${qtd} resposta${qtd!==1?'s':''}</div>`;
+    }
+
+    if(p.tipo === 'estrelas'){
+      for(let i=p.max;i>=1;i--){
+        const count = resps.filter(v=>parseInt(v)===i).length;
+        const pct = qtd > 0 ? Math.round(count/qtd*100) : 0;
+        html += `
+          <div class="estrelas-row">
+            <div class="estrela-num">${i}★</div>
+            <div class="estrelas-track">
+              <div class="estrelas-fill" style="width:${pct}%"></div>
+            </div>
+            <div class="estrela-pct">${pct}%</div>
+            <div class="estrela-abs">${count} resp.</div>
+          </div>`;
+      }
+      const media = qtd > 0 ? (resps.reduce((a,b)=>a+parseInt(b),0)/qtd).toFixed(1) : '—';
+      html += `
+        <div class="media-estrelas">
+          <div class="media-val">${media}★</div>
+          <div>
+            <div class="media-label" style="font-weight:600;color:var(--text)">Média geral</div>
+            <div class="media-label">${qtd} avaliação${qtd!==1?'ões':''}</div>
+          </div>
+        </div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  html += `</div>`;
+
+  // NPS DETALHADO
+  html += `
+    <div class="sec-title">NPS — Net Promoter Score</div>
+    <div class="nps-card">
+      <div class="nps-header">
+        <div>
+          <div class="nps-nota-grande" style="color:${npsScore>=50?'var(--green)':npsScore>=0?'var(--yellow)':'var(--red)'}">${npsScore!==null?npsScore:'—'}</div>
+        </div>
+        <div>
+          <div class="nps-titulo">Score NPS</div>
+          <div class="nps-sub">Média: ${npsMedia}/10 · ${npsVals.length} resposta${npsVals.length!==1?'s':''}</div>
+          <div class="nps-sub" style="margin-top:4px">Promotores − Detratores ÷ Total</div>
+        </div>
+      </div>
+      <div class="nps-categorias">
+        <div class="nps-cat">
+          <div class="nps-cat-val" style="color:var(--green)">${promotores}</div>
+          <div class="nps-cat-label" style="color:var(--green)">Promotores</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Nota 9–10</div>
+        </div>
+        <div class="nps-cat">
+          <div class="nps-cat-val" style="color:var(--yellow)">${neutros}</div>
+          <div class="nps-cat-label" style="color:var(--yellow)">Neutros</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Nota 7–8</div>
+        </div>
+        <div class="nps-cat">
+          <div class="nps-cat-val" style="color:var(--red)">${detratores}</div>
+          <div class="nps-cat-label" style="color:var(--red)">Detratores</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Nota 0–6</div>
+        </div>
+      </div>
+      <!-- Distribuição das notas -->
+      <div style="font-size:10px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Distribuição das notas</div>
+      ${[10,9,8,7,6,5,4,3,2,1,0].map(n=>{
+        const count = npsVals.filter(v=>parseInt(v)===n).length;
+        const pct = npsVals.length ? Math.round(count/npsVals.length*100) : 0;
+        const cor = n>=9?'var(--green)':n>=7?'var(--yellow)':'var(--red)';
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="font-size:11px;font-family:'DM Mono',monospace;color:${cor};min-width:16px;text-align:right">${n}</div>
+          <div style="flex:1;height:5px;background:var(--border2);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${cor};border-radius:3px;transition:width .6s"></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;font-family:'DM Mono',monospace;color:${cor};min-width:32px;text-align:right">${pct}%</div>
+          <div style="font-size:10px;color:var(--muted);min-width:40px">${count} resp.</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  document.getElementById('mainContent').innerHTML = html;
+}
+</script>
+</body>
+</html>
