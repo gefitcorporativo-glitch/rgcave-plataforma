@@ -1592,9 +1592,9 @@ async function loadAll(){
       // mostrando todas as academias).
       acsQ = sessao.academia_id ? `id=eq.${sessao.academia_id}` : `id=eq.__sem_academia_vinculada__`;
     }
-    const[acs,cons,regs,treins]=await Promise.all([sbGet('cave_academias',acsQ),sbGet('cave_consultoras','order=created_at.asc'),sbGet('cave_registros','order=dia.asc,ts.asc'),sbGet('cave_treinadores','ativo=eq.true&order=created_at.asc')]);
+    const[acs,cons,regs,treins]=await Promise.all([sbGet('cave_academias',acsQ),sbGet('cave_consultoras','order=created_at.asc'),sbGet('cave_registros','order=dia.asc,ts.asc'),sbGet('cave_treinadores','order=created_at.asc')]);
     db.acs={};
-    acs.forEach(a=>{db.acs[a.id]={...a,consultoras:{},registros:[],treinadores:{}}});
+    acs.forEach(a=>{db.acs[a.id]={...a,consultoras:{},registros:[],treinadores:{},treinInativos:{}}});
     if(!isAdmin()&&!sessao.academia_id){
       toast('Sua conta não está vinculada a nenhuma academia. Fale com o suporte GeFit.',true);
       console.error('SEGURANÇA: gestor(a) sem academia_id tentou logar, acesso bloqueado.', sessao);
@@ -1605,7 +1605,7 @@ async function loadAll(){
       Object.keys(db.acs).forEach(id=>{ if(id!==sessao.academia_id) delete db.acs[id]; });
     }
     cons.forEach(c=>{if(db.acs[c.academia_id])db.acs[c.academia_id].consultoras[c.id]={nome:c.nome,meta:c.meta,meta_tipo:c.meta_tipo||'planos',horas:c.horas||0,funis:c.funis||[],metas:c.metas||null}});
-    treins.forEach(t=>{if(db.acs[t.academia_id])db.acs[t.academia_id].treinadores[t.id]={nome:t.nome,grau:t.grau_academico||'',cref:t.cref||'',nivel:t.nivel_carreira||'',hi:t.horario_inicio||'',hf:t.horario_fim||'',tel:t.telefone||''}});
+    treins.forEach(t=>{if(t.ativo===false){if(db.acs[t.academia_id])(db.acs[t.academia_id].treinInativos=db.acs[t.academia_id].treinInativos||{})[t.id]={nome:t.nome};return}if(db.acs[t.academia_id])db.acs[t.academia_id].treinadores[t.id]={nome:t.nome,grau:t.grau_academico||'',cref:t.cref||'',nivel:t.nivel_carreira||'',hi:t.horario_inicio||'',hf:t.horario_fim||'',tel:t.telefone||''}});
     try{
       const[alR,exR]=await Promise.all([sbGet('cave_alunos','select=treinador_id,status').catch(()=>[]),sbGet('cave_experiencias','select=treinador_id,status').catch(()=>[])]);
       treinMet={};
@@ -1681,7 +1681,11 @@ async function addCons(){
 }
 async function removeCons(id){
   if(!confirm('Remover consultor(a)?'))return;
-  try{await sbDelete('cave_consultoras',{id});toast('Removido(a)');await loadAll();renderConsManage()}
+  try{
+    const lg=(await sbGet('cave_gestores',`consultora_id=eq.${id}&select=id,email`))[0];
+    let extra='';
+    if(lg){extra=retMsg(await retSync({action:'excluir_usuario',email:lg.email}));await sbDelete('cave_gestores',{id:lg.id})}
+    await sbDelete('cave_consultoras',{id});toast('Removido(a)'+extra);await loadAll();renderConsManage()}
   catch(e){toast('Erro',true)}
 }
 function renderConsManage(){
@@ -2527,7 +2531,9 @@ let treinMet={};let trGrauSel='';
 function renderTreinadoresGrid(a){
   const el=document.getElementById('treinadores-grid');if(!el)return;
   const en=Object.entries(a.treinadores||{});
-  if(!en.length){el.innerHTML='<div style="color:var(--td);font-size:13px;padding:20px 0">Nenhum(a) treinador(a) cadastrado(a).</div>';return}
+  const inat=Object.entries(a.treinInativos||{});
+  const blocoInat=inat.length?`<div style="grid-column:1/-1;margin-top:6px;padding:12px 14px;border:1px dashed var(--bd);border-radius:10px"><div style="font-size:12px;font-weight:700;color:var(--td);margin-bottom:8px">Inativos(as) · ${inat.length}</div>${inat.map(([iid,it])=>{const inm=it.nome.replace(/'/g,"\\'");return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--bd)"><span style="flex:1;font-size:13px;color:var(--td)">${it.nome}</span><button class="btn-gh btn-sm" style="font-size:11px;padding:3px 10px" onclick="inativarTreinador('${iid}','${inm}',true)">▶ Reativar</button><button class="btn-gh btn-sm" style="font-size:11px;padding:3px 10px;color:var(--re)" onclick="excluirTreinador('${iid}','${inm}')">🗑 Excluir</button></div>`}).join('')}</div>`:'';
+  if(!en.length){el.innerHTML='<div style="color:var(--td);font-size:13px;padding:20px 0">Nenhum(a) treinador(a) ativo(a).</div>'+blocoInat;return}
   el.innerHTML=en.map(([id,t])=>{
     const m=treinMet[id]||{al:0,ex:0,cv:0};
     const taxa=m.ex>0?Math.round(m.cv/m.ex*100):0;
@@ -2544,19 +2550,29 @@ function renderTreinadoresGrid(a){
         <button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="abrirAcessoPessoa('treinador','${id}','${nm}')">🔑 Acesso</button>
       </div>
       ${pills?`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px">${pills}</div>`:''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px">
+        <button class="btn-gh btn-sm" style="font-size:11px;padding:3px 10px" onclick="abrirEditarTreinador('${id}')">✎ Editar</button>
+        <button class="btn-gh btn-sm" style="font-size:11px;padding:3px 10px" onclick="inativarTreinador('${id}','${nm}',false)">⏸ Inativar</button>
+        <button class="btn-gh btn-sm" style="font-size:11px;padding:3px 10px;color:var(--re)" onclick="excluirTreinador('${id}','${nm}')">🗑 Excluir</button>
+      </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 14px">
         <div style="background:var(--s2);border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--tx)">${m.al}</div><div style="font-size:10px;color:var(--td)">Alunos na carteira</div></div>
         <div style="background:var(--s2);border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--tx)">${m.ex}</div><div style="font-size:10px;color:var(--td)">Experiências realizadas</div></div>
         <div style="background:var(--s2);border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:${corTx}">${m.cv}</div><div style="font-size:10px;color:var(--td)">Convertidas${m.ex>0?' · '+taxa+'%':''}</div></div>
       </div>
     </div>`}).join('');
+  el.innerHTML+=blocoInat;
 }
 function selTrGrau(g){
   trGrauSel=g;
   document.querySelectorAll('#tr-grau-opts .meta-opt').forEach(o=>o.classList.toggle('sel',o.dataset.g===g));
   document.getElementById('tr-cref-wrap').style.display=(g==='formado'||g==='provisionado')?'flex':'none';
 }
+let trEditId=null;
 function abrirNovoTreinadorROI(){
+  trEditId=null;
+  const hd=document.querySelector('#m-trein .modal-hd h3');if(hd)hd.textContent='Adicionar Treinador(a)';
+  const bt=document.getElementById('btn-add-trein');if(bt)bt.textContent='Adicionar Treinador(a)';
   if(!acId){toast('Selecione uma academia',true);return}
   ['tr-nm','tr-tel','tr-cref'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('tr-nivel').value='estagio_treinador';
@@ -2571,6 +2587,20 @@ async function salvarTreinadorROI(){
   const comCref=trGrauSel==='formado'||trGrauSel==='provisionado';
   const btn=document.getElementById('btn-add-trein');btn.disabled=true;
   try{
+    const dadosTr={
+      telefone:document.getElementById('tr-tel').value.trim()||null,
+      grau_academico:trGrauSel||null,
+      cref:comCref?(document.getElementById('tr-cref').value.trim()||null):null,
+      nivel_carreira:document.getElementById('tr-nivel').value,
+      horario_inicio:document.getElementById('tr-hi').value||null,
+      horario_fim:document.getElementById('tr-hf').value||null};
+    if(trEditId){
+      await fetch(`${SB_URL}/rest/v1/cave_treinadores?id=eq.${trEditId}`,{method:'PATCH',headers:H,body:JSON.stringify({nome,...dadosTr})});
+      const lg=(await sbGet('cave_gestores',`treinador_id=eq.${trEditId}&select=id,email`))[0];
+      let extra='';
+      if(lg){await fetch(`${SB_URL}/rest/v1/cave_gestores?id=eq.${lg.id}`,{method:'PATCH',headers:H,body:JSON.stringify({nome})});extra=retMsg(await retSync({action:'editar_usuario',email:lg.email,nome}))}
+      trEditId=null;closeM('m-trein');toast('Cadastro atualizado'+extra);await loadAll();btn.disabled=false;return;
+    }
     await sbPost('cave_treinadores',{id:uid(),academia_id:acId,nome,ativo:true,
       telefone:document.getElementById('tr-tel').value.trim()||null,
       grau_academico:trGrauSel||null,
@@ -2606,7 +2636,11 @@ async function abrirAcessoPessoa(tipo,pessoaId,pessoaNome){
         </div>
         <div class="divider"></div>
         <div style="font-size:12px;color:var(--td);margin-bottom:6px">E-mail de acesso</div>
-        <div style="font-weight:600;color:var(--or-t);margin-bottom:14px">${login.email}</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <input class="fi" id="acesso-email-input" value="${login.email}" style="flex:1">
+          <button class="btn-gh btn-sm" onclick="salvarEmailAcesso('${login.id}')">Salvar e-mail</button>
+        </div>
+        <div id="acesso-ret-status" style="font-size:12.5px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:14px;color:var(--td)">Área do Treinador: verificando...</div>
         <div style="font-size:12px;color:var(--td);margin-bottom:6px">Senha atual</div>
         <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:10px 14px;font-family:monospace;color:var(--gr);margin-bottom:14px">${login.senha_hash}</div>
         <div style="background:var(--or-d);border:1px solid var(--bdo);border-radius:8px;padding:12px;margin-bottom:16px">
@@ -2617,15 +2651,17 @@ async function abrirAcessoPessoa(tipo,pessoaId,pessoaNome){
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:16px">
-          <input class="fi" id="nova-senha-input" placeholder="Nova senha" style="flex:1">
+          <input class="fi" id="nova-senha-input" placeholder="Nova senha (mínimo 8 caracteres)" style="flex:1">
           <button class="btn-or" onclick="resetSenha('${login.id}')">Salvar</button>
         </div>
         <div class="divider"></div>
         <div style="font-size:12px;color:var(--td);margin:14px 0 8px">Módulos liberados</div>
         <div id="acesso-modulos-existente">${renderModulosCheckboxPessoa(login.id,login.modulos_ativos||[])}</div>
         <div class="divider"></div>
-        <button class="btn-${login.ativo?'danger':'or'}" style="width:100%" onclick="toggleAtivoAcademia('${login.id}',${login.ativo})">${login.ativo?'⛔ Suspender acesso':'✅ Reativar acesso'}</button>
+        <button class="btn-${login.ativo?'danger':'or'}" style="width:100%;margin-bottom:8px" onclick="toggleAtivoPessoa('${login.id}',${login.ativo})">${login.ativo?'⏸ Inativar acesso':'▶ Reativar acesso'}</button>
+        <button class="btn-gh" style="width:100%;color:var(--re)" onclick="excluirAcessoPessoa('${login.id}')">🗑 Excluir só o acesso (o cadastro continua)</button>
       `;
+      atStatusAcesso(login);
       return;
     }
     // Sem login ainda, verifica limite de 5 por tipo antes de mostrar o formulário
@@ -2639,7 +2675,7 @@ async function abrirAcessoPessoa(tipo,pessoaId,pessoaNome){
       <div style="margin-bottom:14px"><div style="font-size:12px;color:var(--td);margin-bottom:4px">Criar acesso para</div><div style="font-weight:600;font-size:15px">${pessoaNome}</div></div>
       <p style="font-size:12.5px;color:var(--td);margin-bottom:14px">${todos.length}/5 acessos de ${tipo==='consultor'?'consultor(a)':'treinador(a)'} usados nesta academia.</p>
       <div class="fg" style="margin-bottom:10px"><label class="fl">E-mail de acesso</label><input class="fi" id="novo-pessoa-email" placeholder="nome@email.com"></div>
-      <div class="fg" style="margin-bottom:16px"><label class="fl">Senha</label><input class="fi" id="novo-pessoa-senha" placeholder="Defina uma senha"></div>
+      <div class="fg" style="margin-bottom:16px"><label class="fl">Senha</label><input class="fi" id="novo-pessoa-senha" placeholder="Mínimo 8 caracteres, só minúsculas e números"></div>
       <div style="font-size:12px;color:var(--td);margin-bottom:8px">Módulos a liberar</div>
       <div id="acesso-modulos-novo">${MODULOS_QG90.map(m=>`
         <label style="display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;cursor:pointer;margin-bottom:8px">
@@ -2654,7 +2690,7 @@ async function criarAcessoPessoa(tipo,pessoaId,pessoaNome){
   const email=document.getElementById('novo-pessoa-email').value.trim().toLowerCase();
   const senha=document.getElementById('novo-pessoa-senha').value;
   const modulos=[...document.querySelectorAll('.novo-modulo-chk:checked')].map(el=>el.value);
-  if(!email||!senha||senha.length<4){toast('Preencha e-mail e uma senha com ao menos 4 caracteres',true);return}
+  if(!email||!senha||senha.length<8){toast('Preencha o e-mail e uma senha com no mínimo 8 caracteres',true);return}
   if(!modulos.length){toast('Selecione ao menos 1 módulo pra liberar.',true);return}
   try{
     const existeEmail=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(email)}&select=id`);
@@ -2664,7 +2700,8 @@ async function criarAcessoPessoa(tipo,pessoaId,pessoaNome){
       id:uid(),nome:pessoaNome,email,senha_hash:senha,academia_id:acId,
       role:tipo,ativo:true,[campoId]:pessoaId,modulos_ativos:modulos
     });
-    toast('Acesso criado! Agora é só enviar a mensagem pronta para a pessoa.');
+    const rs=await retSync({action:'garantir_usuario',nome:pessoaNome,email,senha,tipo});
+    toast('Acesso criado'+retMsg(rs)+'. Agora é só enviar a mensagem pronta.',!!rs.error);
     await abrirAcessoPessoa(tipo,pessoaId,pessoaNome);
   }catch(e){console.error(e);toast('Erro ao criar acesso: '+String(e.message||e).slice(0,140),true);}
 }
@@ -3168,8 +3205,11 @@ function msgAcesso(){
   const mods=(a.modulos_ativos||[]).map(m=>(MODULOS_QG90.find(x=>x.key===m)||{}).label).filter(Boolean);
   const primeiro=(a.nomePessoa||a.nome||'').trim().split(/\s+/)[0];
   let t=`Olá, ${primeiro}! 👋\nAqui está o seu acesso à plataforma da ${acad}:\n\n🔗 Link: ${base}\n📧 E-mail: ${a.email}\n🔑 Senha: ${a.senha_hash}\n`;
-  if(mods.length)t+=`\n✅ Liberado para você: ${mods.join(', ')}\n`;
-  if(a.tipo==='treinador')t+=`\n🏋️ Planner e carteira de alunos: depois de entrar, abra "Área do Treinador" e toque em Conectar (esse login é outro e vai em uma mensagem separada).\n`;
+  if(mods.length&&!(a.tipo==='treinador'&&typeof AT_MODULOS!=='undefined'))t+=`\n✅ Liberado para você: ${mods.join(', ')}\n`;
+  if(a.tipo==='treinador'&&typeof AT_MODULOS!=='undefined'){
+    t=`Olá, ${primeiro}! 👋\nAqui está o seu acesso à Área do Treinador da ${acad} (planner, carteira de alunos, diário e revisão de treino):\n\n🔗 Link: ${base}retencao/\n📧 E-mail: ${a.email}\n🔑 Senha: ${a.senha_hash}\n`;
+    if(mods.length)t+=`\n🧭 O mesmo login também abre a plataforma (${mods.join(', ')}): ${base}\n`;
+  }
   t+=`\n📲 Dica: salve o link nos favoritos do celular para abrir rápido.`;
   return t;
 }
@@ -3187,11 +3227,15 @@ function whatsMsgAcesso(tipo,pessoaId){
 }
 async function resetSenha(gId){
   const nova=document.getElementById('nova-senha-input').value.trim();
-  if(!nova||nova.length<4){toast('Informe uma senha com ao menos 4 caracteres',true);return}
+  if(!nova||nova.length<8){toast('Informe uma senha com no mínimo 8 caracteres',true);return}
   try{
     const params=`id=eq.${gId}`;
     await fetch(`${SB_URL}/rest/v1/cave_gestores?${params}`,{method:'PATCH',headers:H,body:JSON.stringify({senha_hash:nova})});
-    toast('Senha atualizada!');
+    let extra='';
+    if(acessoAberto&&acessoAberto.id===gId&&(acessoAberto.tipo==='treinador'||acessoAberto.tipo==='consultor')){
+      extra=retMsg(await retSync({action:'garantir_usuario',nome:acessoAberto.nomePessoa||acessoAberto.nome,email:acessoAberto.email,senha:nova,tipo:acessoAberto.tipo}));
+    }
+    toast('Senha atualizada'+extra);
     // atualiza cache
     const g=Object.values(gestoresDB).find(g=>g.id===gId);
     if(g)g.senha_hash=nova;
@@ -4946,6 +4990,118 @@ function openM(id){
 }
 function closeM(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+// ══ EQUIPE: editar, inativar e excluir + cadastro único com a Área do Treinador (Retenção) ══
+// A Retenção tem login próprio. Quem está conectado a ela como gestor(a) sincroniza tudo daqui,
+// pela Edge Function "gestor-equipe" (a chave secreta nunca vem para o navegador).
+async function retSync(payload){
+  try{
+    if(typeof atClient!=='function')return{none:true};
+    if(!atClient())return{skip:true};
+    const ses=await atSessao();if(!ses)return{skip:true};
+    const r=await fetch(APP_CONFIG.SUPABASE_URL+'/functions/v1/gestor-equipe',{method:'POST',headers:{'Content-Type':'application/json','apikey':APP_CONFIG.SUPABASE_ANON,'Authorization':'Bearer '+ses.access_token},body:JSON.stringify(payload)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||j.error)return{error:j.error||('erro '+r.status)};
+    return j;
+  }catch(e){return{error:String(e.message||e)}}
+}
+function retMsg(r){
+  if(!r||r.none)return'';
+  if(r.skip)return' (Área do Treinador: entre em "Área do Treinador" e toque em Conectar com o login de gestor para sincronizar)';
+  if(r.error)return' · ⚠️ Área do Treinador: '+r.error;
+  return' · Área do Treinador também atualizada';
+}
+async function atStatusAcesso(login){
+  const el=document.getElementById('acesso-ret-status');if(!el)return;
+  if(!(acessoAberto&&(acessoAberto.tipo==='treinador'||acessoAberto.tipo==='consultor'))){el.style.display='none';return}
+  const r=await retSync({action:'status_equipe'});
+  if(r.none){el.style.display='none';return}
+  const btnCriar=`<button class="btn-gh btn-sm" style="margin-left:6px" onclick="sincronizarAcessoRet()">🔄 Criar / sincronizar agora</button>`;
+  if(r.skip){el.innerHTML='Área do Treinador: para conferir e sincronizar, abra "Área do Treinador" no menu e toque em <b>Conectar</b> com o login de gestor(a).';return}
+  if(r.error){el.innerHTML='Área do Treinador: ⚠️ '+r.error;return}
+  const achou=(r.lista||[]).find(x=>String(x.email||'').toLowerCase()===String(login.email||'').toLowerCase());
+  if(!achou){el.innerHTML='Área do Treinador: ⚠️ ainda sem acesso com este e-mail.'+btnCriar;return}
+  el.innerHTML=achou.inativo?'Área do Treinador: ⏸ inativo(a).':'Área do Treinador: ✅ entra com o mesmo e-mail e senha.'+btnCriar;
+}
+async function sincronizarAcessoRet(){
+  const a=acessoAberto;if(!a)return;
+  if(String(a.senha_hash||'').length<8){toast('A Área do Treinador exige senha de 8 caracteres ou mais. Defina uma nova senha abaixo.',true);return}
+  const r=await retSync({action:'garantir_usuario',nome:a.nomePessoa||a.nome,email:a.email,senha:a.senha_hash,tipo:a.tipo});
+  toast(r.error?'⚠️ '+r.error:(r.skip?'Conecte-se à Área do Treinador como gestor(a) primeiro.':'✅ '+(r.message||'Sincronizado')),!!(r.error||r.skip));
+  atStatusAcesso(a);
+}
+async function salvarEmailAcesso(gId){
+  const novo=document.getElementById('acesso-email-input').value.trim().toLowerCase();
+  const a=acessoAberto;if(!a||!novo)return;
+  if(novo===String(a.email).toLowerCase()){toast('O e-mail não mudou.');return}
+  try{
+    const ja=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(novo)}&select=id`);
+    if(ja.length){toast('Já existe um acesso com esse e-mail.',true);return}
+    const extra=retMsg(await retSync({action:'editar_usuario',email:a.email,novoEmail:novo}));
+    await fetch(`${SB_URL}/rest/v1/cave_gestores?id=eq.${gId}`,{method:'PATCH',headers:H,body:JSON.stringify({email:novo})});
+    toast('E-mail atualizado'+extra);
+    await abrirAcessoPessoa(a.tipo,a.pessoaId,a.nomePessoa);
+  }catch(e){console.error(e);toast('Erro ao salvar o e-mail',true)}
+}
+async function toggleAtivoPessoa(gId,ativoAtual){
+  const novo=!ativoAtual;
+  if(!confirm(novo?'Reativar este acesso?':'Inativar este acesso? A pessoa não consegue mais entrar, mas o histórico continua guardado.'))return;
+  try{
+    await fetch(`${SB_URL}/rest/v1/cave_gestores?id=eq.${gId}`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:novo})});
+    const a=acessoAberto;let extra='';
+    if(a&&a.id===gId)extra=retMsg(await retSync({action:'ativar_usuario',email:a.email,ativo:novo}));
+    toast((novo?'Acesso reativado':'Acesso inativado')+extra);
+    if(a&&a.id===gId)await abrirAcessoPessoa(a.tipo,a.pessoaId,a.nomePessoa);else closeM('m-acesso');
+  }catch(e){console.error(e);toast('Erro ao atualizar o acesso',true)}
+}
+async function excluirAcessoPessoa(gId){
+  const a=acessoAberto;if(!a)return;
+  if(!confirm('Excluir o acesso de '+(a.nomePessoa||a.nome)+'? O cadastro da pessoa continua; só o login é apagado (no Hub e na Área do Treinador).'))return;
+  try{
+    const extra=retMsg(await retSync({action:'excluir_usuario',email:a.email}));
+    await sbDelete('cave_gestores',{id:gId});
+    toast('Acesso excluído'+extra);closeM('m-acesso');acessoAberto=null;
+  }catch(e){console.error(e);toast('Erro ao excluir o acesso',true)}
+}
+function abrirEditarTreinador(id){
+  const a=ac();const t=a&&a.treinadores[id];if(!t)return;
+  abrirNovoTreinadorROI();trEditId=id;
+  document.querySelector('#m-trein .modal-hd h3').textContent='Editar Treinador(a)';
+  document.getElementById('btn-add-trein').textContent='Salvar alterações';
+  document.getElementById('tr-nm').value=t.nome||'';
+  document.getElementById('tr-tel').value=t.tel||'';
+  document.getElementById('tr-cref').value=t.cref||'';
+  if(t.nivel)document.getElementById('tr-nivel').value=t.nivel;
+  document.getElementById('tr-hi').value=t.hi||'';document.getElementById('tr-hf').value=t.hf||'';
+  selTrGrau(t.grau||'estagio_aprendiz');
+}
+async function inativarTreinador(id,nome,reativar){
+  if(!confirm(reativar?('Reativar '+nome+'?'):('Inativar '+nome+'? Sai das listas e o login fica bloqueado, mas o histórico continua guardado. Dá para reativar depois.')))return;
+  try{
+    await fetch(`${SB_URL}/rest/v1/cave_treinadores?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:!!reativar})});
+    const lg=(await sbGet('cave_gestores',`treinador_id=eq.${id}&select=id,email`))[0];
+    let extra='';
+    if(lg){await fetch(`${SB_URL}/rest/v1/cave_gestores?id=eq.${lg.id}`,{method:'PATCH',headers:H,body:JSON.stringify({ativo:!!reativar})});extra=retMsg(await retSync({action:'ativar_usuario',email:lg.email,ativo:!!reativar}))}
+    toast((reativar?'Reativado(a)':'Inativado(a)')+extra);await loadAll();
+  }catch(e){console.error(e);toast('Erro ao atualizar',true)}
+}
+async function excluirTreinador(id,nome){
+  const pn=String(nome).split(' ')[0];
+  const conf=prompt('Excluir de vez o cadastro de '+nome+'? Use só para cadastro errado. Para não perder histórico, prefira Inativar.\n\nPara confirmar, digite: '+pn);
+  if(conf===null)return;
+  if(conf.trim().toLowerCase()!==pn.toLowerCase()){toast('Nome não confere. Nada foi excluído.',true);return}
+  try{
+    const lg=(await sbGet('cave_gestores',`treinador_id=eq.${id}&select=id,email`))[0];
+    if(lg){
+      const r=await retSync({action:'excluir_usuario',email:lg.email});
+      if(r.error){toast('⚠️ Área do Treinador: '+r.error,true);return}
+      await sbDelete('cave_gestores',{id:lg.id});
+    }
+    try{await sbDelete('cave_treinadores',{id})}
+    catch(e){toast('Não deu para excluir: já há registros ligados a este cadastro. Use Inativar.',true);await loadAll();return}
+    toast('Cadastro excluído');await loadAll();
+  }catch(e){console.error(e);toast('Erro ao excluir',true)}
+}
+
 function toast(msg,err=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(err?'err':'ok')+' show';setTimeout(()=>t.classList.remove('show'),3000)}
 
 // auto-refresh 30s, só recarrega se modal de lançamento não estiver aberto
