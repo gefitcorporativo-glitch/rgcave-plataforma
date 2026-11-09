@@ -248,6 +248,17 @@ body.role-consultor .nav-group-label{display:none!important}
 body.role-consultor #btn-add-cons-top,body.role-consultor #btn-tv,body.role-consultor #admin-ac-row,
 body.role-consultor #roi-dia-edit,body.role-consultor #btn-finalizar-desafio,body.role-consultor #sel-desafio,
 body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{display:none!important}
+
+.menu-ferr{position:relative}
+.menu-ferr>.btn-gh{color:var(--tm)}
+.menu-ferr .dd{display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:6px;min-width:250px;box-shadow:0 14px 34px rgba(0,0,0,.45);z-index:300}
+.menu-ferr.open .dd{display:block}
+.menu-ferr .dd button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:transparent;border:0;color:var(--tx);padding:9px 10px;border-radius:7px;font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer}
+.menu-ferr .dd button:hover{background:var(--s2)}
+.menu-ferr .dd .dd-sep{border-top:1px solid var(--bd);margin:5px 4px}
+.menu-ferr .dd .dd-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--td);padding:6px 10px 2px}
+.menu-ferr .dd .admin-ac-row{padding:4px 10px 8px}.menu-ferr .dd .admin-ac-row.show{flex-direction:column;align-items:stretch;gap:4px}.menu-ferr .dd .admin-ac-row select{width:100%}
+.topbar .menu-ferr .dd button{color:var(--tx)!important}
 </style><style id="tema-rgcave">
 .brand-img{background:#111;padding:5px 9px;border-radius:9px;box-sizing:content-box}
 .topbar .brand-img,header .brand-img,.logo .brand-img{background:none;padding:0;height:38px;border-radius:0}
@@ -349,12 +360,22 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
       <span id="user-chip" class="user-chip"></span>
       <button class="btn-gh btn-sm" id="btn-add-cons-top" onclick="if(!ac()){toast('Selecione uma academia no seletor acima.',true);return}openM('m-cons')" style="display:none">+ Consultor(a)</button>
       <button class="btn-or" id="btn-lancar-top" onclick="if(!ac()){toast('Selecione uma academia no seletor acima.',true);return}openM('m-lanc')" style="display:none">Lançar Dia</button>
-      <button class="btn-gh btn-sm" onclick="abrirCentralScripts()" title="Metodologia e treinamento (Central de Scripts AQÚI)">🎓 Universidade Corporativa</button>
-      <button class="btn-gh btn-sm" onclick="abrirBibliotecaAcademia()" title="Scripts do dia a dia por funil: opção 1 e opção 2, objeções e rotina">💬 Biblioteca de scripts</button>
-      <button class="btn-gh btn-sm" onclick="abrirCentralScriptsV2()" title="Versão nova, ainda em construção, só Objeções está completa" style="color:#b45309">🚧 Scripts v2 (beta)</button>
-      <button class="btn-gh btn-sm" onclick="abrirCampanhas()" title="Abre em nova aba, já logado">📢 Campanhas</button>
-      <button class="btn-gh btn-sm" onclick="abrirExperiencias()" title="Abre em nova aba, já logado">🎯 Experiências</button>
-      <button class="btn-gh btn-sm" onclick="abrirAgendaUnificada()" title="Abre em nova aba, já logado">📅 Agenda</button>
+      <div class="menu-ferr" id="menu-ferr">
+        <button class="btn-gh btn-sm" type="button" onclick="toggleMenuFerr(event)">☰ Ferramentas ▾</button>
+        <div class="dd" onclick="if(event.target.closest('button'))fecharMenuFerr()">
+          <div class="dd-lbl">Abrem em nova aba, já logado</div>
+          <button onclick="abrirCentralLeads()">🎯 Central de Leads</button>
+          <button onclick="abrirCampanhas()">📢 Campanhas</button>
+          <button onclick="abrirExperiencias()">🧪 Experiências</button>
+          <button onclick="abrirAgendaUnificada()">📅 Agenda</button>
+          <button onclick="abrirCentralScripts()" title="Metodologia e treinamento (Central de Scripts AQÚI)">🎓 Universidade Corporativa</button>
+          <button onclick="abrirBibliotecaAcademia()" title="Scripts do dia a dia por funil: opção 1 e opção 2, objeções e rotina">💬 Biblioteca de scripts</button>
+          <button onclick="abrirHubPessoas()" title="Teste de perfil do candidato e painel do gestor">👥 Hub de Pessoas</button>
+          <button onclick="copiarLinkNps()" title="Link da pesquisa de satisfação para enviar aos alunos">⭐ Copiar link do NPS</button>
+          <button onclick="switchTab('areatreinador')" title="Planner, diário, revisão de treino e gestão da carteira">🏋️ Área do Treinador</button>
+          <div class="dd-sep"></div>
+          <button onclick="abrirCentralScriptsV2()" style="color:#b45309" title="Versão nova, ainda em construção">🚧 Scripts v2 (beta)</button>
+        </div>
       <button class="btn-gh btn-sm" id="btn-tv" onclick="toggleTV()" title="Modo apresentação em tela cheia">📺 TV</button>
       <button class="btn-logout" onclick="doLogout()">Sair</button>
     </div>
@@ -5046,6 +5067,29 @@ function openM(id){
 }
 function closeM(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+function toggleMenuFerr(ev){ev.stopPropagation();document.getElementById('menu-ferr').classList.toggle('open')}
+function fecharMenuFerr(){document.getElementById('menu-ferr').classList.remove('open')}
+document.addEventListener('click',e=>{const m=document.getElementById('menu-ferr');if(m&&!m.contains(e.target))m.classList.remove('open')});
+
+// Hub de Pessoas e NPS: páginas avulsas, recebem a academia por ?a=
+function acAtual(){return (typeof isAdmin==='function'&&isAdmin()&&acId)?acId:(sessao&&sessao.academia_id)}
+function linkDaAcademia(arq){
+  const base=location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/,'');
+  const a=acAtual();
+  return base+arq+(a?'?a='+encodeURIComponent(a):'');
+}
+function abrirHubPessoas(){
+  if(!acAtual()){toast('Selecione uma academia no seletor acima.',true);return}
+  try{sessionStorage.setItem('qg90_sessao_roi',JSON.stringify(sessao))}catch(e){}
+  window.open(linkDaAcademia('pessoas.html'),'_blank');
+}
+function copiarLinkNps(){
+  if(!acAtual()){toast('Selecione uma academia no seletor acima.',true);return}
+  const l=linkDaAcademia('nps.html');
+  if(navigator.clipboard)navigator.clipboard.writeText(l).then(()=>toast('Link do NPS copiado!')).catch(()=>prompt('Copie o link:',l));
+  else prompt('Copie o link:',l);
+}
+
 // ══ ÁREA DO TREINADOR (Retenção) ══
 // O sistema de Retenção usa outro projeto Supabase, com login próprio (Supabase Auth).
 // No login da plataforma usamos o mesmo e-mail e senha para abrir a sessão de lá também;
