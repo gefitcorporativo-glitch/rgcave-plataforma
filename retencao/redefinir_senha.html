@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script src="config.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RG Cave · Nova senha</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A; --card:#111111; --border:#1E1E1E; --border2:#2A2A2A;
+  --orange:#F5B800; --text:#F0F0F0; --muted:#666; --dim:#333;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.logo-wrap{text-align:center;margin-bottom:32px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;
+  width:100%;max-width:400px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--orange),transparent)}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;margin-bottom:4px}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.field input{background:#111;border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:var(--text);
+  font-size:14px;outline:none;font-family:'Barlow',sans-serif}
+.field input:focus{border-color:var(--orange)}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#F5B800,#FFD34D);
+  color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em}
+.btn:disabled{background:var(--dim);color:var(--muted);cursor:default}
+.msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-top:14px;line-height:1.5;display:none}
+.msg.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#EF4444}
+.msg.success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#22C55E}
+.msg.show{display:block}
+.link{text-align:center;margin-top:16px;font-size:12px}
+.link a{color:var(--orange);text-decoration:none}
+.hide{display:none}
+</style>
+<link rel="stylesheet" href="theme-gefit.css">
+</head>
+<body>
+
+<div class="logo-wrap">
+  <img class="gf-logo" src="logo-cave.png" alt="RG Cave" style="height:72px">
+</div>
+
+<div class="card">
+  <div id="carregando">
+    <div class="card-title">Validando link...</div>
+    <div class="card-sub">Só um instante.</div>
+  </div>
+
+  <div id="form" class="hide">
+    <div class="card-title">Criar nova senha</div>
+    <div class="card-sub">Mínimo de 8 caracteres</div>
+    <div class="field">
+      <label>Nova senha</label>
+      <input type="password" id="senha1" autocomplete="new-password" placeholder="••••••••">
+    </div>
+    <div class="field">
+      <label>Repita a nova senha</label>
+      <input type="password" id="senha2" autocomplete="new-password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')salvar()">
+    </div>
+    <button class="btn" id="btnSalvar" onclick="salvar()">Salvar nova senha</button>
+  </div>
+
+  <div class="msg error" id="msgErro"></div>
+  <div class="msg success" id="msgOk"></div>
+  <div class="link"><a href="index.html">← Voltar ao login</a></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = window.supabase.createClient(APP_CONFIG.SUPABASE_URL, APP_CONFIG.SUPABASE_ANON, window.gfOpcoesAuth);
+let pronto = false;
+
+function erro(msg){ const e=document.getElementById('msgErro'); e.textContent=msg; e.classList.add('show'); }
+function mostrarForm(){
+  if(pronto) return;
+  pronto = true;
+  document.getElementById('carregando').classList.add('hide');
+  document.getElementById('form').classList.remove('hide');
+}
+
+// O link do e-mail traz a sessão de recuperação na URL; o SDK a processa e dispara o evento.
+sb.auth.onAuthStateChange((evento, session) => {
+  if(session && (evento === 'PASSWORD_RECOVERY' || evento === 'SIGNED_IN' || evento === 'INITIAL_SESSION')) mostrarForm();
+});
+
+// Link expirado/inválido: o Supabase devolve o erro na URL
+(function(){
+  const p = new URLSearchParams(location.hash.slice(1) || location.search.slice(1));
+  if(p.get('error') || p.get('error_code')){
+    document.getElementById('carregando').classList.add('hide');
+    erro('Este link expirou ou já foi usado. Peça um novo em "Esqueci minha senha".');
+    pronto = true;
+  }
+})();
+
+setTimeout(async () => {
+  if(pronto) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if(session){ mostrarForm(); return; }
+  document.getElementById('carregando').classList.add('hide');
+  erro('Link inválido ou expirado. Peça um novo em "Esqueci minha senha".');
+  pronto = true;
+}, 2500);
+
+async function salvar(){
+  const s1 = document.getElementById('senha1').value;
+  const s2 = document.getElementById('senha2').value;
+  document.getElementById('msgErro').classList.remove('show');
+  if(s1.length < 8){ erro('A senha precisa ter no mínimo 8 caracteres.'); return; }
+  if(s1 !== s2){ erro('As senhas não conferem.'); return; }
+  const btn = document.getElementById('btnSalvar');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  const { error } = await sb.auth.updateUser({ password: s1 });
+  if(error){
+    erro('Erro: ' + error.message);
+    btn.disabled = false; btn.textContent = 'Salvar nova senha';
+    return;
+  }
+  await sb.auth.signOut();
+  document.getElementById('form').classList.add('hide');
+  const ok = document.getElementById('msgOk');
+  ok.textContent = 'Senha alterada! Redirecionando para o login...';
+  ok.classList.add('show');
+  setTimeout(() => location.replace('index.html'), 2000);
+}
+</script>
+</body>
+</html>
