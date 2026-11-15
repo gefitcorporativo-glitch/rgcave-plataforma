@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Lançamentos da equipe técnica, RG Cave</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--or:#F5B800;--bg:#0A0A0A;--s1:#111;--s2:#1A1A1A;--s3:#242424;--bd:rgba(255,255,255,0.07);--tx:#fff;--tm:rgba(255,255,255,0.68);--td:rgba(255,255,255,0.38);--gr:#22c55e;--re:#ef4444;--am:#f59e0b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--tx)}
+  h1,h2,h3{font-family:'Barlow Condensed'}
+  header{background:var(--s1);padding:16px 32px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--bd)}
+  header a{color:var(--tm);text-decoration:none;font-size:13px}
+  .logo{font-family:'Barlow Condensed';font-weight:800;font-size:18px;color:var(--or)}
+  main{max-width:1200px;margin:0 auto;padding:26px 20px 60px}
+  .card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-bottom:18px}
+  .hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .hd h2{font-size:24px;margin-right:auto}
+  .sub{font-size:12.5px;color:var(--td);margin-bottom:16px;line-height:1.5}
+  .fi{padding:8px 11px;border:1px solid var(--bd);border-radius:7px;background:var(--s2);color:var(--tx);font-family:'Barlow';font-size:13.5px}
+  .tabs{display:flex;gap:6px}
+  .tab{padding:7px 14px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--tm);font-family:'Barlow Condensed';font-weight:700;font-size:14px;cursor:pointer}
+  .tab.on{background:var(--or);border-color:var(--or);color:#111}
+  .btn{background:var(--or);color:#111;border:none;border-radius:7px;padding:9px 16px;font-family:'Barlow Condensed';font-weight:700;font-size:14px;cursor:pointer}
+  .wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:10px}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:1000px}
+  th{color:var(--td);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:10px 8px;border-bottom:1px solid var(--bd);text-align:center;vertical-align:bottom}
+  td{padding:10px 8px;border-bottom:1px solid var(--bd);text-align:center}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--s1);min-width:170px}
+  tr.tot td{font-weight:700;background:rgba(245,184,0,.07);color:var(--or)}
+  tr.tot td:first-child{background:#15130d}
+  td a{color:var(--tx);text-decoration:none;font-weight:600}
+  td a:hover{color:var(--or)}
+  .g{color:var(--gr)}.r{color:var(--re)}.a{color:var(--am)}
+  .leg{font-size:11.5px;color:var(--td);margin-top:10px;line-height:1.5}
+  .locked{text-align:center;color:var(--td);padding:60px 20px}
+  .conn{max-width:520px}
+  .conn label{font-size:11.5px;font-weight:600;color:var(--tm);display:block;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px}
+  .conn .fi{width:100%}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="retencao/config.js"></script>
+<script src="diario-retencao.js"></script>
+<script src="tour.js"></script>
+</head>
+<body>
+<header><a href="index.html">← Voltar</a><div class="logo">RG Cave</div><div style="font-size:13px;color:var(--tm)">Lançamentos da equipe técnica</div></header>
+<main id="app"><div class="locked">Carregando...</div></main>
+<script>
+const SB_URL='https://irwvagffrguiljaxrzmd.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd3ZhZ2Zmcmd1aWxqYXhyem1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNDk5ODUsImV4cCI6MjEwNDkyNTk4NX0.YAApyaH6iIHEua_89fgCUpMzgXRIcWb_vNRkBQAoq5A';
+async function sbGet(t,p=''){const r=await fetch(`${SB_URL}/rest/v1/${t}?${p}`,{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});if(!r.ok)throw new Error(await r.text());return r.json()}
+const uid=new URLSearchParams(location.search).get('uid');
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const hoje=new Date();
+const ST={ano:hoje.getFullYear(),mes:hoje.getMonth()+1,per:hoje.getDate()<=15?'q1':'q2',viewer:null,acadRet:null,equipe:[],rows:[],hubTr:[],func:null,cal:[]};
+function esc(t){return String(t??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function norm(t){return String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim()}
+
+async function init(){
+  const app=document.getElementById('app');
+  try{const v=await sbGet('cave_gestores',`id=eq.${encodeURIComponent(uid||'')}&select=id,nome,email,role,academia_id`);ST.viewer=v[0]}catch(e){}
+  if(!ST.viewer||!['gestor','admin'].includes(ST.viewer.role)){app.innerHTML='<div class="locked">🔒 Abra esta tela pelo Hub, com login de gestor(a).</div>';return}
+  if(!(await DR.sessao()))return telaConectar();
+  const g=await DR.gestor();
+  if(!g)return telaConectar('Este navegador está conectado à Área do Treinador com um login que não é de gestor(a).');
+  ST.acadRet=g.academia_id;
+  try{
+    const [eq,hubTr,logins]=await Promise.all([DR.treinadores(g.academia_id),sbGet('cave_treinadores',`academia_id=eq.${ST.viewer.academia_id}&select=id,nome,ativo`).catch(()=>[]),sbGet('cave_gestores',`academia_id=eq.${ST.viewer.academia_id}&role=eq.treinador&select=email,treinador_id`).catch(()=>[])]);
+    ST.equipe=eq.filter(t=>t.ativo!==false);
+    // liga cada treinador da Retenção ao perfil do Hub (pelo e-mail do login, ou pelo nome)
+    const porEmail={};logins.forEach(l=>{if(l.email)porEmail[String(l.email).toLowerCase()]=l.treinador_id});
+    ST.equipe.forEach(t=>{t.hubId=porEmail[String(t.email||'').toLowerCase()]||(hubTr.find(h=>norm(h.nome)===norm(t.nome))||{}).id||null});
+  }catch(e){console.error(e);app.innerHTML='<div class="locked">Não foi possível carregar a equipe da Área do Treinador.</div>';return}
+  await carregar();
+}
+function telaConectar(msg){
+  document.getElementById('app').innerHTML=`<div class="card conn"><h2 style="font-size:22px;margin-bottom:8px">Conectar a Área do Treinador</h2>
+    <div class="sub">${msg?esc(msg)+'<br>':''}Os lançamentos ficam na Área do Treinador. <b style="color:var(--tx)">Use o mesmo e-mail e a mesma senha do Hub.</b> Só precisa fazer uma vez neste navegador.</div>
+    <label>E-mail</label><input class="fi" id="c-email" value="${esc(ST.viewer.email||'')}">
+    <label>Senha (a mesma do Hub)</label><input class="fi" type="password" id="c-senha" onkeydown="if(event.key==='Enter')conectar()">
+    <div style="margin-top:14px"><button class="btn" id="c-ok" onclick="conectar()">Conectar</button></div>
+    <div id="c-err" style="color:var(--re);font-size:13px;margin-top:10px"></div></div>`;
+}
+async function conectar(){
+  const b=document.getElementById('c-ok');b.disabled=true;b.textContent='Conectando...';
+  const r=await DR.conectar(document.getElementById('c-email').value,document.getElementById('c-senha').value);
+  if(!r.ok){b.disabled=false;b.textContent='Conectar';document.getElementById('c-err').textContent=r.msg;return}
+  init();
+}
+async function carregar(){
+  const Q=DR.quinzenas(ST.ano,ST.mes);
+  try{ST.rows=await DR.diario(ST.acadRet,Q.mes[0],Q.mes[1])}catch(e){console.error(e);ST.rows=[]}
+  [ST.func,ST.cal]=await Promise.all([DR.funcionamento(ST.viewer.academia_id),DR.calendario(ST.viewer.academia_id,Q.mes[0],Q.mes[1])]);
+  render();
+}
+function render(){
+  const Q=DR.quinzenas(ST.ano,ST.mes),per=Q[ST.per];
+  const diasTxt=t=>{const esp=DR.diasEsperados(...per,ST.func,ST.cal,t.email),rp=ST.rows.filter(r=>r.treinador_id===t.id&&r.data>=per[0]&&r.data<=per[1]),le=rp.filter(r=>esp.includes(r.data)).length,ex=rp.length-le;return{falta:le<esp.length,txt:`${le} de ${esp.length}${ex?` <span style="color:var(--td);font-size:11px">+${ex}</span>`:''}`}};
+  const rows=ST.rows.filter(r=>r.data>=per[0]&&r.data<=per[1]);
+  const linhas=ST.equipe.map(t=>({t,s:DR.soma(rows.filter(r=>r.treinador_id===t.id))}));
+  const tot=DR.soma(rows);
+  const anos=[ST.ano-1,ST.ano,ST.ano+1];
+  const cel=(s,dd)=>{
+    const rp=s.rev_pct==null?'·':s.rev_pct+'%',cs=s.rev_pct==null?'':(s.rev_pct>=90?'g':s.rev_pct>=70?'a':'r');
+    const pl=s.inseridos_carteira<s.novos_alunos?'a':'';
+    return`<td>${s.experiencias_iniciadas}</td><td>${s.novos_alunos}</td><td class="${pl}">${s.inseridos_carteira}</td>
+      <td>${s.consultorias_leads}</td><td>${s.consultorias_alunos}</td><td><b>${s.consultorias_total}</b></td><td>${s.avaliacoes_realizadas}</td>
+      <td>${s.revisoes_previstas}</td><td>${s.revisoes_realizadas}</td><td class="${cs}">${rp}</td>
+      <td class="${s.rev_saldo<0?'r':'g'}">${s.rev_saldo>0?'+':''}${s.rev_saldo}</td>
+      <td class="${dd&&dd.falta?'a':''}">${dd?dd.txt:s.dias}</td><td class="${s.pedidos?'a':''}">${s.pedidos?'⚠ '+s.pedidos:'·'}</td>`};
+  document.getElementById('app').innerHTML=`<div class="card">
+    <div class="hd"><h2>Lançamentos da equipe técnica</h2>
+      <select class="fi" onchange="ST.mes=+this.value;carregar()">${MESES.map((m,i)=>`<option value="${i+1}" ${i+1===ST.mes?'selected':''}>${m}</option>`).join('')}</select>
+      <select class="fi" onchange="ST.ano=+this.value;carregar()">${anos.map(a=>`<option ${a===ST.ano?'selected':''}>${a}</option>`).join('')}</select>
+      <div class="tabs">${[['q1','Q1 · 1 a 15'],['q2','Q2 · 16 a '+DR.ultimoDia(ST.ano,ST.mes)],['mes','Mês']].map(([k,l])=>`<button class="tab ${ST.per===k?'on':''}" onclick="ST.per='${k}';render()">${l}</button>`).join('')}</div>
+    </div>
+    <div class="sub">O que cada treinador lançou no Lançamento do dia (computador da academia). Clique no nome para abrir o perfil com as quinzenas e liberar correções. Só a gestão vê esta tela.</div>
+    <div class="wrap"><table>
+      <thead><tr><th>Treinador(a)</th><th>Exp.<br>iniciadas</th><th>Alunos<br>novos</th><th>Planners<br>iniciados</th><th>Consult.<br>leads</th><th>Consult.<br>alunos</th><th>Consult.<br>total</th><th>Avaliações</th><th>Revisões<br>agendadas</th><th>Revisões<br>realizadas</th><th>Revisões<br>%</th><th>Saldo<br>revisões</th><th>Dias<br>lançados</th><th>Pedidos de<br>correção</th></tr></thead>
+      <tbody>${linhas.length?linhas.map(({t,s})=>`<tr><td>${t.hubId?`<a href="perfil-treinador.html?uid=${encodeURIComponent(uid)}&id=${encodeURIComponent(t.hubId)}">${esc(t.nome)} ›</a>`:esc(t.nome)}</td>${cel(s,diasTxt(t))}</tr>`).join(''):'<tr><td colspan="14" style="color:var(--td)">Nenhum treinador cadastrado na Área do Treinador.</td></tr>'}
+      ${linhas.length?`<tr class="tot"><td>Equipe</td>${cel(tot,null)}</tr>`:''}</tbody>
+    </table></div>
+    <div class="leg" style="padding-bottom:40px">Dias lançados: dias em que a academia abre (<b>${DR.resumoFunc(ST.func)}</b>), até hoje, sem feriados e sem as folgas de cada um. "+N" = lançamentos extras. ${ST.cal.filter(c=>c.tipo==='feriado'&&c.data>=per[0]&&c.data<=per[1]).length?'Feriados no período: '+ST.cal.filter(c=>c.tipo==='feriado'&&c.data>=per[0]&&c.data<=per[1]).map(c=>c.data.slice(8)+'/'+c.data.slice(5,7)).join(', ')+'.':''} Em amarelo: planners abaixo dos alunos novos, dias sem lançamento ou pedidos de correção. Revisões: verde a partir de 90%, amarelo de 70% a 89%, vermelho abaixo de 70%.</div>
+  </div>`;
+  if(window.GFTour){GFTour.botao(TOUR_EQ);GFTour.primeiraVez(TOUR_EQ)}
+}
+const TOUR_EQ={id:'diario-equipe',passos:[
+  {el:'.hd',t:'Mês e quinzena',x:'Escolha o período.'},
+  {el:'.wrap',t:'Tabela',x:'Cada linha é um treinador. Amarelo é ponto de atenção.'},
+  {el:()=>[...document.querySelectorAll('th')].find(th=>th.textContent.includes('Saldo')),t:'Revisões e saldo',x:'Saldo negativo = revisões perdidas. Vale abordar na 1:1.'},
+  {el:'td a',t:'Nome do treinador',x:'Clique para abrir o perfil completo.'}]};
+init();
+</script>
+</body>
+</html>

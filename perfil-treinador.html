@@ -48,6 +48,97 @@
   th{text-align:left;color:var(--td);font-size:10.5px;text-transform:uppercase;padding:0 8px 8px;border-bottom:1px solid var(--bd)}
   td{padding:9px 8px;border-bottom:1px solid var(--bd);vertical-align:top}
   .locked{text-align:center;color:var(--td);padding:60px 20px}
+  .btn-gh{background:transparent;color:var(--tx);border:1px solid rgba(26,26,26,.22);border-radius:7px;padding:8px 14px;font-family:'Barlow Condensed';font-weight:700;font-size:13px;cursor:pointer}
+  .btn-sm{padding:4px 10px;font-size:12px}
+  .btn:disabled{opacity:.5;cursor:default}
+  .card-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .card-hd h3{margin:0;margin-right:auto}
+  /* Indicadores do ano */
+  .ind-wrap{overflow-x:auto;margin-top:14px;border:1px solid var(--bd);border-radius:10px}
+  .ind{min-width:1080px;font-size:12px}
+  .ind th,.ind td{padding:6px 5px;text-align:center;border-bottom:1px solid var(--bd);white-space:nowrap}
+  .ind th{padding-top:9px}
+  .ind th:first-child,.ind td:first-child{text-align:left;position:sticky;left:0;background:var(--s1);z-index:1;min-width:210px;padding-left:10px}
+  .ind td.ano,.ind th.ano{background:rgba(245,184,0,.08);font-weight:700}
+  .ind tr.calc td{color:var(--or-t);font-weight:700;background:rgba(245,184,0,.06)}
+  .ind tr.calc td:first-child{background:#FFF6D6}
+  .ind tr.sub td:first-child{padding-left:24px;color:var(--tm)}
+  .ind input{width:52px;padding:5px 4px;text-align:center;border:1px solid var(--bd);border-radius:6px;background:var(--s2);color:var(--tx);font-family:'Barlow';font-size:12.5px}
+  .ind input::placeholder{color:#9A7400;font-style:italic}
+  .ind input:focus{outline:1px solid var(--or)}
+  .ar{font-size:9px;margin-left:2px}.ar.up{color:var(--gr)}.ar.dn{color:var(--re)}
+  .leg{font-size:11.5px;color:var(--td);margin-top:8px;line-height:1.5}
+  .saved{font-size:11.5px;color:var(--gr);opacity:0;transition:opacity .3s}.saved.on{opacity:1}
+  /* Ata 1:1 */
+  .pend{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+  .pend h4{font-family:'Barlow Condensed';font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--am);margin-bottom:8px}
+  .pend-it{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--bd);font-size:13px}
+  .pend-it:first-of-type{border-top:none}
+  .pend-it .tx{flex:1;min-width:180px}
+  .pend-it .pz{font-size:11px;color:var(--td)}
+  .st-b{border:1px solid var(--bd);background:var(--s2);color:var(--tm);border-radius:6px;padding:3px 8px;font-size:11.5px;cursor:pointer}
+  .st-b:hover{border-color:var(--or);color:var(--tx)}
+  .ata{border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--s2)}
+  .ata-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--td);margin-bottom:6px}
+  .ata-top b{color:var(--tx);font-size:13.5px}
+  .ata .ln{font-size:13px;margin-top:6px;line-height:1.45}
+  .ata .ln span.k{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--td);display:block}
+  .badge.cumprido{background:rgba(34,197,94,.15);color:var(--gr)}
+  .badge.parcial{background:rgba(245,184,0,.18);color:var(--or-t)}
+  .badge.nao_cumprido{background:rgba(239,68,68,.15);color:var(--re)}
+  .comb-row{display:grid;grid-template-columns:1fr 150px 30px;gap:8px;margin-bottom:8px}
+  .x{background:none;border:none;color:var(--td);cursor:pointer;font-size:16px}
+  .prox{font-size:12.5px;color:var(--tm);background:var(--s2);border:1px solid var(--bd);border-radius:20px;padding:4px 12px}
+  textarea.fi{resize:vertical;min-height:58px}
+  /* Perfil comportamental */
+  .pf-badges{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+  .pf-badge{font-size:12px;font-weight:700;padding:5px 11px;border-radius:20px;border:1px solid var(--bd);background:var(--s2)}
+  .bars{display:grid;gap:8px;margin-bottom:16px}
+  .bar{display:grid;grid-template-columns:110px 1fr 44px;align-items:center;gap:10px;font-size:13px}
+  .bar .t{height:9px;background:var(--s3);border-radius:9px;overflow:hidden}
+  .bar .t i{display:block;height:100%;background:var(--pc);border-radius:9px}
+  .bar b{text-align:right}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .two ul{padding-left:18px;font-size:13px;color:var(--tm);line-height:1.6}
+  .two h4,.pf-lid h4{font-family:'Barlow Condensed';font-size:14px;margin-bottom:6px}
+  .pf-lid{background:rgba(245,184,0,.07);border:1px solid rgba(245,184,0,.25);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:13px;color:var(--tm)}
+  .lib{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd);font-size:13px;flex-wrap:wrap}
+  .sw{position:relative;width:40px;height:22px;flex:none}
+  .sw input{opacity:0;width:0;height:0}
+  .sw i{position:absolute;inset:0;background:var(--s3);border-radius:22px;cursor:pointer;transition:.2s}
+  .sw i:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .sw input:checked+i{background:var(--or)}
+  .sw input:checked+i:before{transform:translateX(18px)}
+  .linkbox{font-family:monospace;font-size:11.5px;background:var(--s2);border:1px dashed var(--bd);border-radius:8px;padding:8px 10px;word-break:break-all;color:var(--tm);margin:10px 0}
+  .small{font-size:11.5px;color:var(--td);margin-top:10px;line-height:1.5}
+  .qz th,.qz td{text-align:center}
+  .qz th:first-child,.qz td:first-child{text-align:left}
+  .qz td.mes,.qz th.mes{background:rgba(245,184,0,.08);font-weight:700}
+  .qz tr.sub td:first-child{padding-left:22px;color:var(--tm)}
+  .qz tr.calc td{color:var(--or-t);font-weight:700}
+  .dias{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .dia{min-width:44px;padding:6px 4px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--td);font-size:11px;text-align:center;cursor:pointer;line-height:1.25}
+  .dia b{display:block;font-size:13px;color:var(--tm)}
+  .dia.ok{border-color:rgba(34,197,94,.35);color:var(--gr)}
+  .dia.ped{border-color:rgba(245,158,11,.6);color:var(--am);background:rgba(245,158,11,.08)}
+  .dia.lib{border-color:rgba(96,165,250,.5);color:#60A5FA}
+  .dia.fer{border-color:rgba(167,139,250,.45);color:#A78BFA}
+  .dia.fol{border-color:rgba(96,165,250,.35);color:#93C5FD}
+  .dia.fec{opacity:.45}
+  .dia.fut{opacity:.6}
+  .dia.falta{border-color:rgba(239,68,68,.35);color:var(--re)}
+  .dmenu-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:60;padding:20px}
+  .dmenu{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:18px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:8px}
+  .dmenu h4{font-family:'Barlow Condensed';font-size:18px;text-transform:capitalize;margin-bottom:4px}
+  .dmenu button{text-align:left;padding:11px 12px;border-radius:9px;border:1px solid var(--bd);background:var(--s2);color:var(--tx);font-size:13.5px;cursor:pointer}
+  .dmenu button:hover:not(:disabled){border-color:var(--or)}
+  .dmenu button:disabled{opacity:.6;cursor:default}
+  .dmenu .cx{text-align:center;background:transparent;color:var(--tm)}
+  .dia.hoje{outline:1px dashed var(--or)}
+  .ped-lista{margin-top:12px;font-size:13px}
+  .ped-lista div{padding:7px 0;border-top:1px solid var(--bd)}
+  .conn{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px}
+  @media(max-width:620px){.two{grid-template-columns:1fr}.comb-row{grid-template-columns:1fr 120px 30px}}
 </style>
 <style id="marca-css">
 .brand-img{display:block;height:44px;width:auto}
@@ -68,7 +159,12 @@ header a{color:rgba(255,255,255,.85)!important}
 header .logo{color:#F5B800!important}
 header div,header span{color:rgba(255,255,255,.85)!important}
 header .logo{color:#F5B800!important}
-</style></head>
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="retencao/config.js"></script>
+<script src="diario-retencao.js"></script>
+<script src="tour.js"></script>
+</head>
 <body>
   <header>
     <a href="index.html">← Voltar</a>
@@ -85,9 +181,11 @@ header .logo{color:#F5B800!important}
   const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd3ZhZ2Zmcmd1aWxqYXhyem1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNDk5ODUsImV4cCI6MjEwNDkyNTk4NX0.YAApyaH6iIHEua_89fgCUpMzgXRIcWb_vNRkBQAoq5A';
   const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json'};
   async function sbGet(t,p=''){const r=await fetch(`${SB_URL}/rest/v1/${t}?${p}`,{headers:{...H,'Prefer':''}});if(!r.ok)throw new Error(await r.text());return r.json()}
-  async function sbPost(t,b){const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:'POST',headers:H,body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return r.json()}
-  async function sbUpsert(t,b){const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:'POST',headers:{...H,'Prefer':'resolution=merge-duplicates,return=representation'},body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return r.json()}
-  async function sbPatch(t,id,b){const r=await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return r.json()}
+  async function sbPost(t,b){const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:'POST',headers:H,body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return lerJson(r)}
+  async function sbUpsert(t,b){const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:'POST',headers:{...H,'Prefer':'resolution=merge-duplicates,return=representation'},body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return lerJson(r)}
+  async function lerJson(r){const t=await r.text();return t?JSON.parse(t):null}
+  async function sbDel(t,id){const r=await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:'DELETE',headers:H});if(!r.ok)throw new Error(await r.text())}
+  async function sbPatch(t,id,b){const r=await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return lerJson(r)}
 
   const params=new URLSearchParams(location.search);
   const uid=params.get('uid'), treinadorId=params.get('id');
@@ -161,21 +259,40 @@ header .logo{color:#F5B800!important}
         ${canEdit?'<button class="btn" onclick="salvarCargaHoraria()">Salvar carga horária</button>':''}
       </div>
 
-      <div class="card">
-        <h3>📊 KPIs mensais</h3>
-        <div class="sub">Carteira, retenção e experiências puxados automático do sistema.</div>
-        <table><thead><tr><th>Mês</th><th>Carteira</th><th>Experiências atendidas</th><th>Convertidas</th><th>Observação</th></tr></thead><tbody id="kpis-tbody"></tbody></table>
+      <div class="card" id="card-ind">
+        <div class="card-hd">
+          <h3>📈 Indicadores do ano</h3>
+          <select class="fi" id="ind-ano" style="width:auto;padding:6px 10px" onchange="IND.ano=+this.value;carregarIndicadores()"></select>
+          <button class="btn-gh btn-sm" id="ind-toggle" onclick="toggleIndicadores()">Abrir tabela ▾</button>
+        </div>
+        <div class="sub" style="margin-top:0" id="ind-resumo">Evolução mês a mês: carteira, experiências, consultorias, avaliações e retenção.</div>
+        <div id="ind-corpo" hidden></div>
       </div>
 
-      <div class="card">
-        <h3>🗣️ Registros de 1:1</h3>
-        <div id="a1a-lista"></div>
-        ${canEdit?`
-        <div class="row row2" style="margin-top:14px">
-          <div class="fg"><label class="fl">Data</label><input class="fi" type="date" id="a1a-data"></div>
+      ${canEdit?`<div class="card" id="card-dia">
+        <div class="card-hd">
+          <h3>✍️ Lançamento do dia · quinzenas</h3>
+          <select class="fi" id="dia-mes" style="width:auto;padding:6px 10px" onchange="DIA.mes=+this.value;renderDiario()"></select>
         </div>
-        <div class="fg"><label class="fl">Anotação</label><input class="fi" id="a1a-desc" placeholder="O que foi conversado..."></div>
-        <button class="btn" onclick="add1a1()">Adicionar registro</button>`:''}
+        <div class="sub" style="margin-top:0">O que o treinador lançou no computador da academia. Q1 = dia 1 a 15 · Q2 = dia 16 ao fim do mês. Só a gestão vê.</div>
+        <div id="dia-corpo"><div class="item" style="color:var(--td)">Carregando...</div></div>
+      </div>`:''}
+
+      <div class="card" id="card-1a1">
+        <div class="card-hd">
+          <h3>🗣️ Reuniões 1:1</h3>
+          <span class="prox" id="a1a-prox" hidden></span>
+          ${canEdit?'<button class="btn btn-sm" onclick="abrirAta()">+ Nova ata</button>':''}
+        </div>
+        <div class="sub" style="margin-top:0">Ata curta: orientação, ação principal com prazo, combinados e próxima reunião.</div>
+        <div id="a1a-pend"></div>
+        <div id="a1a-form" hidden></div>
+        <div id="a1a-lista"></div>
+      </div>
+
+      <div class="card" id="card-perfil">
+        <div class="card-hd"><h3>🧠 Perfil comportamental</h3></div>
+        <div id="perfil-corpo"><div class="item" style="color:var(--td)">Carregando...</div></div>
       </div>
 
       <div class="card">
@@ -192,7 +309,8 @@ header .logo{color:#F5B800!important}
         <button class="btn" onclick="addPlanoAcao()">Adicionar plano de ação</button>`:''}
       </div>
     `;
-    carregarKpis(); carregarRegistros('1a1','a1a-lista'); carregarRegistros('plano_acao','plano-lista');
+    iniciarIndicadores(); carregarAtas(); carregarPerfil(); carregarRegistros('plano_acao','plano-lista');
+    if(canEdit&&window.GFTour){GFTour.botao(TOUR_PERFIL);GFTour.primeiraVez(TOUR_PERFIL)}
   }
 
   function onGrauChange(){
@@ -221,36 +339,6 @@ header .logo{color:#F5B800!important}
     alert('Carga horária salva!');
   }
 
-  async function carregarKpis(){
-    const [alunos,exps,kpisSalvos]=await Promise.all([
-      sbGet('cave_alunos',`treinador_id=eq.${treinadorId}`),
-      sbGet('cave_experiencias',`treinador_id=eq.${treinadorId}`),
-      sbGet('cave_treinador_kpis_mensais',`treinador_id=eq.${treinadorId}`)
-    ]);
-    const obsMap={}; kpisSalvos.forEach(k=>obsMap[k.mes_referencia.slice(0,7)]=k.observacao||'');
-    const carteiraAtual=alunos.filter(a=>a.status==='ativo').length;
-    const porMes={};
-    exps.forEach(e=>{
-      if(!e.data_agendada&&!e.criado_em)return;
-      const dataRef=e.data_agendada||e.criado_em;
-      const m=String(dataRef).slice(0,7);
-      if(!porMes[m])porMes[m]={atendidas:0,convertidas:0};
-      porMes[m].atendidas++;
-      if(e.status==='convertida')porMes[m].convertidas++;
-    });
-    const meses=Object.keys(porMes).sort().reverse().slice(0,6);
-    const tbody=document.getElementById('kpis-tbody');
-    if(!meses.length){tbody.innerHTML=`<tr><td colspan="5" style="color:var(--td)">Carteira atual: ${carteiraAtual} aluno(s). Sem experiências registradas ainda.</td></tr>`;return;}
-    tbody.innerHTML=meses.map(m=>{
-      const d=porMes[m];
-      const editable=canEdit?`<input class="fi" style="font-size:12px;padding:5px 7px" value="${(obsMap[m]||'').replace(/"/g,'&quot;')}" onchange="salvarObsKpi('${m}',this.value)">`:(obsMap[m]||'-');
-      return `<tr><td>${m}</td><td>${carteiraAtual}</td><td>${d.atendidas}</td><td>${d.convertidas}</td><td>${editable}</td></tr>`;
-    }).join('');
-  }
-  async function salvarObsKpi(mes,valor){
-    await sbUpsert('cave_treinador_kpis_mensais',{academia_id:treinador.academia_id,treinador_id:treinadorId,mes_referencia:mes+'-01',observacao:valor,updated_at:Date.now()});
-  }
-
   async function carregarRegistros(tipo,elId){
     const rows=await sbGet('cave_treinador_registros',`treinador_id=eq.${treinadorId}&tipo=eq.${tipo}&order=data.desc`);
     const el=document.getElementById(elId);
@@ -259,14 +347,6 @@ header .logo{color:#F5B800!important}
       ${tipo==='plano_acao'?`<b>${r.trimestre}</b> <span class="badge ${r.status}">${({pendente:'Pendente',em_andamento:'Em andamento',concluido:'Concluído'})[r.status]||r.status}</span>`:fmtData(r.data)}
       <div class="meta">${r.descricao||''}</div>
     </div>`).join('');
-  }
-  async function add1a1(){
-    const data=document.getElementById('a1a-data').value;
-    const desc=document.getElementById('a1a-desc').value.trim();
-    if(!data||!desc)return alert('Preencha data e anotação.');
-    await sbPost('cave_treinador_registros',{academia_id:treinador.academia_id,treinador_id:treinadorId,tipo:'1a1',data,descricao:desc,criado_por:uid,criado_em:Date.now()});
-    document.getElementById('a1a-desc').value='';
-    carregarRegistros('1a1','a1a-lista');
   }
   async function addPlanoAcao(){
     const desc=document.getElementById('pa-desc').value.trim();
@@ -278,6 +358,402 @@ header .logo{color:#F5B800!important}
     });
     document.getElementById('pa-desc').value='';
     carregarRegistros('plano_acao','plano-lista');
+  }
+
+  /* ======================= INDICADORES DO ANO ======================= */
+  const TOUR_PERFIL={id:'perfil-treinador',passos:[
+    {el:'#card-ind',t:'📈 Indicadores do ano',x:'Abra a tabela: mês a mês, com setas de subiu ou caiu.'},
+    {el:()=>document.querySelector('.ind-wrap')||document.getElementById('ind-toggle'),t:'Números em dourado',x:'São sugestões do sistema. Confirme ou corrija.'},
+    {el:'#card-dia',t:'✍️ Quinzenas',x:'Q1 (1 a 15), Q2 (16 ao fim) e o mês, com o que ele lançou.'},
+    {el:()=>document.querySelector('.dias')||document.getElementById('card-dia'),t:'Faixa de dias',x:'✓ lançou · – não lançou · ⚠ pediu correção. Clique num dia passado para liberar a correção, ou em qualquer dia para marcar folga e feriado.'},
+    {el:'#card-1a1',t:'🗣️ Reuniões 1:1',x:'Comece pelos combinados em aberto. Depois, + Nova ata.'},
+    {el:'#card-perfil',t:'🧠 Perfil comportamental',x:'Envie o teste pelo WhatsApp. Só você vê o resultado até liberar.'}]};
+  const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const pct=(a,b)=>(a==null||!b)?null:Math.round(a/b*100);
+  const soma=(...v)=>v.every(x=>x==null)?null:v.reduce((s,x)=>s+(x||0),0);
+  const IND_LINHAS=[
+    {k:'carteira',n:'Carteira de alunos',ano:'media'},
+    {k:'alunos_novos',n:'Alunos novos',ano:'soma'},
+    {k:'exp_realizadas',n:'Experiências realizadas',ano:'soma'},
+    {k:'exp_convertidas',n:'Experiências convertidas',ano:'soma'},
+    {k:'conv',n:'Conversão de experiência (%)',pct:true,calc:m=>pct(m.exp_convertidas,m.exp_realizadas)},
+    {k:'cons_total',n:'Consultorias realizadas (total)',calc:m=>soma(m.cons_leads,m.cons_alunos)},
+    {k:'cons_leads',n:'Com leads (Experiência)',sub:true,ano:'soma'},
+    {k:'cons_alunos',n:'Com alunos',sub:true,ano:'soma'},
+    {k:'aval_tec',n:'Avaliações tecnológicas realizadas',ano:'soma'},
+    {k:'rev_agendadas',n:'Revisões de treino agendadas',ano:'soma'},
+    {k:'rev_realizadas',n:'Revisões de treino realizadas',ano:'soma'},
+    {k:'rev_pct',n:'Revisões realizadas (%)',pct:true,calc:m=>pct(m.rev_realizadas,m.rev_agendadas)},
+    {k:'a_renovar',n:'Encarteirados a renovar',ano:'soma'},
+    {k:'renovados',n:'Encarteirados renovados',ano:'soma'},
+    {k:'retencao',n:'Retenção (%)',pct:true,calc:m=>pct(m.renovados,m.a_renovar)}
+  ];
+  const IND_CAMPOS=IND_LINHAS.filter(l=>!l.calc).map(l=>l.k);
+  const IND={ano:new Date().getFullYear(),dados:{},sug:{},aberto:false,erro:null};
+
+  function iniciarIndicadores(){
+    const sel=document.getElementById('ind-ano');const a=new Date().getFullYear();
+    sel.innerHTML=[a-1,a,a+1].map(x=>`<option ${x===IND.ano?'selected':''}>${x}</option>`).join('');
+    carregarIndicadores();
+  }
+  function toggleIndicadores(){
+    IND.aberto=!IND.aberto;
+    document.getElementById('ind-corpo').hidden=!IND.aberto;
+    document.getElementById('ind-toggle').textContent=IND.aberto?'Fechar tabela ▴':'Abrir tabela ▾';
+    if(IND.aberto)renderIndicadores();
+  }
+  function mesDe(...datas){for(const d of datas){if(!d)continue;const t=String(d);if(/^\d{4}-\d{2}/.test(t))return t.slice(0,7);const n=Number(t);if(n>1e11){const x=new Date(n);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')}}return null}
+  async function carregarIndicadores(){
+    IND.dados={};IND.sug={};IND.erro=null;
+    // Sugestões do sistema (experiências, consultorias de Experiência e carteira atual)
+    try{
+      const [alunos,exps,consExp]=await Promise.all([
+        sbGet('cave_alunos',`treinador_id=eq.${treinadorId}&select=status`),
+        sbGet('cave_experiencias',`treinador_id=eq.${treinadorId}&select=status,data_inicio,data_agendada,data_conversao,criado_em,created_at`),
+        sbGet('cave_experiencias',`consultoria_treinador_id=eq.${treinadorId}&consultoria_realizada=eq.true&select=data_inicio,data_agendada,criado_em,created_at`)
+      ]);
+      const add=(ym,k)=>{if(!ym||+ym.slice(0,4)!==IND.ano)return;const m=+ym.slice(5,7);IND.sug[m]=IND.sug[m]||{};IND.sug[m][k]=(IND.sug[m][k]||0)+1};
+      exps.forEach(e=>{
+        if(e.status&&e.status!=='agendada')add(mesDe(e.data_inicio,e.data_agendada,e.criado_em,e.created_at),'exp_realizadas');
+        if(e.status==='convertida')add(mesDe(e.data_conversao,e.data_inicio,e.data_agendada,e.criado_em),'exp_convertidas');
+      });
+      consExp.forEach(e=>add(mesDe(e.data_inicio,e.data_agendada,e.criado_em,e.created_at),'cons_leads'));
+      const hoje=new Date();
+      if(hoje.getFullYear()===IND.ano){const m=hoje.getMonth()+1;IND.sug[m]=IND.sug[m]||{};IND.sug[m].carteira=alunos.filter(a=>a.status==='ativo').length}
+    }catch(e){console.warn('sugestões',e)}
+    try{
+      const rows=await sbGet('cave_treinador_indicadores',`treinador_id=eq.${treinadorId}&ano=eq.${IND.ano}`);
+      rows.forEach(r=>IND.dados[r.mes]=r);
+    }catch(e){IND.erro='A tabela de indicadores ainda não existe no banco. Rode o SQL cave-perfil-colaborador.sql no Supabase.'}
+    aplicarDiarioNoAno();
+    renderResumo();
+    if(IND.aberto)renderIndicadores();
+    if(canEdit)carregarDiario();
+  }
+  // valor que vale para a conta: o digitado; se não houver, a sugestão do sistema
+  function efetivo(m){const d=IND.dados[m]||{},s=IND.sug[m]||{},o={};IND_CAMPOS.forEach(k=>{o[k]=d[k]!=null?Number(d[k]):(s[k]!=null?s[k]:null)});return o}
+  function valorLinha(l,m){const e=efetivo(m);return l.calc?l.calc(e):e[l.k]}
+  function valorAno(l){
+    const ms=[...Array(12)].map((_,i)=>efetivo(i+1));
+    const tot=k=>soma(...ms.map(e=>e[k]));
+    if(l.calc){const T={};IND_CAMPOS.forEach(k=>T[k]=tot(k));return l.calc(T)}
+    if(l.ano==='media'){const v=ms.map(e=>e[l.k]).filter(x=>x!=null);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}
+    return tot(l.k);
+  }
+  function seta(l,m){if(m===1)return'';const a=valorLinha(l,m),b=valorLinha(l,m-1);if(a==null||b==null||a===b)return'';return a>b?'<span class="ar up">▲</span>':'<span class="ar dn">▼</span>'}
+  function fmtV(v,isPct){return v==null?'<span style="color:var(--td)">·</span>':(v+(isPct?'%':''))}
+  function renderResumo(){
+    const el=document.getElementById('ind-resumo');
+    if(IND.erro){el.innerHTML=`<span style="color:var(--am)">⚠️ ${IND.erro}</span>`;return}
+    let ult=null;for(let m=12;m>=1;m--){if(IND.dados[m]&&IND_CAMPOS.some(k=>IND.dados[m][k]!=null)){ult=m;break}}
+    if(!ult){el.textContent='Evolução mês a mês: carteira, experiências, consultorias, avaliações e retenção. Nenhum mês preenchido em '+IND.ano+'.';return}
+    const e=efetivo(ult),L=k=>IND_LINHAS.find(x=>x.k===k);
+    const cv=L('conv').calc(e),rt=L('retencao').calc(e);
+    el.innerHTML=`Último mês preenchido (<b>${MESES[ult-1]}</b>): carteira <b>${e.carteira??'·'}</b> · conversão <b>${cv==null?'·':cv+'%'}</b> · retenção <b>${rt==null?'·':rt+'%'}</b>`;
+  }
+  function renderIndicadores(){
+    const c=document.getElementById('ind-corpo');
+    if(IND.erro){c.innerHTML=`<div class="leg" style="color:var(--am)">⚠️ ${IND.erro}</div>`;return}
+    const temSug=Object.keys(IND.sug).some(m=>Object.keys(IND.sug[m]).some(k=>!(IND.dados[m]&&IND.dados[m][k]!=null)));
+    c.innerHTML=`
+      <div class="ind-wrap"><table class="ind">
+        <thead><tr><th>Indicador</th>${MESES.map(m=>`<th>${m}</th>`).join('')}<th class="ano">${IND.ano}</th></tr></thead>
+        <tbody>${IND_LINHAS.map(l=>`<tr class="${l.calc?'calc':''} ${l.sub?'sub':''}"><td>${l.calc?'⚙️ ':''}${l.n}</td>${[...Array(12)].map((_,i)=>{
+          const m=i+1;
+          if(l.calc)return`<td>${fmtV(valorLinha(l,m),l.pct)}${seta(l,m)}</td>`;
+          const d=IND.dados[m],s=IND.sug[m];const v=d&&d[l.k]!=null?d[l.k]:'';const ph=s&&s[l.k]!=null&&v===''?s[l.k]:'';
+          if(!canEdit)return`<td>${v!==''?v:(ph!==''?`<i style="color:var(--td)">${ph}</i>`:'<span style="color:var(--td)">·</span>')}${seta(l,m)}</td>`;
+          return`<td><input type="number" min="0" inputmode="numeric" value="${v}" placeholder="${ph}" data-m="${m}" data-k="${l.k}" onchange="salvarIndicador(this)">${seta(l,m)}</td>`;
+        }).join('')}<td class="ano">${fmtV(valorAno(l),l.pct)}</td></tr>`).join('')}</tbody>
+      </table></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px">
+        ${canEdit&&temSug?'<button class="btn-gh btn-sm" onclick="confirmarSugestoes()">Confirmar sugestões do sistema</button>':''}
+        <span class="saved" id="ind-saved">✓ salvo</span>
+      </div>
+      <div class="leg">⚙️ Linhas calculadas sozinhas: conversão = convertidas ÷ realizadas · consultorias = leads + alunos · retenção = renovados ÷ a renovar. Coluna ${IND.ano}: carteira em média; os demais em total.
+      ${canEdit?'<br>Números em <i style="color:rgba(245,184,0,.8)">dourado e itálico</i> são sugestões do sistema: o Lançamento do dia do treinador (experiências, alunos novos, consultorias, avaliações e revisões), as experiências do Hub e a carteira do mês atual. Digite por cima para corrigir.':''}</div>`;
+  }
+  async function salvarIndicador(inp){
+    const m=+inp.dataset.m,k=inp.dataset.k;const v=inp.value===''?null:Math.max(0,Number(inp.value));
+    try{
+      await sbUpsert('cave_treinador_indicadores',{academia_id:treinador.academia_id,treinador_id:treinadorId,ano:IND.ano,mes:m,[k]:v,updated_at:Date.now()});
+      IND.dados[m]=Object.assign(IND.dados[m]||{},{[k]:v});
+      const sc=document.querySelector('.ind-wrap').scrollLeft;renderIndicadores();renderResumo();document.querySelector('.ind-wrap').scrollLeft=sc;
+      const sv=document.getElementById('ind-saved');sv.classList.add('on');setTimeout(()=>sv.classList.remove('on'),1500);
+    }catch(e){console.error(e);alert('Não foi possível salvar. Verifique a internet e tente de novo.')}
+  }
+  async function confirmarSugestoes(){
+    const lote=[];
+    Object.keys(IND.sug).forEach(m=>{const o={};Object.entries(IND.sug[m]).forEach(([k,v])=>{if(!(IND.dados[m]&&IND.dados[m][k]!=null))o[k]=v});
+      if(Object.keys(o).length)lote.push(Object.assign({academia_id:treinador.academia_id,treinador_id:treinadorId,ano:IND.ano,mes:+m,updated_at:Date.now()},o))});
+    if(!lote.length)return;
+    try{for(const r of lote){await sbUpsert('cave_treinador_indicadores',r)}await carregarIndicadores()}catch(e){console.error(e);alert('Não foi possível salvar as sugestões.')}
+  }
+
+  /* ======================= LANÇAMENTO DO DIA (ÁREA DO TREINADOR) ======================= */
+  const DIA={mes:new Date().getMonth()+1,ret:null,academiaRet:null,rowsAno:[],libs:[],func:null,cal:[],estado:'carregando',msg:''};
+  const MESES_L=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  function normNome(t){return String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim()}
+  async function carregarDiario(){
+    if(!window.DR){DIA.estado='erro';DIA.msg='Não foi possível carregar a ligação com a Área do Treinador.';return renderDiario()}
+    const sel=document.getElementById('dia-mes');
+    if(sel&&!sel.options.length){sel.innerHTML=MESES_L.map((m,i)=>`<option value="${i+1}" ${i+1===DIA.mes?'selected':''}>${m} ${IND.ano}</option>`).join('')}
+    else if(sel){[...sel.options].forEach((o,i)=>o.textContent=MESES_L[i]+' '+IND.ano)}
+    try{
+      if(!(await DR.sessao())){DIA.estado='desconectado';return renderDiario()}
+      const g=await DR.gestor();
+      if(!g){DIA.estado='nao_gestor';return renderDiario()}
+      DIA.academiaRet=g.academia_id;
+      const [logins,ts]=await Promise.all([sbGet('cave_gestores',`treinador_id=eq.${treinadorId}&select=email`).catch(()=>[]),DR.treinadores(g.academia_id)]);
+      const emails=logins.map(l=>String(l.email||'').toLowerCase());
+      DIA.ret=ts.find(t=>emails.includes(String(t.email||'').toLowerCase()))||ts.find(t=>normNome(t.nome)===normNome(treinador.nome))||ts.find(t=>normNome(t.nome).split(' ')[0]===normNome(treinador.nome).split(' ')[0]&&ts.filter(x=>normNome(x.nome).split(' ')[0]===normNome(t.nome).split(' ')[0]).length===1);
+      if(!DIA.ret){DIA.estado='sem_cadastro';return renderDiario()}
+      DIA.rowsAno=await DR.diario(g.academia_id,`${IND.ano}-01-01`,`${IND.ano}-12-31`,DIA.ret.id);
+      try{DIA.libs=await DR.liberacoes(String(DIA.ret.email||'').toLowerCase())}catch(e){DIA.libs=[]}
+      [DIA.func,DIA.cal]=await Promise.all([DR.funcionamento(treinador.academia_id),DR.calendario(treinador.academia_id,`${IND.ano}-01-01`,`${IND.ano}-12-31`)]);
+      DIA.estado='ok';
+      aplicarDiarioNoAno();renderResumo();if(IND.aberto){const w=document.querySelector('.ind-wrap'),sc=w?w.scrollLeft:0;renderIndicadores();const w2=document.querySelector('.ind-wrap');if(w2)w2.scrollLeft=sc}
+    }catch(e){console.error(e);DIA.estado='erro';DIA.msg='Não foi possível ler os lançamentos agora.'}
+    renderDiario();
+  }
+  // Os totais do Lançamento do dia viram sugestão na tabela do ano
+  function aplicarDiarioNoAno(){
+    if(!DIA.rowsAno||!DIA.rowsAno.length||!window.DR)return;
+    const por={};DIA.rowsAno.filter(r=>String(r.data).startsWith(IND.ano+'-')).forEach(r=>{const m=+String(r.data).slice(5,7);(por[m]=por[m]||[]).push(r)});
+    Object.entries(por).forEach(([m,rows])=>{
+      const t=DR.soma(rows);IND.sug[m]=IND.sug[m]||{};
+      Object.assign(IND.sug[m],{exp_realizadas:t.experiencias_iniciadas,alunos_novos:t.novos_alunos,cons_leads:t.consultorias_leads,cons_alunos:t.consultorias_alunos,aval_tec:t.avaliacoes_realizadas,rev_agendadas:t.revisoes_previstas,rev_realizadas:t.revisoes_realizadas});
+    });
+  }
+  function renderDiario(){
+    const el=document.getElementById('dia-corpo');if(!el)return;
+    if(DIA.estado==='carregando'){el.innerHTML='<div class="item" style="color:var(--td)">Carregando...</div>';return}
+    if(DIA.estado==='desconectado'||DIA.estado==='nao_gestor'){
+      el.innerHTML=`<div class="conn">
+        <div style="font-size:13.5px;margin-bottom:10px">${DIA.estado==='nao_gestor'?'Este navegador está conectado à Área do Treinador com um login que não é de gestor(a).':'Para ver os lançamentos, conecte a Área do Treinador neste navegador.'}
+        <br><b>É o mesmo e-mail e a mesma senha do Hub.</b> Só precisa fazer uma vez.</div>
+        <div class="row row2"><div class="fg"><label class="fl">E-mail</label><input class="fi" id="dc-email" value="${esc(viewer.email||'')}"></div>
+        <div class="fg"><label class="fl">Senha (a mesma do Hub)</label><input class="fi" type="password" id="dc-senha" onkeydown="if(event.key==='Enter')conectarDiario()"></div></div>
+        <button class="btn" id="dc-ok" onclick="conectarDiario()">Conectar</button> <span id="dc-err" style="color:var(--re);font-size:12.5px;margin-left:8px"></span></div>`;
+      return;
+    }
+    if(DIA.estado==='sem_cadastro'){el.innerHTML=`<div class="item" style="color:var(--am)">⚠️ ${esc(treinador.nome)} ainda não tem cadastro na Área do Treinador, então não consegue lançar o dia. Cadastre pelo Painel Admin ou pela Equipe da Área do Treinador, com o mesmo e-mail do Hub.</div>`;return}
+    if(DIA.estado==='erro'){el.innerHTML=`<div class="item" style="color:var(--am)">⚠️ ${esc(DIA.msg)}</div>`;return}
+    const ano=IND.ano,mes=DIA.mes,rows=DIA.rowsAno.filter(r=>+String(r.data).slice(5,7)===mes);
+    const P=DR.porPeriodo(rows,ano,mes),Q=DR.quinzenas(ano,mes),email=String(DIA.ret.email||'').toLowerCase();
+    const esp={},lancEsp={},extra={};
+    ['q1','q2','mes'].forEach(p=>{esp[p]=DR.diasEsperados(...Q[p],DIA.func,DIA.cal,email);const rp=rows.filter(r=>r.data>=Q[p][0]&&r.data<=Q[p][1]);lancEsp[p]=rp.filter(r=>esp[p].includes(r.data)).length;extra[p]=rp.length-lancEsp[p]});
+    const comeco={q1:Q.q1[0],q2:Q.q2[0],mes:Q.mes[0]},hj=hojeISO();
+    const col=(k,f)=>['q1','q2','mes'].map(p=>`<td class="${p==='mes'?'mes':''}">${comeco[p]<=hj?f(P[p],p):'<span style="color:var(--td)">·</span>'}</td>`).join('');
+    const linhas=DR.CAMPOS.map(c=>`<tr class="${c.sub?'sub':''} ${c.calc?'calc':''}"><td>${c.calc?'⚙️ ':''}${c.n}</td>${col(c.k,t=>t[c.k])}</tr>`).join('')
+      +`<tr class="calc"><td>⚙️ Revisões realizadas (%)</td>${col('',t=>t.rev_pct==null?'·':t.rev_pct+'%')}</tr>`
+      +`<tr class="calc"><td>⚙️ Saldo de revisões</td>${col('',t=>`<span style="color:${t.rev_saldo<0?'var(--re)':'var(--gr)'}">${t.rev_saldo>0?'+':''}${t.rev_saldo}</span>`)}</tr>`
+      +`<tr><td>Dias lançados</td>${col('',(t,p)=>`<span style="color:${lancEsp[p]<esp[p].length?'var(--am)':'var(--gr)'}">${lancEsp[p]} de ${esp[p].length}</span>${extra[p]?` <span style="color:var(--td);font-size:11px">+${extra[p]} extra</span>`:''}`)}</tr>`;
+    const lanc={};rows.forEach(r=>lanc[r.data]=r);
+    const libPend={};DIA.libs.filter(l=>!l.usado).forEach(l=>libPend[l.data]=l);
+    const dias=DR.diasDoPeriodo(...Q.mes,false).map(d=>{
+      const r=lanc[d],st=DR.statusDia(d,DIA.func,DIA.cal,email).st,fut=d>hj,dw=['dom','seg','ter','qua','qui','sex','sáb'][new Date(d+'T12:00:00').getDay()];
+      let cls='',ic='';
+      if(libPend[d]){cls='lib';ic='🔓'}else if(r&&r.pedido_correcao){cls='ped';ic='⚠'}else if(r){cls='ok';ic=st==='trabalho'?'✓':'✓+'}
+      else if(st==='feriado'){cls='fer';ic='🎌'}else if(st==='folga'){cls='fol';ic='🏖'}else if(st==='fechado'){cls='fec';ic='fechado'}
+      else if(fut){cls='fut';ic='·'}else{cls='falta';ic='–'}
+      return`<button class="dia ${cls} ${d===hj?'hoje':''}" onclick="clicarDia('${d}')"><b>${d.slice(8)}</b>${dw} ${ic}</button>`}).join('');
+    const peds=rows.filter(r=>r.pedido_correcao);
+    el.innerHTML=`<table class="qz"><thead><tr><th>Indicador</th><th>Q1 · 1 a 15</th><th>Q2 · 16 a ${DR.ultimoDia(ano,mes)}</th><th class="mes">${MESES_L[mes-1]}</th></tr></thead><tbody>${linhas}</tbody></table>
+      <div class="dias">${dias}</div>
+      <div class="leg">✓ lançado · ✓+ lançamento extra (dia fechado, folga ou feriado) · – faltou lançar · ⚠ pediu correção · 🔓 correção liberada · 🏖 folga · 🎌 feriado · fechado = academia não abre.
+      Academia abre: <b>${DR.resumoFunc(DIA.func)}</b> (muda em Equipe › 🏢 Funcionamento). <b>Clique num dia</b> para liberar correção ou marcar folga e feriado.</div>
+      ${peds.length?`<div class="ped-lista"><b style="color:var(--am)">Pedidos de correção</b>${peds.map(r=>`<div>${fmtData(r.data)}: ${esc(r.obs||r.pedido_correcao)}</div>`).join('')}</div>`:''}`;
+  }
+  async function conectarDiario(){
+    const b=document.getElementById('dc-ok'),er=document.getElementById('dc-err');er.textContent='';b.disabled=true;b.textContent='Conectando...';
+    const r=await DR.conectar(document.getElementById('dc-email').value,document.getElementById('dc-senha').value);
+    b.disabled=false;b.textContent='Conectar';
+    if(!r.ok){er.textContent=r.msg;return}
+    DIA.estado='carregando';renderDiario();carregarDiario();
+  }
+  function clicarDia(d){
+    const email=String(DIA.ret.email||'').toLowerCase(),hj=hojeISO(),nm=(DIA.ret.nome||'').split(' ')[0];
+    const fer=DIA.cal.find(c=>c.data===d&&c.tipo==='feriado'),fol=DIA.cal.find(c=>c.data===d&&c.tipo==='folga'&&String(c.treinador_email||'').toLowerCase()===email);
+    const lib=DIA.libs.find(l=>l.data===d&&!l.usado);
+    const ops=[];
+    if(d<hj)ops.push(lib?['','🔓 Correção já liberada para '+nm,true]:['liberar',`🔓 Liberar ${nm} para lançar ou corrigir este dia`]);
+    ops.push(fol?['tirar_folga',`↩ Tirar a folga de ${nm}`]:['folga',`🏖 Marcar folga de ${nm}`]);
+    ops.push(fer?['tirar_feriado','↩ Tirar o feriado (academia toda)']:['feriado','🎌 Marcar feriado (academia toda)']);
+    let ov=document.getElementById('dia-menu');if(!ov){ov=document.createElement('div');ov.id='dia-menu';ov.className='dmenu-ov';document.body.appendChild(ov);ov.onclick=e=>{if(e.target===ov)ov.remove()}}
+    ov.innerHTML=`<div class="dmenu"><h4>${new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</h4>
+      ${ops.map(([k,t,dis])=>`<button ${dis?'disabled':''} onclick="acaoDia('${d}','${k}')">${t}</button>`).join('')}
+      <button class="cx" onclick="document.getElementById('dia-menu').remove()">Cancelar</button></div>`;
+  }
+  async function acaoDia(d,k){
+    const email=String(DIA.ret.email||'').toLowerCase();document.getElementById('dia-menu')?.remove();
+    try{
+      if(k==='liberar')await DR.liberar({academia_id:treinador.academia_id,treinador_email:email,treinador_nome:DIA.ret.nome,data:d,liberado_por:viewer.nome||''});
+      if(k==='folga')await DR.marcarDia({academia_id:treinador.academia_id,data:d,tipo:'folga',treinador_email:email,treinador_nome:DIA.ret.nome,marcado_por:viewer.nome||''});
+      if(k==='feriado')await DR.marcarDia({academia_id:treinador.academia_id,data:d,tipo:'feriado',treinador_email:null,marcado_por:viewer.nome||''});
+      if(k==='tirar_folga'){const r=DIA.cal.find(c=>c.data===d&&c.tipo==='folga'&&String(c.treinador_email||'').toLowerCase()===email);if(r)await DR.desmarcarDia(r.id)}
+      if(k==='tirar_feriado'){const r=DIA.cal.find(c=>c.data===d&&c.tipo==='feriado');if(r)await DR.desmarcarDia(r.id)}
+      [DIA.libs,DIA.cal]=await Promise.all([DR.liberacoes(email),DR.calendario(treinador.academia_id,`${IND.ano}-01-01`,`${IND.ano}-12-31`)]);renderDiario();
+    }catch(e){console.error(e);alert('Não foi possível salvar. Confira se o SQL de 14/11 (calendário) já foi rodado.')}
+  }
+
+  /* ======================= REUNIÕES 1:1 (ATA CURTA) ======================= */
+  let ATAS=[];
+  const ST_LBL={pendente:'Pendente',cumprido:'Cumpriu',parcial:'Parcial',nao_cumprido:'Não cumpriu'};
+  function hojeISO(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+  function esc(t){return String(t??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+  async function carregarAtas(){
+    try{ATAS=await sbGet('cave_treinador_registros',`treinador_id=eq.${treinadorId}&tipo=eq.1a1&order=data.desc,criado_em.desc`)}catch(e){ATAS=[]}
+    renderAtas();
+  }
+  function itensPendentes(){
+    const it=[];
+    ATAS.forEach(r=>{
+      if(r.acao&&(!r.acao_status||r.acao_status==='pendente'))it.push({id:r.id,idx:-1,t:r.acao,prazo:r.acao_prazo,data:r.data});
+      (Array.isArray(r.combinados)?r.combinados:[]).forEach((c,i)=>{if(c&&c.t&&(!c.status||c.status==='pendente'))it.push({id:r.id,idx:i,t:c.t,prazo:c.prazo,data:r.data})});
+    });
+    return it.sort((a,b)=>String(a.prazo||'9').localeCompare(String(b.prazo||'9')));
+  }
+  function renderAtas(){
+    // próxima reunião
+    const px=document.getElementById('a1a-prox');const prox=ATAS.map(r=>r.proxima_reuniao).filter(Boolean).sort().pop();
+    if(prox){const atras=prox<hojeISO();px.hidden=false;px.innerHTML=`📅 Próxima 1:1: <b style="color:${atras?'var(--re)':'var(--tx)'}">${fmtData(prox)}</b>${atras?' (atrasada)':''}`}else px.hidden=true;
+    // pendências
+    const pend=itensPendentes();const hj=hojeISO();
+    document.getElementById('a1a-pend').innerHTML=pend.length?`<div class="pend"><h4>Combinados em aberto · revisar no início da 1:1</h4>${pend.map(p=>`
+      <div class="pend-it"><div class="tx">${esc(p.t)}<div class="pz">${p.prazo?`prazo ${fmtData(p.prazo)}${p.prazo<hj?' · <span style="color:var(--re)">vencido</span>':''}`:'sem prazo'} · combinado em ${fmtData(p.data)}</div></div>
+      ${canEdit?`<button class="st-b" onclick="marcarItem('${p.id}',${p.idx},'cumprido')">✓ Cumpriu</button><button class="st-b" onclick="marcarItem('${p.id}',${p.idx},'parcial')">◐ Parcial</button><button class="st-b" onclick="marcarItem('${p.id}',${p.idx},'nao_cumprido')">✗ Não cumpriu</button>`:''}
+      </div>`).join('')}</div>`:'';
+    // histórico
+    const el=document.getElementById('a1a-lista');
+    if(!ATAS.length){el.innerHTML='<div class="item" style="color:var(--td)">Nenhuma reunião registrada ainda.</div>';return}
+    el.innerHTML=ATAS.map(r=>{
+      const nova=!!(r.acao||r.conduzido_por||r.proxima_reuniao||r.medir);
+      const comb=(Array.isArray(r.combinados)?r.combinados:[]).filter(c=>c&&c.t);
+      return`<div class="ata">
+        <div class="ata-top"><b>${fmtData(r.data)}</b>${r.conduzido_por?`<span>· conduzida por ${esc(r.conduzido_por)}</span>`:''}
+          ${canEdit?`<button class="x" title="Excluir ata" style="margin-left:auto;font-size:13px" onclick="excluirAta('${r.id}')">🗑</button>`:''}</div>
+        ${r.descricao?`<div class="ln"><span class="k">${nova?'Ponto principal / orientação':'Anotação'}</span>${esc(r.descricao)}</div>`:''}
+        ${r.acao?`<div class="ln"><span class="k">Ação principal</span>${esc(r.acao)} ${r.acao_prazo?`<span style="color:var(--td);font-size:12px">· até ${fmtData(r.acao_prazo)}</span>`:''} <span class="badge ${r.acao_status||'pendente'}">${ST_LBL[r.acao_status||'pendente']}</span></div>`:''}
+        ${comb.length?`<div class="ln"><span class="k">Outros combinados</span>${comb.map(c=>`• ${esc(c.t)} ${c.prazo?`<span style="color:var(--td);font-size:12px">· até ${fmtData(c.prazo)}</span>`:''} <span class="badge ${c.status||'pendente'}">${ST_LBL[c.status||'pendente']}</span>`).join('<br>')}</div>`:''}
+        ${r.medir?`<div class="ln"><span class="k">Como vamos medir / devolutiva</span>${esc(r.medir)}</div>`:''}
+        ${r.proxima_reuniao?`<div class="ln"><span class="k">Próxima reunião</span>${fmtData(r.proxima_reuniao)}</div>`:''}
+      </div>`}).join('');
+  }
+  function abrirAta(){
+    const f=document.getElementById('a1a-form');f.hidden=false;
+    f.innerHTML=`<div class="ata" style="border-color:rgba(245,184,0,.35)">
+      <div class="row row2">
+        <div class="fg"><label class="fl">Data</label><input class="fi" type="date" id="at-data" value="${hojeISO()}"></div>
+        <div class="fg"><label class="fl">Conduzida por</label><input class="fi" id="at-cond" value="${esc(viewer.nome||'')}"></div>
+      </div>
+      <div class="fg"><label class="fl">Ponto principal / orientação *</label><textarea class="fi" id="at-ponto" placeholder="Em uma ou duas frases: o que ficou de mais importante desta conversa."></textarea></div>
+      <div class="row" style="grid-template-columns:1fr 160px">
+        <div class="fg"><label class="fl">Ação principal *</label><input class="fi" id="at-acao" placeholder="O que ele(a) vai fazer"></div>
+        <div class="fg"><label class="fl">Prazo</label><input class="fi" type="date" id="at-prazo"></div>
+      </div>
+      <label class="fl">Outros combinados (opcional)</label>
+      <div id="at-comb"></div>
+      <button class="btn-gh btn-sm" style="margin-bottom:14px" onclick="addComb()">+ Combinado</button>
+      <div class="fg"><label class="fl">Como vamos medir / devolutiva</label><input class="fi" id="at-medir" placeholder="Ex.: conferir na próxima 1:1 a carteira e as revisões feitas"></div>
+      <div class="row row2">
+        <div class="fg"><label class="fl">Próxima reunião</label><input class="fi" type="date" id="at-prox"></div>
+      </div>
+      <div style="display:flex;gap:8px"><button class="btn" id="at-salvar" onclick="salvarAta()">Salvar ata</button><button class="btn-gh" onclick="fecharAta()">Cancelar</button></div>
+    </div>`;
+    f.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function addComb(){const w=document.getElementById('at-comb');const d=document.createElement('div');d.className='comb-row';d.innerHTML='<input class="fi" placeholder="Combinado"><input class="fi" type="date"><button class="x" title="Remover" onclick="this.parentNode.remove()">✕</button>';w.appendChild(d)}
+  function fecharAta(){const f=document.getElementById('a1a-form');f.hidden=true;f.innerHTML=''}
+  async function salvarAta(){
+    const g=id=>document.getElementById(id).value.trim();
+    const ponto=g('at-ponto'),acao=g('at-acao'),data=g('at-data');
+    if(!data||!ponto||!acao)return alert('Preencha a data, o ponto principal e a ação principal.');
+    const combinados=[...document.querySelectorAll('#at-comb .comb-row')].map(r=>{const i=r.querySelectorAll('input');return{t:i[0].value.trim(),prazo:i[1].value||null,status:'pendente'}}).filter(c=>c.t);
+    const b=document.getElementById('at-salvar');b.disabled=true;b.textContent='Salvando...';
+    try{
+      await sbPost('cave_treinador_registros',{academia_id:treinador.academia_id,treinador_id:treinadorId,tipo:'1a1',data,descricao:ponto,
+        conduzido_por:g('at-cond')||null,acao,acao_prazo:g('at-prazo')||null,acao_status:'pendente',combinados,medir:g('at-medir')||null,
+        proxima_reuniao:g('at-prox')||null,criado_por:uid,criado_em:Date.now()});
+      fecharAta();await carregarAtas();
+    }catch(e){console.error(e);b.disabled=false;b.textContent='Salvar ata';alert('Não foi possível salvar. Se for a primeira vez, confira se o SQL cave-perfil-colaborador.sql já foi rodado.')}
+  }
+  async function marcarItem(id,idx,status){
+    const r=ATAS.find(x=>x.id===id);if(!r)return;
+    try{
+      if(idx<0)await sbPatch('cave_treinador_registros',id,{acao_status:status});
+      else{const c=(r.combinados||[]).slice();c[idx]=Object.assign({},c[idx],{status});await sbPatch('cave_treinador_registros',id,{combinados:c})}
+      await carregarAtas();
+    }catch(e){console.error(e);alert('Não foi possível atualizar.')}
+  }
+  async function excluirAta(id){
+    if(!confirm('Excluir esta ata? Não dá para desfazer.'))return;
+    try{await sbDel('cave_treinador_registros',id);await carregarAtas()}catch(e){console.error(e);alert('Não foi possível excluir.')}
+  }
+
+  /* ======================= PERFIL COMPORTAMENTAL ======================= */
+  const PERF={
+    D:{nome:'Executor',cor:'#FF7A63',fortes:['Decisão rápida e iniciativa','Foco em meta e resiliência','Assume a frente em situações difíceis'],desafios:['Impaciência e pouca escuta','Tom duro sob pressão','Dificuldade de delegar'],lider:'Meta clara, autonomia e cobrança de resultado com respeito.',tec:'Motiva por desafio. Cuidado para respeitar o ritmo do aluno.'},
+    I:{nome:'Comunicador',cor:'#F5BD3C',fortes:['Persuasão e carisma','Cria vínculo rápido com alunos','Mobiliza e anima o time'],desafios:['Dispersão em rotina e detalhe','Follow-up e registros','Otimismo que subestima riscos'],lider:'Reconhecimento, espaço para interagir e prazos curtos combinados.',tec:'Engaja e motiva. Precisa de organização de fichas e revisões.'},
+    S:{nome:'Planejador',cor:'#58C98A',fortes:['Constância e confiabilidade','Paciência e escuta','Ótimo em retenção e acompanhamento'],desafios:['Resistência a mudanças rápidas','Demora em decisões difíceis','Evita dizer não'],lider:'Previsibilidade, mudanças explicadas com antecedência e elogio sincero.',tec:'Forte em retenção e acompanhamento. Precisa de estímulo para inovar.'},
+    C:{nome:'Analista',cor:'#7DA6FF',fortes:['Atenção a detalhe e qualidade','Organização e consistência','Análise antes de agir'],desafios:['Perfeccionismo e lentidão','Aversão a risco','Frieza percebida no primeiro contato'],lider:'Critério claro, tempo para se preparar e feedback objetivo.',tec:'Forte em prescrição e técnica. Precisa de calor humano com o aluno.'}
+  };
+  let TESTE=null;
+  function linkTeste(){
+    const base=location.href.split('?')[0].replace(/[^/]*$/,'');
+    return `${base}teste-candidato.html?a=${encodeURIComponent(treinador.academia_id)}&col=treinador&pid=${encodeURIComponent(treinadorId)}&n=${encodeURIComponent(treinador.nome||'')}`;
+  }
+  function msgTeste(){const p=(treinador.nome||'').split(' ')[0];return `Oi, ${p}! Separei um teste rápido de perfil comportamental para a gente usar nas nossas conversas de desenvolvimento. São 12 situações do dia a dia, leva uns 5 minutos e não tem resposta certa ou errada:\n${linkTeste()}`}
+  async function carregarPerfil(){
+    const el=document.getElementById('perfil-corpo');
+    try{const r=await sbGet('cave_pessoas_testes',`pessoa_tipo=eq.treinador&pessoa_id=eq.${encodeURIComponent(treinadorId)}&select=*&order=created_at.desc&limit=1`);TESTE=r[0]||null}
+    catch(e){el.innerHTML='<div class="leg" style="color:var(--am)">⚠️ Falta rodar o SQL cave-perfil-colaborador.sql no Supabase para ligar o teste ao colaborador.</div>';return}
+    renderPerfil();
+  }
+  function blocoEnvio(titulo){
+    return`<div class="sub" style="margin:0 0 6px">${titulo}</div>
+      <div class="linkbox" id="pf-link">${esc(linkTeste())}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msgTeste())}">📲 Enviar pelo WhatsApp</a>
+        <button class="btn-gh" onclick="copiarLinkTeste(this)">Copiar link</button>
+        <button class="btn-gh" onclick="carregarPerfil()">↻ Ver se já respondeu</button>
+      </div>`;
+  }
+  function copiarLinkTeste(b){navigator.clipboard.writeText(linkTeste()).then(()=>{b.textContent='Link copiado ✓';setTimeout(()=>b.textContent='Copiar link',1800)}).catch(()=>{const r=document.createRange();r.selectNodeContents(document.getElementById('pf-link'));const s=getSelection();s.removeAllRanges();s.addRange(r)})}
+  function renderPerfil(){
+    const el=document.getElementById('perfil-corpo');
+    if(!TESTE){
+      el.innerHTML=canEdit?blocoEnvio('Ainda não respondeu. Envie o teste (12 situações, 5 minutos). O resultado aparece aqui, só para a gestão, até você liberar.')
+        :'<div class="item" style="color:var(--td)">Nenhum teste de perfil respondido ainda.</div>';
+      return;
+    }
+    const sc=TESTE.sc||{},t=Object.values(sc).reduce((a,b)=>a+b,0)||1;
+    const ord=['D','I','S','C'].sort((a,b)=>(sc[b]||0)-(sc[a]||0)),p=ord[0],s=ord[1];
+    const P=PERF[p];
+    const dt=(TESTE.created_at||'').slice(0,10);
+    if(!canEdit&&!TESTE.liberado){el.innerHTML='<div class="item" style="color:var(--td)">Você já respondeu o teste. O resultado será apresentado pelo seu gestor numa conversa de devolutiva.</div>';return}
+    el.innerHTML=`
+      <div class="sub" style="margin:0">Respondido em ${fmtData(dt)}${canEdit?` · consistência das respostas: ${Math.round(Number(TESTE.cons||0)*100)}%`:''}</div>
+      <div class="pf-badges">
+        <span class="pf-badge" style="border-color:${P.cor};color:${P.cor}">Predominante: ${P.nome} ${Math.round((sc[p]||0)/t*100)}%</span>
+        <span class="pf-badge">Secundário: ${PERF[s].nome} ${Math.round((sc[s]||0)/t*100)}%</span>
+      </div>
+      <div class="bars">${['D','I','S','C'].map(k=>`<div class="bar" style="--pc:${PERF[k].cor}"><span>${PERF[k].nome}</span><span class="t"><i style="width:${(sc[k]||0)/t*100}%"></i></span><b>${Math.round((sc[k]||0)/t*100)}%</b></div>`).join('')}</div>
+      <div class="two">
+        <div><h4>Pontos fortes</h4><ul>${P.fortes.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+        <div><h4>${canEdit?'Pede acompanhamento':'Pontos de desenvolvimento'}</h4><ul>${P.desafios.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+      </div>
+      ${canEdit?`<div class="pf-lid"><h4>Como liderar</h4>${P.lider}<br><span style="color:var(--td)">No atendimento técnico:</span> ${P.tec}</div>
+      <div class="lib">
+        <label class="sw"><input type="checkbox" ${TESTE.liberado?'checked':''} onchange="liberarPerfil(this.checked)"><i></i></label>
+        <span><b>${TESTE.liberado?'Liberado para o colaborador':'Só a gestão vê'}</b><br><span style="color:var(--td);font-size:12px">${TESTE.liberado?'Ele(a) vê o resultado no próprio perfil.':'Libere depois da conversa de devolutiva.'}</span></span>
+        <button class="btn-gh btn-sm" style="margin-left:auto" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">Enviar novo teste</button>
+        <div hidden style="flex-basis:100%">${blocoEnvio('Um novo teste substitui este resultado quando for respondido.')}</div>
+      </div>`:''}
+      <p class="small">O perfil indica tendência de comportamento. É apoio para a conversa, não um rótulo.</p>`;
+  }
+  async function liberarPerfil(v){
+    try{await sbPatch('cave_pessoas_testes',TESTE.id,{liberado:v});TESTE.liberado=v;renderPerfil()}catch(e){console.error(e);alert('Não foi possível salvar.');renderPerfil()}
   }
 
   init();

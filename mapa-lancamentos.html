@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa · Lançamento do dia e acompanhamento da equipe técnica · RG Cave</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0A0A;--c1:#121212;--c2:#1A1A1A;--bd:rgba(255,255,255,.09);--tx:#F4F4F4;--tm:rgba(255,255,255,.72);--td:rgba(255,255,255,.45);--or:#F5B800;--or2:#FFD34D;--ord:rgba(245,184,0,.12);--orb:rgba(245,184,0,.4);--gr:#22C55E;--bl:#60A5FA}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(1100px 500px at 85% -10%,rgba(245,184,0,.10),transparent 60%),var(--bg);color:var(--tx);font-family:'Barlow',sans-serif;line-height:1.55}
+h1,h2,h3,h4{font-family:'Barlow Condensed',sans-serif;line-height:1.1}
+a{color:var(--or2)}
+.top{display:flex;align-items:center;gap:14px;padding:16px 28px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:rgba(10,10,10,.92);backdrop-filter:blur(6px);z-index:5}
+.top img{height:40px}
+.top b{font-family:'Barlow Condensed';font-size:20px;font-weight:800}
+.top span{font-size:13px;color:var(--td)}
+.top nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.top nav a{font-size:13px;text-decoration:none;color:var(--tm);padding:6px 10px;border-radius:8px;border:1px solid var(--bd)}
+.top nav a:hover{border-color:var(--orb);color:var(--tx)}
+main{max-width:1060px;margin:0 auto;padding:34px 22px 80px}
+.hero h1{font-size:46px;font-weight:800}
+.hero h1 em{font-style:normal;color:var(--or)}
+.hero p{color:var(--tm);font-size:17px;margin-top:10px;max-width:760px}
+.teste{margin-top:24px;border:1px solid var(--orb);background:var(--ord);border-radius:16px;padding:20px 22px}
+.teste h3{font-size:22px;color:var(--or);margin-bottom:8px}
+.teste ol{padding-left:20px;color:var(--tm)}
+.teste li{margin:4px 0}
+.teste .modelo{margin-top:12px;background:var(--c1);border:1px dashed var(--orb);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--tm)}
+.quem{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
+.qc{background:var(--c1);border:1px solid var(--bd);border-radius:16px;padding:20px;text-decoration:none;color:var(--tx);display:block}
+.qc:hover{border-color:var(--orb)}
+.qc .ic{font-size:30px}
+.qc h3{font-size:24px;margin:6px 0}
+.qc p{color:var(--tm);font-size:14.5px}
+section{margin-top:54px}
+section>h2{font-size:34px;font-weight:800;display:flex;align-items:center;gap:12px}
+section>h2 small{font-family:'Barlow';font-size:14px;font-weight:500;color:var(--td)}
+section>.lead{color:var(--tm);margin-top:6px;max-width:780px}
+.passo{display:grid;grid-template-columns:56px 1fr;gap:16px;margin-top:22px}
+.num{width:56px;height:56px;border-radius:50%;background:var(--ord);border:1px solid var(--orb);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:800;font-size:26px;color:var(--or)}
+.pc{background:var(--c1);border:1px solid var(--bd);border-radius:16px;padding:18px 20px}
+.pc h3{font-size:23px;margin-bottom:6px}
+.pc p,.pc li{color:var(--tm);font-size:15px}
+.pc ul{padding-left:20px;margin-top:6px}
+.pc li{margin:3px 0}
+.pc b{color:var(--tx)}
+.pc img{width:100%;border-radius:12px;border:1px solid var(--bd);margin-top:14px;display:block}
+.pc img.m{max-width:560px}
+.ex{font-size:12px;color:var(--td);margin-top:6px}
+.link{display:inline-block;margin-top:10px;font-family:monospace;font-size:13px;background:var(--c2);border:1px solid var(--bd);border-radius:8px;padding:7px 10px;color:var(--or2);word-break:break-all;text-decoration:none}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14.5px}
+td,th{padding:9px 10px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--td)}
+td:first-child{white-space:nowrap;font-weight:600}
+.chk{margin-top:12px;background:var(--c2);border-radius:12px;padding:14px 16px}
+.chk h4{font-size:17px;color:var(--or);margin-bottom:6px}
+.chk label{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--tm);margin:6px 0;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--or);margin-top:3px;flex:none}
+.rot{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.rc{background:var(--c1);border:1px solid var(--bd);border-radius:16px;padding:18px}
+.rc .t{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--or);font-weight:700}
+.rc h3{font-size:22px;margin:4px 0 8px}
+.rc li{color:var(--tm);font-size:14.5px;margin:4px 0 4px 18px}
+.dica{margin-top:12px;font-size:14px;color:var(--tm);border-left:3px solid var(--or);padding:6px 12px;background:rgba(245,184,0,.05)}
+.foot{margin-top:60px;display:flex;justify-content:center;align-items:center;gap:6px;font-size:11px;color:var(--td);opacity:.75}
+@media(max-width:760px){.quem,.rot{grid-template-columns:1fr}.hero h1{font-size:34px}.top nav{display:none}.passo{grid-template-columns:40px 1fr}.num{width:40px;height:40px;font-size:20px}}
+@media print{.top{position:static}body{background:#fff;color:#111}}
+</style>
+</head>
+<body>
+<div class="top">
+  <img src="logo-cave.png" alt="RG Cave" onerror="this.style.display='none'">
+  <div><b>Mapa da equipe técnica</b><br><span>Lançamento do dia e acompanhamento</span></div>
+  <nav><a href="#teste">Como testar</a><a href="#treinador">Treinador</a><a href="#gestor">Gestão</a><a href="#rotina">Rotina</a><a href="#links">Links</a></nav>
+</div>
+<main>
+  <div class="hero">
+    <h1>Do lançamento do dia ao <em>resultado do mês</em></h1>
+    <p>Este mapa mostra o caminho completo: o que o treinador lança todo dia no computador da musculação, onde a gestão acompanha por quinzena, como ficam as reuniões 1:1 e o perfil de cada um. Percorra na ordem.</p>
+  </div>
+
+  <div class="teste" id="teste">
+    <h3>🧪 Esta é uma versão de teste</h3>
+    <ol>
+      <li>Percorra o mapa e faça cada passo na plataforma.</li>
+      <li>Use os botões de verdade. Pode lançar números de teste: depois a gente limpa.</li>
+      <li>Em cada tela tem o botão <b>🧭 Como usar</b> no canto inferior direito. Ele explica tudo passo a passo.</li>
+      <li><b>Anote tudo o que travar, confundir ou parecer errado</b> e mande para o seu líder.</li>
+    </ol>
+    <div class="modelo"><b>Como anotar um problema ou dúvida:</b><br>
+      📍 Tela: (ex.: Lançamento do dia)<br>
+      👆 O que eu fiz: (ex.: cliquei em Salvar o dia)<br>
+      ❗ O que aconteceu: (ex.: apareceu uma mensagem de erro)<br>
+      📸 Print da tela, se puder.</div>
+  </div>
+
+  <div class="teste" style="margin-top:16px;border-color:var(--bd);background:var(--c1)">
+    <h3 style="color:var(--tx)">🛠️ Antes de começar · gestão · 2 minutos</h3>
+    <p style="color:var(--tm);font-size:15px">O Lançamento do dia funciona em <b>qualquer computador ou celular</b>. Para testar agora, pode ser no de vocês. Quando for para o <b>computador da musculação</b>, repita estes passos lá, <b>uma vez só</b>.</p>
+    <ol style="margin-top:8px">
+      <li>Abra <a href="retencao/lancamento_dia.html">o Lançamento do dia</a> (link no fim deste mapa).</li>
+      <li>Clique em <b>"Configurar com o login do gestor"</b> e entre com o login da Direção (o mesmo do Hub). A lista com os nomes da equipe aparece.</li>
+      <li>Salve a página nos favoritos do navegador com o nome <b>Lançamento do dia</b>.</li>
+      <li>No Hub, vá em <b>Equipe › 🏢 Funcionamento</b> e confira os dias e horários da academia (hoje está segunda a sábado).</li>
+      <li>Pronto: cada treinador já pode clicar no próprio nome e lançar.</li>
+    </ol>
+    <p style="color:var(--td);font-size:13px;margin-top:8px">Se depois de atualizar a página algo aparecer diferente do mapa, aperte <b>Ctrl + F5</b> (no celular, feche e abra a página).</p>
+  </div>
+
+  <div class="quem">
+    <a class="qc" href="#treinador"><div class="ic">🏋️</div><h3>Sou treinador(a)</h3><p>Lançamento do dia no computador da musculação. 5 passos, cerca de 2 minutos por dia.</p></a>
+    <a class="qc" href="#gestor"><div class="ic">📊</div><h3>Sou da gestão</h3><p>Direção e líderes: funcionamento, lançamentos da equipe, quinzenas, reuniões 1:1, perfil comportamental e Hub de Pessoas.</p></a>
+  </div>
+
+  <!-- ================= TREINADOR ================= -->
+  <section id="treinador">
+    <h2>🏋️ Treinador(a) <small>todo dia, no fim do turno</small></h2>
+    <p class="lead">Você lança só o que aconteceu hoje. Leva cerca de 2 minutos.</p>
+
+    <div class="passo"><div class="num">1</div><div class="pc">
+      <h3>Abra o Lançamento do dia</h3>
+      <p>No computador da musculação, abra o favorito <b>Lançamento do dia</b> (ou o link abaixo).</p>
+      <a class="link" href="retencao/lancamento_dia.html">gefitcorporativo-glitch.github.io/rgcave-plataforma/retencao/lancamento_dia.html</a>
+    </div></div>
+
+    <div class="passo"><div class="num">2</div><div class="pc">
+      <h3>Clique no seu nome e digite a sua senha</h3>
+      <p>A senha é <b>a mesma do Hub e da Área do Treinador</b>. Esqueceu? Procure o seu líder.</p>
+      <img src="mapa/lanc-nomes.jpg" alt="Tela com os nomes da equipe" loading="lazy"><div class="ex">Imagem de exemplo.</div>
+    </div></div>
+
+    <div class="passo"><div class="num">3</div><div class="pc">
+      <h3>Lance o dia com os botões − e +</h3>
+      <table>
+        <tr><th>Item</th><th>O que lançar</th></tr>
+        <tr><td>⚡ Experiências iniciadas</td><td>Leads que fizeram hoje o 1º dia da Experiência com você.</td></tr>
+        <tr><td>🆕 Alunos novos</td><td>Alunos que se matricularam e começaram a treinar com você hoje.</td></tr>
+        <tr><td>🗂️ Planners iniciados</td><td>Planners que você iniciou hoje: alunos novos, alunos antigos ou mudança de carteira. Precisa ser no mínimo igual a alunos novos.</td></tr>
+        <tr><td>🎯 Consultorias com leads</td><td>Consultorias com leads em Experiência (ainda não são alunos).</td></tr>
+        <tr><td>📋 Consultorias com alunos</td><td>Consultorias com alunos já matriculados.</td></tr>
+        <tr><td>📏 Avaliações tecnológicas</td><td>Bioimpedância, testes físicos, mapeamento de saúde.</td></tr>
+        <tr><td>📅 Revisões agendadas</td><td>Alunos da sua carteira marcados para revisar o treino hoje (a cada 21 dias). Sem revisão hoje? Deixe 0.</td></tr>
+        <tr><td>✅ Revisões realizadas</td><td>Revisões que você realmente fez hoje. Se o aluno faltou, não conta.</td></tr>
+      </table>
+      <img src="mapa/lanc-lancamento.jpg" alt="Tela do lançamento" loading="lazy"><div class="ex">Imagem de exemplo.</div>
+    </div></div>
+
+    <div class="passo"><div class="num">4</div><div class="pc">
+      <h3>Clique em Salvar o dia</h3>
+      <p>Se algo não bater (por exemplo, menos planners que alunos novos), aparece <b>"Confere antes de salvar?"</b>. Corrija ou confirme. Depois aparece <b>"Pronto!"</b> e a tela volta para a lista de nomes.</p>
+      <div class="dica">Se ficar 2 minutos sem mexer, a tela sai sozinha. Assim ninguém lança no nome do outro.</div>
+    </div></div>
+
+    <div class="passo"><div class="num">5</div><div class="pc">
+      <h3>Errou um dia que já passou?</h3>
+      <p>Você só lança o dia de hoje. Para corrigir outro dia, marque <b>"Preciso corrigir um lançamento de outro dia"</b> e explique na observação. O seu líder libera, e na próxima vez aparece o botão <b>"Corrigir"</b> com a data.</p>
+    </div></div>
+
+    <div class="chk"><h4>✅ Checklist de teste do treinador</h4>
+      <label><input type="checkbox"> Entrei com o meu nome e a minha senha</label>
+      <label><input type="checkbox"> Abri o 🧭 Como usar e o ❓ Ajuda com os indicadores</label>
+      <label><input type="checkbox"> Lancei números de teste e salvei</label>
+      <label><input type="checkbox"> Entrei de novo e vi o lançamento de hoje (dá para ajustar)</label>
+      <label><input type="checkbox"> Testei o aviso: alunos novos maior que planners</label>
+      <label><input type="checkbox"> Marquei "Preciso corrigir um lançamento" com uma observação</label>
+    </div>
+  </section>
+
+  <!-- ================= GESTÃO ================= -->
+  <section id="gestor">
+    <h2>📊 Gestão <small>Direção e líderes</small></h2>
+    <p class="lead">Tudo fica no Hub, na aba <b>Equipe</b>. Os lançamentos vêm da Área do Treinador, que usa <b>o mesmo e-mail e a mesma senha do Hub</b>.</p>
+
+    <div class="passo"><div class="num">1</div><div class="pc">
+      <h3>Prepare o computador (uma vez só)</h3>
+      <p>É o bloco "Antes de começar", no topo do mapa. Abra o Lançamento do dia no computador que vai ser usado, clique em <b>"Configurar com o login do gestor"</b> e entre com o login da Direção. A lista da equipe aparece. Salve a página nos favoritos.</p>
+      <div class="dica">Entrou alguém novo na equipe? Clique em "Atualizar equipe (gestor)" no rodapé da mesma tela.</div>
+    </div></div>
+
+    <div class="passo"><div class="num">2</div><div class="pc">
+      <h3>Hub › Equipe › 🏢 Funcionamento</h3>
+      <p>Marque os dias e horários em que a academia abre. <b>Só os dias abertos contam como dia de lançamento.</b> Hoje está seg a sáb: confira e ajuste (domingo, se abrir).</p>
+      <img class="m" src="mapa/hub-funcionamento.jpg" alt="Funcionamento da academia" loading="lazy">
+    </div></div>
+
+    <div class="passo"><div class="num">3</div><div class="pc">
+      <h3>Hub › Equipe › 📊 Lançamentos da equipe</h3>
+      <p>Todos os treinadores lado a lado por <b>Q1 (dia 1 a 15)</b>, <b>Q2 (dia 16 ao fim)</b> ou mês. Amarelo é ponto de atenção: dias sem lançamento, planners abaixo de alunos novos, pedidos de correção. <b>Saldo de revisões negativo</b> = revisões perdidas: vale abordar na 1:1.</p>
+      <img src="mapa/equipe-lancamentos.jpg" alt="Lançamentos da equipe" loading="lazy"><div class="ex">Imagem de exemplo.</div>
+      <div class="dica">Se pedir para conectar a Área do Treinador, use a mesma senha do Hub. É só uma vez por navegador.</div>
+    </div></div>
+
+    <div class="passo"><div class="num">4</div><div class="pc">
+      <h3>Perfil do treinador › ✍️ Quinzenas e calendário</h3>
+      <p>No Hub › Equipe, clique em <b>👤 Perfil</b> do treinador. O bloco de quinzenas mostra o que ele lançou e a faixa com todos os dias do mês:</p>
+      <ul><li>✓ lançou · – faltou lançar · ⚠ pediu correção · 🔓 correção liberada · 🏖 folga · 🎌 feriado</li>
+        <li><b>Clique num dia</b> para: liberar a correção (dia que já passou), marcar folga daquele treinador ou marcar feriado da academia toda.</li></ul>
+      <img src="mapa/perfil-quinzenas.jpg" alt="Quinzenas e calendário" loading="lazy">
+      <img class="m" src="mapa/perfil-menu-dia.jpg" alt="Opções ao clicar num dia" loading="lazy"><div class="ex">Imagens de exemplo.</div>
+    </div></div>
+
+    <div class="passo"><div class="num">5</div><div class="pc">
+      <h3>Perfil › 📈 Indicadores do ano</h3>
+      <p>Clique em <b>Abrir tabela</b>: janeiro a dezembro, com setas de subiu ou caiu. <b>Números em dourado</b> são sugestões que vêm do lançamento do dia e do sistema: confirme ou digite por cima. Carteira e renovação (a renovar e renovados) são digitadas pela gestão.</p>
+      <img src="mapa/perfil-indicadores.jpg" alt="Indicadores do ano" loading="lazy"><div class="ex">Imagem de exemplo.</div>
+    </div></div>
+
+    <div class="passo"><div class="num">6</div><div class="pc">
+      <h3>Perfil › 🗣️ Reuniões 1:1</h3>
+      <p>Comece pelos <b>combinados em aberto</b> (Cumpriu, Parcial, Não cumpriu). Depois clique em <b>+ Nova ata</b>: ponto principal, ação principal com prazo, outros combinados, como vamos medir e próxima reunião.</p>
+      <img src="mapa/perfil-1a1.jpg" alt="Reuniões 1:1" loading="lazy"><div class="ex">Imagem de exemplo.</div>
+    </div></div>
+
+    <div class="passo"><div class="num">7</div><div class="pc">
+      <h3>Perfil › 🧠 Perfil comportamental</h3>
+      <p>Clique em <b>Enviar pelo WhatsApp</b>: o treinador responde 12 situações (5 minutos). O resultado aparece só para a gestão. Depois da conversa de devolutiva, ligue <b>"Liberar para o colaborador"</b> se quiser que ele veja.</p>
+      <img src="mapa/perfil-comportamental.jpg" alt="Perfil comportamental" loading="lazy"><div class="ex">Imagem de exemplo.</div>
+    </div></div>
+
+    <div class="passo"><div class="num">8</div><div class="pc">
+      <h3>👥 Hub de Pessoas (contratação)</h3>
+      <p>Para <b>candidatos</b> a uma vaga. Abra em <b>Hub › ☰ Ferramentas › 👥 Hub de Pessoas</b>.</p>
+      <ul>
+        <li><b>Visão geral:</b> a jornada de contratação em 7 etapas (inscrição, triagem, videochamada, entrevista, teste prático, teste de situações e onboarding de 30, 60 e 90 dias).</li>
+        <li><b>Painel do gestor:</b> entre com o e-mail e a senha de gestor do Hub. Clique em <b>Copiar link do teste</b> e mande para o candidato.</li>
+        <li><b>O candidato responde</b> pelo celular: 12 situações do dia a dia, cerca de 5 minutos, com aceite de uso dos dados (LGPD).</li>
+        <li><b>Onde ver o resultado:</b> no Painel do gestor, clique no nome do candidato. O relatório mostra o perfil predominante e o secundário, a consistência das respostas, os pontos fortes, o que pede acompanhamento, o encaixe em cada área (recepção, vendas, técnica) e perguntas para a entrevista.</li>
+      </ul>
+      <img class="m" src="mapa/pessoas-teste-inicio.jpg" alt="Início do teste do candidato" loading="lazy">
+      <img src="mapa/pessoas-relatorio.jpg" alt="Relatório do candidato no Painel do gestor" loading="lazy"><div class="ex">Imagens de exemplo.</div>
+      <div class="dica"><b>Candidato ou colaborador?</b> Candidato: Hub de Pessoas (Painel do gestor). Quem já é da equipe: perfil do treinador › 🧠 Perfil comportamental (passo 7). Os dois ficam separados. O resultado é apoio à decisão, nunca decide sozinho.</div>
+    </div></div>
+
+    <div class="chk"><h4>✅ Checklist de teste da gestão</h4>
+      <label><input type="checkbox"> Configurei o computador da musculação com o login da Direção</label>
+      <label><input type="checkbox"> Conferi e ajustei o 🏢 Funcionamento</label>
+      <label><input type="checkbox"> Abri 📊 Lançamentos da equipe e troquei entre Q1, Q2 e mês</label>
+      <label><input type="checkbox"> No perfil, liberei a correção de um dia e marquei uma folga e um feriado (depois desmarquei)</label>
+      <label><input type="checkbox"> Abri a tabela de indicadores do ano e confirmei uma sugestão</label>
+      <label><input type="checkbox"> Registrei uma ata de 1:1 de teste</label>
+      <label><input type="checkbox"> Enviei o teste de perfil para mim mesmo e vi o resultado no perfil</label>
+      <label><input type="checkbox"> No Hub de Pessoas, copiei o link do teste do candidato, respondi como teste e abri o relatório no Painel do gestor</label>
+    </div>
+  </section>
+
+  <!-- ================= ROTINA ================= -->
+  <section id="rotina">
+    <h2>🔁 A rotina</h2>
+    <div class="rot">
+      <div class="rc"><div class="t">Todo dia</div><h3>Treinador lança</h3><ul><li>No fim do turno, no computador da musculação</li><li>Só o dia de hoje</li><li>Errou outro dia? Pede correção na observação</li></ul></div>
+      <div class="rc"><div class="t">A cada quinzena</div><h3>Gestão acompanha</h3><ul><li>📊 Lançamentos da equipe (Q1 no dia 16, Q2 no fim do mês)</li><li>Libera correções e marca folgas e feriados</li><li>Leva os pontos de atenção para a 1:1</li></ul></div>
+      <div class="rc"><div class="t">Todo mês</div><h3>Fechamento</h3><ul><li>Confere os indicadores do ano de cada treinador</li><li>Digita carteira e renovação</li><li>Reunião 1:1 com ata e combinados</li></ul></div>
+    </div>
+  </section>
+
+  <!-- ================= LINKS ================= -->
+  <section id="links">
+    <h2>🔗 Links</h2>
+    <table>
+      <tr><th>O quê</th><th>Quem usa</th><th>Link</th></tr>
+      <tr><td>Lançamento do dia</td><td>Treinadores (computador da musculação)</td><td><a href="retencao/lancamento_dia.html">retencao/lancamento_dia.html</a></td></tr>
+      <tr><td>Hub</td><td>Gestão, consultoras e treinadores</td><td><a href="index.html">rgcave-plataforma/</a></td></tr>
+      <tr><td>Hub de Pessoas</td><td>Gestão (candidatos)</td><td>Hub › ☰ Ferramentas › 👥 Hub de Pessoas</td></tr>
+      <tr><td>Área do Treinador (Planner)</td><td>Treinadores e gestão</td><td><a href="retencao/">retencao/</a></td></tr>
+      <tr><td>Este mapa</td><td>Todos</td><td><a href="mapa-lancamentos.html">mapa-lancamentos.html</a></td></tr>
+    </table>
+    <p class="dica">Dúvida sobre como usar? Primeiro o 🧭 Como usar da própria tela. Continua com dúvida? Procure o seu líder.</p>
+  </section>
+
+  <div class="foot">Metodologia <img src="retencao/logo-gefit.png" alt="GeFit" style="height:12px" onerror="this.outerHTML='GeFit'"></div>
+</main>
+</body>
+</html>

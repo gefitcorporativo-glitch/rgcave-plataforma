@@ -241,6 +241,13 @@ const Q=[
  {id:12,ctx:'Iniciativa',t:'Você tem uma tarde mais calma no trabalho. O que você faz com ela?',o:{D:'Procuro uma meta para antecipar ou um problema para resolver.',I:'Vou conversar com os alunos e ver quem precisa de atenção.',S:'Ajudo colegas e organizo o que está pendente.',C:'Estudo um material ou reviso processos e registros.'}}
 ];
 const SB_URL='https://irwvagffrguiljaxrzmd.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyd3ZhZ2Zmcmd1aWxqYXhyem1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNDk5ODUsImV4cCI6MjEwNDkyNTk4NX0.YAApyaH6iIHEua_89fgCUpMzgXRIcWb_vNRkBQAoq5A';
+// Matriz atende várias academias: a academia vem por ?a= (o Hub abre já com ela).
+const ACADEMIA_PADRAO='7c1e5a3b-2d84-4f6a-9b10-3e8a5d7c9f42'; // RG Cave
+const QS=new URLSearchParams(location.search);
+const ACADEMIA_ID=QS.get('a')||ACADEMIA_PADRAO;
+// Teste de colaborador atual (enviado pelo perfil do treinador ou consultor): fica ligado à pessoa e fora da lista de candidatos.
+const COL=['treinador','consultor'].includes(QS.get('col'))?QS.get('col'):null, COL_ID=QS.get('pid')||null, COL_NOME=QS.get('n')||'';
+const COL_CARGO=COL==='consultor'?'Equipe atual · Consultor(a)':'Equipe atual · Treinador(a)';
 const HD={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
 async function sbGet(t,p){const r=await fetch(`${SB_URL}/rest/v1/${t}?${p}`,{headers:HD});if(!r.ok)throw new Error(await r.text());return r.json()}
 async function sbPost(t,b){const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:'POST',headers:{...HD,'Prefer':'return=minimal'},body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text())}
@@ -273,20 +280,24 @@ $$('.tab').forEach(t=>t.onclick=()=>show(t.dataset.v));
 $$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 
 /* teste do candidato */
-let st={fase:'intro',i:0,nome:'',cargo:'Recepção',ans:{},ordem:{}};
+let st={fase:'intro',i:0,nome:COL?COL_NOME:'',cargo:COL?COL_CARGO:'Recepção',ans:{},ordem:{}};
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function renderTeste(){
   const b=$('#t-box');
   if(st.fase==='intro'){
-    b.innerHTML=`<div><span class="eyebrow">Processo seletivo</span><h2 style="margin-top:6px">Como você agiria na nossa academia?</h2></div>
+    b.innerHTML=COL?`<div><span class="eyebrow">Desenvolvimento da equipe</span><h2 style="margin-top:6px">Como você age no dia a dia da academia?</h2></div>
+    <p style="color:var(--ink2)">São 12 situações do dia a dia. Não existe resposta certa ou errada: escolha a atitude que mais parece com a sua. Leva cerca de 5 minutos. O resultado será conversado com você pelo seu gestor.</p>
+    <div class="field"><label for="f-nome">Seu nome</label><input type="text" id="f-nome" value="${st.nome.replace(/"/g,'&quot;')}" autocomplete="name"></div>
+    <label class="check"><input type="checkbox" id="f-ok"><span>Concordo em fornecer minhas respostas para fins de desenvolvimento profissional, e que elas sejam guardadas pela academia enquanto eu fizer parte da equipe (LGPD).</span></label>`
+    :`<div><span class="eyebrow">Processo seletivo</span><h2 style="margin-top:6px">Como você agiria na nossa academia?</h2></div>
     <p style="color:var(--ink2)">São 12 situações do dia a dia. Não existe resposta certa ou errada: escolha a atitude que mais parece com a sua. Leva cerca de 5 minutos.</p>
     <div class="field"><label for="f-nome">Seu nome</label><input type="text" id="f-nome" value="${st.nome.replace(/"/g,'&quot;')}" autocomplete="name"></div>
     <div class="field"><label for="f-cargo">Vaga ou área</label><select id="f-cargo">${['Recepção','Vendas','Instrutor(a)','Coordenação','Outra / equipe atual'].map(c=>`<option${c===st.cargo?' selected':''}>${c}</option>`).join('')}</select></div>
-    <label class="check"><input type="checkbox" id="f-ok"><span>Concordo em fornecer minhas respostas para fins de processo seletivo, e que elas sejam guardadas pela academia pelo tempo necessário para esse processo (LGPD).</span></label>
-    <button class="cta" id="ini" disabled>Começar</button>`;
+    <label class="check"><input type="checkbox" id="f-ok"><span>Concordo em fornecer minhas respostas para fins de processo seletivo, e que elas sejam guardadas pela academia pelo tempo necessário para esse processo (LGPD).</span></label>`;
+    b.innerHTML+=`<button class="cta" id="ini" disabled>Começar</button>`;
     const chk=()=>{$('#ini').disabled=!($('#f-nome').value.trim()&&$('#f-ok').checked)};
     $('#f-nome').oninput=chk;$('#f-ok').onchange=chk;
-    $('#ini').onclick=()=>{st.nome=$('#f-nome').value.trim();st.cargo=$('#f-cargo').value;st.fase='q';st.i=0;st.ans={};st.ordem={};renderTeste()};
+    $('#ini').onclick=()=>{st.nome=$('#f-nome').value.trim();st.cargo=COL?COL_CARGO:$('#f-cargo').value;st.fase='q';st.i=0;st.ans={};st.ordem={};renderTeste()};
   }else if(st.fase==='q'){
     const q=Q[st.i];
     if(!st.ordem[q.id])st.ordem[q.id]=shuffle(ORD);
@@ -300,7 +311,7 @@ function renderTeste(){
     $('#vol').onclick=()=>{st.i--;renderTeste()};
     $('#prox').onclick=()=>{if(st.i<Q.length-1){st.i++;renderTeste()}else finalizar()};
   }else{
-    b.innerHTML=`<div class="done"><div class="ok">✓</div><h2>Respostas enviadas</h2><p style="color:var(--ink2);max-width:46ch">Obrigado, ${st.nome.split(' ')[0]}. A equipe da academia entrará em contato.</p>${cand?'':'<button class="cta ghost" id="novo">Fazer outro teste</button><button class="cta" id="vp">Ver no painel do gestor</button>'}</div>`;
+    b.innerHTML=`<div class="done"><div class="ok">✓</div><h2>Respostas enviadas</h2><p style="color:var(--ink2);max-width:46ch">Obrigado, ${st.nome.split(' ')[0]}. ${COL?'Seu gestor vai conversar com você sobre o resultado.':'A equipe da academia entrará em contato.'}</p>${cand?'':'<button class="cta ghost" id="novo">Fazer outro teste</button><button class="cta" id="vp">Ver no painel do gestor</button>'}</div>`;
     if(!cand){$('#novo').onclick=()=>{st={fase:'intro',i:0,nome:'',cargo:'Recepção',ans:{},ordem:{}};renderTeste()};$('#vp').onclick=()=>show('painel')}
   }
 }
@@ -312,7 +323,7 @@ function calc(ans){
 async function finalizar(){
   const r=calc(st.ans);const btn=$('#prox');btn.disabled=true;btn.textContent='Enviando...';
   try{
-    await sbPost('cave_pessoas_testes',{nome:st.nome,cargo:st.cargo,sc:r.sc,cons:r.cons,respostas:st.ans});
+    await sbPost('cave_pessoas_testes',Object.assign({academia_id:ACADEMIA_ID,nome:st.nome,cargo:st.cargo,sc:r.sc,cons:r.cons,respostas:st.ans},COL?{pessoa_tipo:COL,pessoa_id:COL_ID}:{}));
     st.fase='fim';renderTeste();
   }catch(e){console.error(e);btn.disabled=false;btn.textContent='Finalizar';
     if(!$('#errt')){const d=document.createElement('p');d.id='errt';d.style.color='var(--d)';d.textContent='Não foi possível enviar agora. Verifique a internet e tente novamente.';$('#t-box').appendChild(d)}}
@@ -324,7 +335,7 @@ let dbl=[];function todos(){return dbl.length?dbl:EX}
 async function renderPainel(){
   if(!gestor){return loginGate()}
   $('#painel-conteudo').hidden=false;$('#gate').hidden=true;
-  try{const rows=await sbGet('cave_pessoas_testes','select=*&order=created_at.desc');dbl=rows.map(r=>({id:r.id,nome:r.nome,cargo:r.cargo,ex:false,sc:r.sc,cons:Number(r.cons),data:(r.created_at||'').slice(0,10)}))}catch(e){dbl=[]}
+  try{const rows=await sbGet('cave_pessoas_testes','pessoa_tipo=is.null&select=*&order=created_at.desc');dbl=rows.map(r=>({id:r.id,nome:r.nome,cargo:r.cargo,ex:false,sc:r.sc,cons:Number(r.cons),data:(r.created_at||'').slice(0,10)}))}catch(e){dbl=[]}
   const base=location.href.split('#')[0].split('?')[0];
   $('#linkbox').textContent=base+'?c=1';
   const l=todos();if(!sel||!l.find(x=>x.id===sel))sel=l[0].id;

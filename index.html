@@ -302,6 +302,7 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="retencao/config.js"></script>
+<script src="tour.js"></script>
 </head>
 <body>
 
@@ -855,7 +856,11 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin:28px 0 14px;padding-top:20px;border-top:1px solid var(--bd)">
         <div class="lbl" style="margin:0">Treinadores(as)</div>
-        <button class="btn-gh btn-sm" onclick="abrirNovoTreinadorROI()">+ Treinador(a)</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-gh btn-sm" id="btn-funcionamento" onclick="abrirFuncionamento()" title="Dias e horários em que a academia abre">🏢 Funcionamento</button>
+          <button class="btn-gh btn-sm" id="btn-lanc-equipe" onclick="window.location.href='diario-equipe.html?uid='+encodeURIComponent(sessao.id)" title="O que cada treinador lançou no Lançamento do dia, por quinzena">📊 Lançamentos da equipe</button>
+          <button class="btn-gh btn-sm" onclick="abrirNovoTreinadorROI()">+ Treinador(a)</button>
+        </div>
       </div>
       <div class="cons-grid" id="treinadores-grid"></div>
     </div>
@@ -1382,10 +1387,10 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
   <!-- MODAL ACESSO À RETENÇÃO -->
   <div class="modal-ov" id="m-ret">
     <div class="modal" style="max-width:420px">
-      <div class="modal-hd"><h3>Acesso à Retenção</h3><button class="btn-x" onclick="closeM('m-ret')">×</button></div>
-      <div style="font-size:13px;color:var(--tm);margin-bottom:14px;line-height:1.5">Entre com o e-mail e a senha do sistema de Retenção. É só uma vez: depois os módulos abrem direto neste navegador.</div>
+      <div class="modal-hd"><h3>Conectar a Área do Treinador</h3><button class="btn-x" onclick="closeM('m-ret')">×</button></div>
+      <div style="font-size:13px;color:var(--tm);margin-bottom:14px;line-height:1.5"><b style="color:var(--tx)">Use o mesmo e-mail e a mesma senha do Hub.</b> É só uma vez neste navegador: depois os módulos da Área do Treinador abrem direto.</div>
       <div class="fg" style="margin-bottom:10px"><label class="fl">E-mail</label><input class="fi" type="email" id="ret-email" autocomplete="username"></div>
-      <div class="fg" style="margin-bottom:6px"><label class="fl">Senha da Retenção</label><input class="fi" type="password" id="ret-senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')atConfirmarSenha()"></div>
+      <div class="fg" style="margin-bottom:6px"><label class="fl">Senha (a mesma do Hub)</label><input class="fi" type="password" id="ret-senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')atConfirmarSenha()"></div>
       <div class="auth-err" id="ret-err" style="margin-top:10px"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
         <button class="btn-gh" onclick="closeM('m-ret')">Cancelar</button>
@@ -1395,7 +1400,21 @@ body.role-consultor #painel-prod-time,body.role-consultor #painel-cons-filter{di
   </div>
 
 
-<!-- MODAL ACESSO ACADEMIA -->
+<!-- MODAL FUNCIONAMENTO DA ACADEMIA -->
+  <div class="modal-ov" id="m-func">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-hd"><h3>🏢 Funcionamento da academia</h3><button class="btn-x" onclick="closeM('m-func')">×</button></div>
+      <div style="font-size:13px;color:var(--tm);margin-bottom:14px;line-height:1.5">Marque os dias em que a academia abre e o horário. Os dias abertos contam como dia de lançamento da equipe técnica. Feriados e folgas você marca no perfil de cada treinador.</div>
+      <div id="func-lista"></div>
+      <div class="auth-err" id="func-err" style="margin-top:10px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn-gh" onclick="closeM('m-func')">Cancelar</button>
+        <button class="btn-or" id="func-ok" onclick="salvarFuncionamento()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ACESSO ACADEMIA -->
 <div class="modal-ov" id="m-acesso">
   <div class="modal" style="max-width:460px">
     <div class="modal-hd"><h3>🔑 Gerenciar Academia</h3><button class="btn-x" onclick="closeM('m-acesso')">×</button></div>
@@ -3663,7 +3682,7 @@ function exportCSV(){
 
 // TABS / MODAIS / TOAST
 const TABS=['geral','vendasmkt','retencao','painel','alunos','areatreinador','briefing','planejamento','diagnostico','funis','consultoras','relatorio','ranking','admin','ferramentas','ajuda'];
-function switchTab(t){TABS.forEach(x=>{document.getElementById('pan-'+x).classList.toggle('active',x===t)});document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===t));if(t==='ferramentas')renderFerramentas();if(t==='planejamento')initPlanejamento();if(t==='diagnostico')initDiagnostico();if(t==='alunos')carregarAlunos();if(t==='areatreinador')renderAreaTreinador();if(t==='geral')carregarGeral();if(t==='vendasmkt')carregarVendasMkt();if(t==='retencao')carregarRetencao();if(t==='briefing')initBriefing();}
+function switchTab(t){TABS.forEach(x=>{document.getElementById('pan-'+x).classList.toggle('active',x===t)});document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===t));if(t==='ferramentas')renderFerramentas();if(t==='planejamento')initPlanejamento();if(t==='diagnostico')initDiagnostico();if(t==='alunos')carregarAlunos();if(t==='areatreinador')renderAreaTreinador();if(t==='geral')carregarGeral();if(t==='vendasmkt')carregarVendasMkt();if(t==='retencao')carregarRetencao();if(t==='briefing')initBriefing();tourEquipeHub(t);}
 
 // ══════════════════════════════════════
 // BRIEFING DO NEGÓCIO
@@ -5098,13 +5117,47 @@ function copiarLinkNps(){
 // pedimos uma vez só.
 const AT_MODULOS=[
   {ic:'📅',nome:'Planner do Treinador',url:'retencao/sistema_integrado_v3.html',quem:'Treinador(a)',desc:'Home, agenda, carteira e consultoria técnica com o aluno.'},
-  {ic:'✍️',nome:'Diário do Treinador',url:'retencao/diario_treinador.html',quem:'Treinador(a)',desc:'Relatório diário de atividades e resultados.'},
+  {ic:'✍️',nome:'Lançamento do dia',url:'retencao/lancamento_dia.html',quem:'Treinador(a) · computador da academia',desc:'Cada treinador clica no nome, digita a senha e lança o dia. Volta sozinho para a lista.'},
   {ic:'✅',nome:'Revisão de Treino',url:'retencao/revisao_treino.html',quem:'Treinador(a)',desc:'Checklist guiado da revisão de treino.'},
   {ic:'📊',nome:'Gestão da Retenção',url:'retencao/dashboard_gestor_v3.html',quem:'Gestor(a)',desc:'Indicadores, equipe, renovações e carteiras.'},
   {ic:'🗂️',nome:'Atualizar Carteira',url:'retencao/importar_carteira.html',quem:'Gestor(a)',desc:'Suba a planilha de alunos e distribua a carteira.'},
   {ic:'📈',nome:'Painel de Vendas',url:'retencao/painel_vendas.html',quem:'Consultor(a) e Gestor(a)',desc:'Funil de experiências e follow-ups.'},
   {ic:'🧭',nome:'Mapa do Sistema',url:'retencao/mapa_retencao.html',quem:'Todos',desc:'Como cada tela funciona, passo a passo.'}
 ];
+// ══ JORNADA GUIADA DA EQUIPE (aba Equipe, só gestão) ══
+const TOUR_HUB={id:'hub-equipe',antes:()=>{const g=document.getElementById('treinadores-grid');if(g)g.scrollIntoView({block:'center'})},passos:[
+  {el:'#treinadores-grid',t:'Treinadores(as)',x:'Aqui está a sua equipe técnica.'},
+  {el:()=>document.querySelector('#treinadores-grid button'),t:'👤 Perfil',x:'Indicadores, quinzenas, reuniões 1:1 e perfil comportamental de cada um.'},
+  {el:'#btn-lanc-equipe',t:'📊 Lançamentos da equipe',x:'Todos os treinadores lado a lado por quinzena.'},
+  {el:'#btn-funcionamento',t:'🏢 Funcionamento',x:'Dias e horários em que a academia abre. Só os dias abertos contam como dia de lançamento.'},
+  {el:'.tab[data-tab="areatreinador"]',t:'🏋️ Área do Treinador',x:'Conecta com a mesma senha do Hub. Verde = conectado. É de lá que sai o Lançamento do dia para o computador da musculação.'}]};
+function tourEquipeHub(t){
+  if(!window.GFTour)return;const gestao=sessao&&['gestor','admin'].includes(sessao.role);
+  if(t==='consultoras'&&gestao){GFTour.botao(TOUR_HUB);if(!document.querySelector('.modal-ov.open'))GFTour.primeiraVez(TOUR_HUB)}
+  else{const b=document.getElementById('gft-btn');if(b)b.remove()}
+}
+
+// ══ FUNCIONAMENTO DA ACADEMIA (dias e horários) ══
+const FUNC_DIAS=[['seg','Segunda'],['ter','Terça'],['qua','Quarta'],['qui','Quinta'],['sex','Sexta'],['sab','Sábado'],['dom','Domingo']];
+const FUNC_PADRAO={dom:{abre:false,ini:'',fim:''},seg:{abre:true,ini:'06:00',fim:'22:00'},ter:{abre:true,ini:'06:00',fim:'22:00'},qua:{abre:true,ini:'06:00',fim:'22:00'},qui:{abre:true,ini:'06:00',fim:'22:00'},sex:{abre:true,ini:'06:00',fim:'22:00'},sab:{abre:true,ini:'08:00',fim:'12:00'}};
+async function abrirFuncionamento(){
+  if(!acId)return;
+  let f=null;try{const r=await sbGet('cave_academias',`id=eq.${acId}&select=funcionamento`);f=r[0]&&r[0].funcionamento}catch(e){}
+  f=Object.assign({},FUNC_PADRAO,f||{});
+  document.getElementById('func-err').classList.remove('show');
+  document.getElementById('func-lista').innerHTML=FUNC_DIAS.map(([k,n])=>`<div style="display:grid;grid-template-columns:130px 1fr 1fr;gap:10px;align-items:center;margin-bottom:8px">
+    <label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" id="fn-${k}" ${f[k].abre?'checked':''} onchange="document.getElementById('fi-${k}').disabled=document.getElementById('ff-${k}').disabled=!this.checked"> ${n}</label>
+    <input class="fi" type="time" id="fi-${k}" value="${f[k].ini||''}" ${f[k].abre?'':'disabled'}>
+    <input class="fi" type="time" id="ff-${k}" value="${f[k].fim||''}" ${f[k].abre?'':'disabled'}></div>`).join('');
+  openM('m-func');
+}
+async function salvarFuncionamento(){
+  const f={};FUNC_DIAS.forEach(([k])=>{f[k]={abre:document.getElementById('fn-'+k).checked,ini:document.getElementById('fi-'+k).value,fim:document.getElementById('ff-'+k).value}});
+  const b=document.getElementById('func-ok');b.disabled=true;b.textContent='Salvando...';
+  try{const r=await fetch(`${SB_URL}/rest/v1/cave_academias?id=eq.${acId}`,{method:'PATCH',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({funcionamento:f})});if(!r.ok)throw new Error(await r.text());closeM('m-func')}
+  catch(e){console.error(e);const er=document.getElementById('func-err');er.textContent='Não foi possível salvar. Confira se o SQL de 14/11 (calendário) já foi rodado.';er.classList.add('show')}
+  b.disabled=false;b.textContent='Salvar';
+}
 let atSb=null,atPendente=null;
 function atClient(){
   if(!atSb&&window.supabase&&window.APP_CONFIG)atSb=window.supabase.createClient(APP_CONFIG.SUPABASE_URL,APP_CONFIG.SUPABASE_ANON,window.gfOpcoesAuth);
@@ -5131,7 +5184,7 @@ async function renderAreaTreinador(){
   grid.innerHTML=AT_MODULOS.map((m,i)=>`<button class="at-card" onclick="atAbrir(${i})"><div class="at-ic">${m.ic}</div><h4>${m.nome}</h4><p>${m.desc}</p><span class="at-who">${m.quem}</span></button>`).join('');
   const ses=await atSessao();
   document.getElementById('at-dot').classList.toggle('on',!!ses);
-  document.getElementById('at-status-txt').textContent=ses?('Conectado à Retenção como '+(ses.user.email||'')):'Ainda não conectado à Retenção neste navegador.';
+  document.getElementById('at-status-txt').textContent=ses?('✓ Área do Treinador conectada como '+(ses.user.email||'')+' (mesma senha do Hub).'):'Área do Treinador não conectada neste navegador. Clique em Conectar e use a mesma senha do Hub.';
   document.getElementById('at-btn-conectar').style.display=ses?'none':'';
   document.getElementById('at-btn-trocar').style.display=ses?'':'none';
 }
@@ -5156,7 +5209,7 @@ async function atConfirmarSenha(){
   const b=document.getElementById('ret-ok');b.disabled=true;b.textContent='Verificando...';
   const ok=await atConectar(email,senha);
   b.disabled=false;b.textContent='Entrar';
-  if(!ok){err.textContent='E-mail ou senha da Retenção incorretos.';err.classList.add('show');return}
+  if(!ok){err.textContent='Não entrou. Se você digitou a senha do Hub e não funcionou, a senha da Área do Treinador está diferente: peça ao suporte para igualar.';err.classList.add('show');return}
   closeM('m-ret');
   await renderAreaTreinador();
   if(atPendente!==null){const m=AT_MODULOS[atPendente];atPendente=null;window.open(m.url,'_blank');}

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lançamento do dia · Área do Treinador</title>
+<script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme-gefit.css">
+<style>
+:root{
+  --bg:#0A0A0A;--c1:#121212;--c2:#1A1A1A;--c3:#262626;--bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.16);
+  --tx:#F4F4F4;--tm:rgba(255,255,255,.7);--td:rgba(255,255,255,.42);
+  --or:#F5B800;--or2:#FFD34D;--ord:rgba(245,184,0,.12);--orb:rgba(245,184,0,.35);
+  --gr:#22C55E;--grd:rgba(34,197,94,.12);--re:#EF4444;--red:rgba(239,68,68,.12);--am:#F59E0B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:radial-gradient(1200px 600px at 80% -10%,rgba(245,184,0,.10),transparent 60%),var(--bg);color:var(--tx);font-family:'Barlow',sans-serif;min-height:100vh}
+h1,h2,h3,.cond{font-family:'Barlow Condensed',sans-serif}
+button{font-family:inherit;cursor:pointer}
+.top{display:flex;align-items:center;gap:16px;padding:18px 36px;border-bottom:1px solid var(--bd)}
+.top img{height:46px}
+.top .t1{font-family:'Barlow Condensed';font-weight:800;font-size:22px;letter-spacing:.3px}
+.top .t2{font-size:13px;color:var(--td)}
+.top .rel{margin-left:auto;text-align:right}
+.top .rel b{font-family:'Barlow Condensed';font-size:30px;font-weight:700;display:block;line-height:1}
+.top .rel span{font-size:13px;color:var(--tm);text-transform:capitalize}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 36px 60px}
+.btn{border:none;border-radius:12px;padding:14px 22px;font-family:'Barlow Condensed';font-weight:700;font-size:17px;letter-spacing:.3px}
+.btn-or{background:linear-gradient(135deg,var(--or),var(--or2));color:#111}
+.btn-gh{background:transparent;border:1px solid var(--bd2);color:var(--tx)}
+.btn-sm{padding:8px 14px;font-size:14px;border-radius:9px}
+.btn:disabled{opacity:.55;cursor:default}
+.link{background:none;border:none;color:var(--td);font-size:13px;text-decoration:underline}
+/* Entrada */
+.hello{display:flex;align-items:flex-end;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.hello h1{font-size:40px;font-weight:800;line-height:1}
+.hello p{color:var(--tm);font-size:15px;margin-top:6px}
+.hello .help{margin-left:auto}
+.nomes{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.nome{background:var(--c1);border:1px solid var(--bd);border-radius:18px;padding:22px 18px;text-align:left;color:var(--tx);display:flex;flex-direction:column;gap:14px;transition:transform .12s,border-color .12s}
+.nome:hover{transform:translateY(-2px);border-color:var(--orb)}
+.av{width:58px;height:58px;border-radius:50%;background:var(--ord);border:1px solid var(--orb);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:800;font-size:24px;color:var(--or)}
+.nome b{font-family:'Barlow Condensed';font-size:22px;font-weight:700;line-height:1.1}
+.nome .st{font-size:12.5px;color:var(--td)}
+.nome .st.ok{color:var(--gr)}
+.rod{margin-top:30px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--td)}
+/* Modal */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:24px;z-index:50}
+.ov.on{display:flex}
+.mo{background:var(--c1);border:1px solid var(--bd2);border-radius:20px;width:100%;max-width:440px;padding:26px;max-height:90vh;overflow:auto}
+.mo.lg{max-width:760px}
+.mo h2{font-size:26px;font-weight:800;margin-bottom:6px}
+.mo p.d{color:var(--tm);font-size:14px;margin-bottom:18px;line-height:1.5}
+.fl{font-size:12px;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:7px}
+.fi{width:100%;padding:14px;border-radius:11px;border:1px solid var(--bd2);background:var(--c2);color:var(--tx);font-family:'Barlow';font-size:17px}
+.fi:focus{outline:2px solid var(--or);border-color:transparent}
+.err{color:var(--re);font-size:13.5px;margin-top:10px;min-height:18px}
+.mo .acts{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+/* Lançamento */
+.lhead{display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap}
+.lhead h1{font-size:34px;font-weight:800}
+.lhead .help{margin-left:auto}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:6px 12px;border-radius:30px;background:var(--c2);border:1px solid var(--bd);color:var(--tm)}
+.chip.ok{background:var(--grd);border-color:rgba(34,197,94,.3);color:var(--gr)}
+.chip.or{background:var(--ord);border-color:var(--orb);color:var(--or)}
+.sec{margin-top:24px}
+.sec h3{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--or);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec h3 small{font-family:'Barlow';text-transform:none;letter-spacing:0;font-size:13px;color:var(--td);font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.ind{background:var(--c1);border:1px solid var(--bd);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.ind.on{border-color:var(--orb);background:linear-gradient(180deg,rgba(245,184,0,.06),var(--c1))}
+.ind .nm{font-weight:700;font-size:16px;display:flex;gap:8px;align-items:flex-start}
+.ind .nm .ic{font-size:20px;line-height:1}
+.ind .ds{font-size:12.5px;color:var(--td);margin-top:2px;font-weight:500}
+.step{display:flex;align-items:center;gap:10px;margin-top:auto}
+.step button{width:52px;height:52px;border-radius:14px;border:1px solid var(--bd2);background:var(--c2);color:var(--tx);font-size:26px;font-weight:600}
+.step button:hover{border-color:var(--or)}
+.step button.mais{background:var(--ord);border-color:var(--orb);color:var(--or)}
+.step input{flex:1;min-width:0;height:52px;text-align:center;font-family:'Barlow Condensed';font-size:32px;font-weight:700;border-radius:14px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.step input:focus{outline:2px solid var(--or)}
+.rev{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
+.revres{border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;justify-content:center;gap:4px;border:1px solid var(--bd);background:var(--c1)}
+.revres .big{font-family:'Barlow Condensed';font-size:42px;font-weight:800;line-height:1}
+.revres .sm{font-size:13px;color:var(--tm)}
+.aviso{margin-top:10px;font-size:13px;color:var(--am);display:none}
+.aviso.on{display:block}
+textarea.fi{min-height:84px;resize:vertical;font-size:15px}
+.chk{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:14px;color:var(--tm);cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--or);margin-top:1px}
+.bar{margin-top:26px;padding:6px 0 60px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bar .btn-or{flex:1;max-width:420px;font-size:20px;padding:18px}
+.bar .tempo{margin-left:auto;font-size:12.5px;color:var(--td)}
+.banner{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;border:1px solid var(--orb);background:var(--ord);margin-top:14px;font-size:14.5px;flex-wrap:wrap}
+.banner b{color:var(--or)}
+.banner .btn{margin-left:auto}
+/* Sucesso */
+.ok-scr{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+.ok-scr .ck{width:110px;height:110px;border-radius:50%;background:var(--grd);border:2px solid var(--gr);display:flex;align-items:center;justify-content:center;font-size:56px;color:var(--gr)}
+.ok-scr h1{font-size:44px;font-weight:800}
+.ok-scr p{color:var(--tm);font-size:17px}
+/* Ajuda */
+.aj{display:grid;gap:10px;margin:6px 0 4px}
+.aj div{background:var(--c2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px}
+.aj b{font-size:15px}
+.aj p{font-size:13.5px;color:var(--tm);margin-top:3px;line-height:1.45}
+.aj p i{color:var(--td)}
+.lider{margin-top:16px;padding:14px 16px;border-radius:12px;background:var(--ord);border:1px solid var(--orb);font-size:14.5px}
+.load{min-height:60vh;display:flex;align-items:center;justify-content:center;color:var(--td)}
+.sig{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--td);opacity:.7;margin-top:28px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rev{grid-template-columns:repeat(2,minmax(0,1fr))}.revres{grid-column:1/-1}.wrap,.top{padding-left:18px;padding-right:18px}}
+@media(max-width:560px){.grid,.rev{grid-template-columns:1fr}.hello h1{font-size:30px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <img src="logo-cave.png" alt="" onerror="this.style.display='none'">
+  <div><div class="t1" id="marca">Área do Treinador</div><div class="t2">Lançamento do dia</div></div>
+  <div class="rel"><b id="hora">--:--</b><span id="hoje">&nbsp;</span></div>
+</div>
+<div class="wrap" id="app"><div class="load">Carregando...</div></div>
+
+<!-- Senha do treinador / configuração -->
+<div class="ov" id="m-senha"><div class="mo">
+  <h2 id="ms-tit">Olá!</h2>
+  <p class="d" id="ms-d">Digite a sua senha para lançar o dia.</p>
+  <div id="ms-email-wrap" style="margin-bottom:12px"><label class="fl">E-mail</label><input class="fi" type="email" id="ms-email" autocomplete="off"></div>
+  <label class="fl">Senha</label>
+  <input class="fi" type="password" id="ms-senha" autocomplete="off" onkeydown="if(event.key==='Enter')confirmarSenha()">
+  <div class="err" id="ms-err"></div>
+  <div class="acts"><button class="btn btn-gh btn-sm" onclick="fecharSenha()">Cancelar</button><button class="btn btn-or btn-sm" id="ms-ok" onclick="confirmarSenha()">Entrar</button></div>
+</div></div>
+
+<!-- Ajuda -->
+<div class="ov" id="m-ajuda" onclick="if(event.target===this)fechar('m-ajuda')"><div class="mo lg">
+  <h2>❓ Ajuda com os indicadores</h2>
+  <p class="d">Lance <b>só o que aconteceu hoje</b>, no fim do seu turno. Use os botões − e + ou digite o número.</p>
+  <div class="aj" id="aj-lista"></div>
+  <div class="lider">💬 <b>Ficou com dúvida?</b> Procure diretamente o seu líder para esclarecer antes de lançar.</div>
+  <div class="acts"><button class="btn btn-or btn-sm" onclick="fechar('m-ajuda')">Entendi</button></div>
+</div></div>
+
+<!-- Confirmação -->
+<div class="ov" id="m-conf"><div class="mo">
+  <h2>Confere antes de salvar?</h2>
+  <p class="d" id="mc-txt"></p>
+  <div class="acts"><button class="btn btn-gh btn-sm" onclick="fechar('m-conf')">Corrigir</button><button class="btn btn-or btn-sm" onclick="fechar('m-conf');salvar(true)">Salvar assim mesmo</button></div>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../diario-retencao.js"></script>
+<script src="../tour.js"></script>
+<script>
+/* Lançamento do dia: feito para o computador da academia, usado por vários treinadores.
+   Cada um entra com a própria senha, lança só o dia de hoje e a tela volta sozinha para a lista de nomes.
+   A sessão aqui NÃO fica salva no navegador (não mexe no login do gestor neste computador). */
+const CFG=window.APP_CONFIG;
+const KEY_EQUIPE='lanc-equipe-'+CFG.STORAGE_KEY;
+const INATIVO_MS=2*60*1000;
+const sb=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON,{auth:{persistSession:false,autoRefreshToken:false,storageKey:CFG.STORAGE_KEY+'-lanc'}});
+const MARCA=String(CFG.NOME_MARCA||'').replace(/\s*Reten[cç][aã]o\s*$/i,'');
+document.getElementById('marca').textContent=MARCA?MARCA+' · Área do Treinador':'Área do Treinador';
+document.title='Lançamento do dia · '+(MARCA||'Área do Treinador');
+
+const CAMPOS=[
+  {sec:'Novos inícios',sub:'quem começou hoje com você',itens:[
+    {k:'experiencias_iniciadas',ic:'⚡',n:'Experiências iniciadas',d:'1º dia da Experiência hoje',aj:'Leads que fizeram hoje o <b>primeiro dia</b> da Experiência com você. <i>Ex.: 2 pessoas começaram a Experiência de 10 dias hoje = 2.</i>'},
+    {k:'novos_alunos',ic:'🆕',n:'Alunos novos',d:'iniciaram hoje com você',aj:'Alunos que <b>se matricularam e começaram</b> a treinar com você hoje. <i>Todo aluno novo precisa de um planner iniciado.</i>'},
+    {k:'inseridos_carteira',ic:'🗂️',n:'Planners iniciados',d:'alunos novos, alunos antigos ou mudança de carteira',aj:'Planners que você <b>iniciou hoje</b>: de alunos novos, de alunos antigos que ainda não tinham, ou de quem mudou para a sua carteira. <i>Precisa ser no mínimo igual ao número de alunos novos.</i>'}
+  ]},
+  {sec:'Atendimentos técnicos',sub:'consultorias e avaliações feitas hoje',itens:[
+    {k:'consultorias_leads',ic:'🎯',n:'Consultorias com leads',d:'durante a Experiência',aj:'Consultorias feitas com <b>leads em Experiência</b> (ainda não são alunos): área foco, metas e plano.'},
+    {k:'consultorias_alunos',ic:'📋',n:'Consultorias com alunos',d:'alunos da carteira',aj:'Consultorias feitas com <b>alunos já matriculados</b>: novas metas, reavaliação de objetivo, plano de evolução.'},
+    {k:'avaliacoes_realizadas',ic:'📏',n:'Avaliações tecnológicas',d:'bioimpedância, testes, mapeamento',aj:'Avaliações com <b>equipamento ou teste</b> feitas hoje (bioimpedância, testes físicos, mapeamento de saúde).'}
+  ]}
+];
+const REV=[
+  {k:'revisoes_previstas',ic:'📅',n:'Revisões agendadas para hoje',d:'da sua carteira, a cada 21 dias',aj:'Quantos alunos da sua carteira estavam <b>marcados para revisar o treino hoje</b>. Se hoje não tinha nenhuma, deixe 0.'},
+  {k:'revisoes_realizadas',ic:'✅',n:'Revisões realizadas',d:'feitas de verdade hoje',aj:'Quantas revisões de treino você <b>realmente fez</b> hoje. Se o aluno faltou, não conta.'}
+];
+const TODOS=[...CAMPOS.flatMap(s=>s.itens),...REV];
+const TOUR_NOMES={id:'lanc-nomes',passos:[
+  {el:'.nomes',t:'Quem vai lançar o dia?',x:'Clique no seu nome. Cada um lança o seu.'},
+  {el:'.nomes',t:'Senha',x:'Depois de clicar no nome, digite a sua senha: a mesma do Hub e da Área do Treinador. Esqueceu? Procure seu líder.'},
+  {el:'.hello .help',t:'❓ Ajuda',x:'Dúvida sobre um indicador? Clique aqui.'}]};
+const TOUR_LANC={id:'lanc',passos:[
+  {el:'.lhead .chip.or',t:'Data de hoje',x:'Você lança só o dia de hoje, no fim do turno.'},
+  {el:'#c-experiencias_iniciadas .step',t:'Botões − / +',x:'Toque para somar ou tirar. Também dá para digitar o número.'},
+  {el:()=>document.querySelectorAll('.sec')[0],t:'Novos inícios',x:'Experiências no 1º dia, alunos novos e planners. Todo aluno novo precisa de um planner.'},
+  {el:()=>document.querySelectorAll('.sec')[1],t:'Atendimentos',x:'Consultorias com leads (Experiência), com alunos, e avaliações.'},
+  {el:()=>document.querySelectorAll('.sec')[2],t:'Revisões de treino',x:'Agendadas para hoje × realizadas. Sem revisão hoje? Deixe 0 de 0.'},
+  {el:()=>document.querySelectorAll('.sec')[3],t:'Observação e correção',x:'Errou outro dia? Marque e explique. O seu líder libera.'},
+  {el:'#btn-salvar',t:'Salvar o dia',x:'Ao salvar, a tela volta para os nomes. Se ficar parada 2 minutos, sai sozinha.'},
+  {el:'.lhead .help',t:'❓ Ajuda',x:'Dúvida sobre um indicador? Clique aqui. Ficou com dúvida mesmo assim? Procure seu líder.'}]};
+
+let equipe=null,pessoa=null,treinador=null,dataLanc=hoje(),registro=null,vals={},liberacao=null,timer=null,saindo=false;
+function hoje(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function fmtD(s){const [a,m,d]=s.split('-');return d+'/'+m}
+function longo(s){return new Date(s+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}
+function esc(t){return String(t??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function abrir(id){document.getElementById(id).classList.add('on')}
+function fechar(id){document.getElementById(id).classList.remove('on')}
+function relogio(){const d=new Date();document.getElementById('hora').textContent=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});document.getElementById('hoje').textContent=d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}
+relogio();setInterval(relogio,15000);
+document.getElementById('aj-lista').innerHTML=TODOS.map(i=>`<div><b>${i.ic} ${i.n}</b><p>${i.aj}</p></div>`).join('')+'<div><b>📝 Observação</b><p>Algo importante do dia: aluno em risco, evento, dificuldade. <b>Errou um lançamento de outro dia?</b> Marque "Preciso corrigir um lançamento" e explique aqui. O seu líder libera a correção.</p></div>';
+
+/* ---------- Hub (para correções liberadas pelo gestor) ---------- */
+async function hubGet(t,q){if(!CFG.HUB_URL)return[];const r=await fetch(`${CFG.HUB_URL}/rest/v1/${CFG.HUB_PREFIXO}${t}?${q}`,{headers:{apikey:CFG.HUB_ANON,Authorization:'Bearer '+CFG.HUB_ANON}});if(!r.ok)throw new Error(await r.text());return r.json()}
+async function hubPatch(t,id,b){if(!CFG.HUB_URL)return;await fetch(`${CFG.HUB_URL}/rest/v1/${CFG.HUB_PREFIXO}${t}?id=eq.${id}`,{method:'PATCH',headers:{apikey:CFG.HUB_ANON,Authorization:'Bearer '+CFG.HUB_ANON,'Content-Type':'application/json'},body:JSON.stringify(b)})}
+
+/* ---------- Equipe deste computador ---------- */
+function lerEquipe(){try{return JSON.parse(localStorage.getItem(KEY_EQUIPE)||'null')}catch(e){return null}}
+function telaInicial(){
+  sair(true);
+  equipe=lerEquipe();
+  const app=document.getElementById('app');
+  if(!equipe||!equipe.pessoas||!equipe.pessoas.length){
+    app.innerHTML=`<div class="hello"><div><h1>Vamos preparar este computador</h1><p>Uma vez só: o(a) gestor(a) entra com o login da Área do Treinador e a lista da equipe aparece aqui.</p></div></div>
+      <button class="btn btn-or" onclick="pedirGestor()">Configurar com o login do gestor</button>`;
+    return;
+  }
+  app.innerHTML=`
+    <div class="hello"><div><h1>Quem vai lançar o dia?</h1><p>Clique no seu nome. Lance só o que aconteceu <b>hoje</b>.</p></div>
+      <button class="btn btn-gh btn-sm help" onclick="abrir('m-ajuda')">❓ Ajuda com os indicadores</button></div>
+    <div class="nomes">${equipe.pessoas.map((p,i)=>`<button class="nome" onclick="escolher(${i})"><span class="av">${esc((p.nome||'?').trim()[0]||'?').toUpperCase()}</span><div><b>${esc(p.nome)}</b></div></button>`).join('')}</div>
+    <div class="rod"><span>Equipe de ${esc(equipe.academia||'')} · atualizada em ${esc(equipe.em||'')}</span><button class="link" onclick="pedirGestor()">Atualizar equipe (gestor)</button></div>
+    <div class="sig">Metodologia <img src="logo-gefit.png" alt="GeFit" style="height:12px" onerror="this.outerHTML='GeFit'"></div>`;
+  if(window.GFTour)GFTour.botao(TOUR_NOMES);
+}
+function pedirGestor(){
+  pessoa={gestor:true};
+  document.getElementById('ms-tit').textContent='Login do gestor';
+  document.getElementById('ms-d').textContent='Use o e-mail e a senha de gestor da Área do Treinador (a mesma senha do Hub). Serve só para carregar a lista da equipe neste computador.';
+  document.getElementById('ms-email-wrap').hidden=false;document.getElementById('ms-email').value='';
+  abrirSenha();setTimeout(()=>document.getElementById('ms-email').focus(),60);
+}
+function escolher(i){
+  pessoa=equipe.pessoas[i];
+  document.getElementById('ms-tit').textContent='Olá, '+(pessoa.nome||'').split(' ')[0]+'!';
+  document.getElementById('ms-d').textContent='Digite a sua senha para lançar o dia (a mesma do Hub e da Área do Treinador).';
+  document.getElementById('ms-email-wrap').hidden=true;document.getElementById('ms-email').value=pessoa.email;
+  abrirSenha();setTimeout(()=>document.getElementById('ms-senha').focus(),60);
+}
+function abrirSenha(){document.getElementById('ms-senha').value='';document.getElementById('ms-err').textContent='';abrir('m-senha')}
+function fecharSenha(){fechar('m-senha');pessoa=null}
+async function confirmarSenha(){
+  const email=document.getElementById('ms-email').value.trim().toLowerCase(),senha=document.getElementById('ms-senha').value;
+  const er=document.getElementById('ms-err'),b=document.getElementById('ms-ok');er.textContent='';
+  if(!email||!senha){er.textContent='Digite a senha.';return}
+  b.disabled=true;b.textContent='Entrando...';
+  try{
+    const {data,error}=await sb.auth.signInWithPassword({email,password:senha});
+    if(error){er.textContent='Senha incorreta. Se esqueceu, procure o seu líder.';return}
+    if(pessoa&&pessoa.gestor)await configurar(data.user);
+    else await entrarTreinador(data.user);
+  }catch(e){console.error(e);er.textContent='Sem conexão agora. Tente de novo.'}
+  finally{b.disabled=false;b.textContent='Entrar'}
+}
+async function configurar(user){
+  const er=document.getElementById('ms-err');
+  const {data:g}=await sb.from('gestores').select('id,nome,academia_id').eq('user_id',user.id).maybeSingle();
+  if(!g){await sb.auth.signOut();er.textContent='Este login não é de gestor(a).';return}
+  const {data:ac}=await sb.from('academias').select('nome').eq('id',g.academia_id).maybeSingle();
+  if(window.gfConfereAcademia&&!(await gfConfereAcademia(sb,ac&&ac.nome)))return;
+  const {data:ts,error}=await sb.from('treinadores').select('id,nome,email,ativo').eq('academia_id',g.academia_id).order('nome');
+  await sb.auth.signOut();
+  if(error){er.textContent='Não foi possível carregar a equipe.';return}
+  const pessoas=(ts||[]).filter(t=>t.ativo!==false&&t.email).map(t=>({id:t.id,nome:t.nome,email:String(t.email).toLowerCase()}));
+  localStorage.setItem(KEY_EQUIPE,JSON.stringify({academia:ac?ac.nome:'',academia_id:g.academia_id,em:new Date().toLocaleDateString('pt-BR'),pessoas}));
+  fechar('m-senha');telaInicial();
+}
+
+/* ---------- Lançamento ---------- */
+async function entrarTreinador(user){
+  const er=document.getElementById('ms-err');
+  const {data:t}=await sb.from('treinadores').select('id,nome,academia_id').eq('user_id',user.id).maybeSingle();
+  if(!t){await sb.auth.signOut();er.textContent='Este login não é de treinador(a).';return}
+  treinador=t;fechar('m-senha');
+  dataLanc=hoje();liberacao=null;
+  await carregarDia();
+  try{const l=await hubGet('diario_liberacoes',`treinador_email=eq.${encodeURIComponent(pessoa.email)}&usado=eq.false&select=id,data&order=data.asc`);window._libs=l||[]}catch(e){window._libs=[]}
+  window._stHoje='trabalho';
+  try{if(window.DR&&CFG.HUB_ACADEMIA_ID){const h=hoje();const [fn,cal]=await Promise.all([DR.funcionamento(CFG.HUB_ACADEMIA_ID),DR.calendario(CFG.HUB_ACADEMIA_ID,h,h)]);window._stHoje=DR.statusDia(h,fn,cal,pessoa.email).st}}catch(e){}
+  renderLanc();vigiar();
+}
+async function carregarDia(){
+  registro=null;vals={};TODOS.forEach(i=>vals[i.k]=0);vals.obs='';vals.pedido=false;
+  const {data}=await sb.from('diario_treinador').select('*').eq('treinador_id',treinador.id).eq('data',dataLanc).maybeSingle();
+  if(data){registro=data;TODOS.forEach(i=>vals[i.k]=Number(data[i.k]||0));
+    if(!data.consultorias_leads&&!data.consultorias_alunos&&data.consultorias_realizadas)vals.consultorias_alunos=Number(data.consultorias_realizadas);
+    vals.obs=data.obs||'';vals.pedido=!!data.pedido_correcao}
+}
+function renderLanc(){
+  const app=document.getElementById('app');const ehHoje=dataLanc===hoje();
+  const libs=(window._libs||[]).filter(l=>l.data!==dataLanc);
+  app.innerHTML=`
+    <div class="lhead"><h1>Olá, ${esc((treinador.nome||'').split(' ')[0])}!</h1>
+      ${ehHoje?`<span class="chip or">📅 Lançamento de hoje · ${longo(dataLanc)}</span>`:`<span class="chip or">✏️ Correção liberada · ${longo(dataLanc)}</span>`}
+      ${registro?`<span class="chip ok">✓ ${ehHoje?'Você já lançou hoje. Pode ajustar e salvar de novo.':'Lançamento existente'}</span>`:''}
+      <button class="btn btn-gh btn-sm help" onclick="abrir('m-ajuda')">❓ Ajuda com os indicadores</button></div>
+    ${ehHoje&&window._stHoje&&window._stHoje!=='trabalho'?`<div class="banner" style="border-color:var(--bd2);background:var(--c2)"><span>${{folga:'🏖 Hoje está marcado como a sua <b>folga</b>.',feriado:'🎌 Hoje está marcado como <b>feriado</b>.',fechado:'Hoje a academia normalmente <b>não abre</b>.'}[window._stHoje]} Se você trabalhou, pode lançar normalmente: conta como lançamento extra.</span></div>`:''}
+    ${libs.map(l=>`<div class="banner"><span>✏️ O seu líder liberou a correção do dia <b>${fmtD(l.data)}</b>.</span><button class="btn btn-or btn-sm" onclick="corrigir('${l.id}','${l.data}')">Corrigir ${fmtD(l.data)}</button></div>`).join('')}
+    ${CAMPOS.map(s=>`<div class="sec"><h3>${s.sec} <small>${s.sub}</small></h3><div class="grid">${s.itens.map(cartao).join('')}</div>
+      ${s.itens.some(i=>i.k==='inseridos_carteira')?'<div class="aviso" id="av-plan">⚠️ Planners iniciados precisa ser no mínimo igual a alunos novos.</div>':''}</div>`).join('')}
+    <div class="sec"><h3>Revisões de treino <small>agendadas para hoje × realizadas</small></h3>
+      <div class="rev">${REV.map(cartao).join('')}<div class="revres" id="revres"></div></div></div>
+    <div class="sec"><h3>Observação <small>opcional</small></h3>
+      <textarea class="fi" id="obs" placeholder="Algo importante do dia: aluno em risco, evento, dificuldade..." oninput="vals.obs=this.value">${esc(vals.obs)}</textarea>
+      <label class="chk"><input type="checkbox" id="pedido" ${vals.pedido?'checked':''} onchange="vals.pedido=this.checked"><span><b>Preciso corrigir um lançamento de outro dia.</b> Explique na observação qual dia e o que mudou. O seu líder libera a correção.</span></label></div>
+    <div class="bar"><button class="btn btn-or" id="btn-salvar" onclick="salvar(false)">${ehHoje?'Salvar o dia':'Salvar correção'}</button>
+      <button class="btn btn-gh" onclick="telaInicial()">Sair sem salvar</button><span class="tempo">Sai sozinho após 2 min sem uso</span></div>`;
+  atualizarCalc();
+  if(window.GFTour){GFTour.botao(TOUR_LANC);if(pessoa&&pessoa.email)GFTour.primeiraVez(TOUR_LANC,'lanc-'+pessoa.email)}
+}
+function cartao(i){return`<div class="ind" id="c-${i.k}"><div><div class="nm"><span class="ic">${i.ic}</span><span>${i.n}<div class="ds">${i.d}</div></span></div></div>
+  <div class="step"><button onclick="mudar('${i.k}',-1)" aria-label="menos">−</button><input type="number" min="0" inputmode="numeric" id="v-${i.k}" value="${vals[i.k]}" oninput="digitar('${i.k}',this.value)"><button class="mais" onclick="mudar('${i.k}',1)" aria-label="mais">+</button></div></div>`}
+function mudar(k,d){vals[k]=Math.max(0,(vals[k]||0)+d);document.getElementById('v-'+k).value=vals[k];atualizarCalc()}
+function digitar(k,v){vals[k]=Math.max(0,parseInt(v||'0',10)||0);atualizarCalc()}
+function atualizarCalc(){
+  TODOS.forEach(i=>{const c=document.getElementById('c-'+i.k);if(c)c.classList.toggle('on',vals[i.k]>0)});
+  const ag=vals.revisoes_previstas,re=vals.revisoes_realizadas,el=document.getElementById('revres');
+  if(el){
+    if(!ag&&!re)el.innerHTML='<div class="big" style="color:var(--td)">0 de 0</div><div class="sm">Sem revisões hoje. Tudo bem, deixe 0.</div>';
+    else{const p=ag?Math.round(re/ag*100):100,saldo=re-ag,cor=saldo<0?'var(--re)':'var(--gr)';
+      el.innerHTML=`<div class="big" style="color:${cor}">${re} de ${ag}</div><div class="sm">${ag?p+'% realizadas':'realizadas sem agendamento'} · saldo <b style="color:${cor}">${saldo>0?'+':''}${saldo}</b></div>`}
+  }
+  const av=document.getElementById('av-plan');if(av)av.classList.toggle('on',vals.inseridos_carteira<vals.novos_alunos);
+}
+function vigiar(){clearTimeout(timer);timer=setTimeout(()=>{if(treinador)telaInicial()},INATIVO_MS)}
+['click','keydown','input','mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{if(treinador)vigiar()},{passive:true}));
+async function corrigir(libId,data){liberacao={id:libId,data};dataLanc=data;await carregarDia();renderLanc()}
+async function salvar(forcar){
+  const avisos=[];
+  if(vals.inseridos_carteira<vals.novos_alunos)avisos.push(`Você lançou <b>${vals.novos_alunos} aluno(s) novo(s)</b> e <b>${vals.inseridos_carteira} planner(s) iniciado(s)</b>. Todo aluno novo precisa de um planner.`);
+  if(vals.revisoes_realizadas>vals.revisoes_previstas)avisos.push(`As revisões realizadas (${vals.revisoes_realizadas}) estão maiores que as agendadas (${vals.revisoes_previstas}).`);
+  if(vals.pedido&&!String(vals.obs||'').trim())avisos.push('Você marcou que precisa corrigir um lançamento, mas a observação está vazia. Explique qual dia e o que mudou.');
+  if(avisos.length&&!forcar){document.getElementById('mc-txt').innerHTML=avisos.join('<br><br>');abrir('m-conf');return}
+  const b=document.getElementById('btn-salvar');b.disabled=true;b.textContent='Salvando...';
+  const payload={academia_id:treinador.academia_id,treinador_id:treinador.id,treinador_nome:treinador.nome,data:dataLanc,obs:vals.obs||null,
+    pedido_correcao:vals.pedido?(vals.obs||'sim'):null,consultorias_realizadas:(vals.consultorias_leads||0)+(vals.consultorias_alunos||0)};
+  TODOS.forEach(i=>payload[i.k]=vals[i.k]||0);
+  try{
+    let error;
+    if(registro)({error}=await sb.from('diario_treinador').update(payload).eq('id',registro.id));
+    else({error}=await sb.from('diario_treinador').insert([payload]));
+    if(error)throw error;
+    if(liberacao)await hubPatch('diario_liberacoes',liberacao.id,{usado:true,usado_em:new Date().toISOString()});
+    sucesso();
+  }catch(e){console.error(e);b.disabled=false;b.textContent='Tentar de novo';alert('Não foi possível salvar: '+(e.message||'sem conexão')+'\nSe continuar, procure o seu líder.')}
+}
+function sucesso(){
+  const nm=(treinador.nome||'').split(' ')[0],eraCorr=!!liberacao,d=dataLanc;
+  sair(false);
+  document.getElementById('app').innerHTML=`<div class="ok-scr"><div class="ck">✓</div><h1>Pronto, ${esc(nm)}!</h1><p>${eraCorr?'Correção do dia '+fmtD(d)+' salva.':'Lançamento de hoje salvo.'} Bom descanso!</p><button class="btn btn-gh btn-sm" onclick="telaInicial()">Voltar agora</button></div>`;
+  setTimeout(()=>{if(!treinador)telaInicial()},4000);
+}
+function sair(redesenhar){
+  clearTimeout(timer);if(window.GFTour)GFTour.fechar();
+  if(treinador||pessoa){try{sb.auth.signOut()}catch(e){}}
+  treinador=null;pessoa=null;registro=null;liberacao=null;window._libs=[];
+}
+telaInicial();
+</script>
+</body>
+</html>
