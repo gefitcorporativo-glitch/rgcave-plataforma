@@ -66,7 +66,30 @@ header a{color:rgba(255,255,255,.85)!important}
 header .logo{color:#F5B800!important}
 header div,header span{color:rgba(255,255,255,.85)!important}
 header .logo{color:#F5B800!important}
-</style></head>
+</style><style>
+  /* Perfil comportamental */
+  .pf-badges{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+  .pf-badge{font-size:12px;font-weight:700;padding:5px 11px;border-radius:20px;border:1px solid var(--bd);background:var(--s2)}
+  .bars{display:grid;gap:8px;margin-bottom:16px}
+  .bar{display:grid;grid-template-columns:110px 1fr 44px;align-items:center;gap:10px;font-size:13px}
+  .bar .t{height:9px;background:var(--s3);border-radius:9px;overflow:hidden}
+  .bar .t i{display:block;height:100%;background:var(--pc);border-radius:9px}
+  .bar b{text-align:right}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .two ul{padding-left:18px;font-size:13px;color:var(--tm);line-height:1.6}
+  .two h4,.pf-lid h4{font-family:'Barlow Condensed';font-size:14px;margin-bottom:6px}
+  .pf-lid{background:rgba(245,184,0,.07);border:1px solid rgba(245,184,0,.25);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:13px;color:var(--tm)}
+  .lib{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd);font-size:13px;flex-wrap:wrap}
+  .sw{position:relative;width:40px;height:22px;flex:none}
+  .sw input{opacity:0;width:0;height:0}
+  .sw i{position:absolute;inset:0;background:var(--s3);border-radius:22px;cursor:pointer;transition:.2s}
+  .sw i:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .sw input:checked+i{background:var(--or)}
+  .sw input:checked+i:before{transform:translateX(18px)}
+  .linkbox{font-family:monospace;font-size:11.5px;background:var(--s2);border:1px dashed var(--bd);border-radius:8px;padding:8px 10px;word-break:break-all;color:var(--tm);margin:10px 0}
+  .small{font-size:11.5px;color:var(--td);margin-top:10px;line-height:1.5}
+</style>
+</head>
 <body>
   <header>
     <a href="index.html">← Voltar</a>
@@ -154,6 +177,11 @@ header .logo{color:#F5B800!important}
         <button class="btn" onclick="add1a1()">Adicionar registro</button>`:''}
       </div>
 
+      <div class="card" id="card-perfil">
+        <h3>🧠 Perfil comportamental</h3>
+        <div id="perfil-corpo"><div class="item" style="color:var(--td)">Carregando...</div></div>
+      </div>
+
       <div class="card">
         <h3>📋 Planos de ação trimestrais</h3>
         <div id="plano-lista"></div>
@@ -168,7 +196,7 @@ header .logo{color:#F5B800!important}
         <button class="btn" onclick="addPlanoAcao()">Adicionar plano de ação</button>`:''}
       </div>
     `;
-    carregarMetas(); carregarKpis(); carregarRegistros('1a1','a1a-lista'); carregarRegistros('plano_acao','plano-lista');
+    carregarMetas(); carregarKpis(); carregarRegistros('1a1','a1a-lista'); carregarRegistros('plano_acao','plano-lista'); carregarPerfil();
   }
 
   async function carregarMetas(){
@@ -243,6 +271,73 @@ header .logo{color:#F5B800!important}
     });
     document.getElementById('pa-desc').value='';
     carregarRegistros('plano_acao','plano-lista');
+  }
+
+  function esc(t){return String(t??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+  async function sbPatch(t,id,b){const r=await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return r.json().catch(()=>[])}
+  /* ======================= PERFIL COMPORTAMENTAL ======================= */
+  const PERF={
+    D:{nome:'Executor',cor:'#FF7A63',fortes:['Decisão rápida e iniciativa','Foco em meta e resiliência','Assume a frente em situações difíceis'],desafios:['Impaciência e pouca escuta','Tom duro sob pressão','Dificuldade de delegar'],lider:'Meta clara, autonomia e cobrança de resultado com respeito.',tec:'Fecha rápido e gosta de meta. Cuidado para respeitar o tempo de decisão do lead.'},
+    I:{nome:'Comunicador',cor:'#F5BD3C',fortes:['Persuasão e carisma','Cria vínculo rápido com alunos','Mobiliza e anima o time'],desafios:['Dispersão em rotina e detalhe','Follow-up e registros','Otimismo que subestima riscos'],lider:'Reconhecimento, espaço para interagir e prazos curtos combinados.',tec:'Cria vínculo e encanta na conversa. Precisa de disciplina no registro e no follow-up.'},
+    S:{nome:'Planejador',cor:'#58C98A',fortes:['Constância e confiabilidade','Paciência e escuta','Ótimo em retenção e acompanhamento'],desafios:['Resistência a mudanças rápidas','Demora em decisões difíceis','Evita dizer não'],lider:'Previsibilidade, mudanças explicadas com antecedência e elogio sincero.',tec:'Constante e confiável no acompanhamento. Precisa de estímulo para propor o fechamento.'},
+    C:{nome:'Analista',cor:'#7DA6FF',fortes:['Atenção a detalhe e qualidade','Organização e consistência','Análise antes de agir'],desafios:['Perfeccionismo e lentidão','Aversão a risco','Frieza percebida no primeiro contato'],lider:'Critério claro, tempo para se preparar e feedback objetivo.',tec:'Preparada e precisa nas informações. Precisa de calor humano no primeiro contato.'}
+  };
+  let TESTE=null;
+  function linkTeste(){
+    const base=location.href.split('?')[0].replace(/[^/]*$/,'');
+    return `${base}teste-candidato.html?a=${encodeURIComponent(consultora.academia_id)}&col=consultor&pid=${encodeURIComponent(consultoraId)}&n=${encodeURIComponent(consultora.nome||'')}`;
+  }
+  function msgTeste(){const p=(consultora.nome||'').split(' ')[0];return `Oi, ${p}! Separei um teste rápido de perfil comportamental para a gente usar nas nossas conversas de desenvolvimento. São 12 situações do dia a dia, leva uns 5 minutos e não tem resposta certa ou errada:\n${linkTeste()}`}
+  async function carregarPerfil(){
+    const el=document.getElementById('perfil-corpo');
+    try{const r=await sbGet('cave_pessoas_testes',`pessoa_tipo=eq.consultor&pessoa_id=eq.${encodeURIComponent(consultoraId)}&select=*&order=created_at.desc&limit=1`);TESTE=r[0]||null}
+    catch(e){el.innerHTML='<div class="leg" style="color:var(--am)">⚠️ Falta rodar o SQL cave-perfil-colaborador.sql no Supabase para ligar o teste ao colaborador.</div>';return}
+    renderPerfil();
+  }
+  function blocoEnvio(titulo){
+    return`<div class="sub" style="margin:0 0 6px">${titulo}</div>
+      <div class="linkbox" id="pf-link">${esc(linkTeste())}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msgTeste())}">📲 Enviar pelo WhatsApp</a>
+        <button class="btn-gh" onclick="copiarLinkTeste(this)">Copiar link</button>
+        <button class="btn-gh" onclick="carregarPerfil()">↻ Ver se já respondeu</button>
+      </div>`;
+  }
+  function copiarLinkTeste(b){navigator.clipboard.writeText(linkTeste()).then(()=>{b.textContent='Link copiado ✓';setTimeout(()=>b.textContent='Copiar link',1800)}).catch(()=>{const r=document.createRange();r.selectNodeContents(document.getElementById('pf-link'));const s=getSelection();s.removeAllRanges();s.addRange(r)})}
+  function renderPerfil(){
+    const el=document.getElementById('perfil-corpo');
+    if(!TESTE){
+      el.innerHTML=canEdit?blocoEnvio('Ainda não respondeu. Envie o teste (12 situações, 5 minutos). O resultado aparece aqui, só para a gestão, até você liberar.')
+        :'<div class="item" style="color:var(--td)">Nenhum teste de perfil respondido ainda.</div>';
+      return;
+    }
+    const sc=TESTE.sc||{},t=Object.values(sc).reduce((a,b)=>a+b,0)||1;
+    const ord=['D','I','S','C'].sort((a,b)=>(sc[b]||0)-(sc[a]||0)),p=ord[0],s=ord[1];
+    const P=PERF[p];
+    const dt=(TESTE.created_at||'').slice(0,10);
+    if(!canEdit&&!TESTE.liberado){el.innerHTML='<div class="item" style="color:var(--td)">Você já respondeu o teste. O resultado será apresentado pelo seu gestor numa conversa de devolutiva.</div>';return}
+    el.innerHTML=`
+      <div class="sub" style="margin:0">Respondido em ${fmtData(dt)}${canEdit?` · consistência das respostas: ${Math.round(Number(TESTE.cons||0)*100)}%`:''}</div>
+      <div class="pf-badges">
+        <span class="pf-badge" style="border-color:${P.cor};color:${P.cor}">Predominante: ${P.nome} ${Math.round((sc[p]||0)/t*100)}%</span>
+        <span class="pf-badge">Secundário: ${PERF[s].nome} ${Math.round((sc[s]||0)/t*100)}%</span>
+      </div>
+      <div class="bars">${['D','I','S','C'].map(k=>`<div class="bar" style="--pc:${PERF[k].cor}"><span>${PERF[k].nome}</span><span class="t"><i style="width:${(sc[k]||0)/t*100}%"></i></span><b>${Math.round((sc[k]||0)/t*100)}%</b></div>`).join('')}</div>
+      <div class="two">
+        <div><h4>Pontos fortes</h4><ul>${P.fortes.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+        <div><h4>${canEdit?'Pede acompanhamento':'Pontos de desenvolvimento'}</h4><ul>${P.desafios.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+      </div>
+      ${canEdit?`<div class="pf-lid"><h4>Como liderar</h4>${P.lider}<br><span style="color:var(--td)">No atendimento comercial:</span> ${P.tec}</div>
+      <div class="lib">
+        <label class="sw"><input type="checkbox" ${TESTE.liberado?'checked':''} onchange="liberarPerfil(this.checked)"><i></i></label>
+        <span><b>${TESTE.liberado?'Liberado para o colaborador':'Só a gestão vê'}</b><br><span style="color:var(--td);font-size:12px">${TESTE.liberado?'Ele(a) vê o resultado no próprio perfil.':'Libere depois da conversa de devolutiva.'}</span></span>
+        <button class="btn-gh btn-sm" style="margin-left:auto" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">Enviar novo teste</button>
+        <div hidden style="flex-basis:100%">${blocoEnvio('Um novo teste substitui este resultado quando for respondido.')}</div>
+      </div>`:''}
+      <p class="small">O perfil indica tendência de comportamento. É apoio para a conversa, não um rótulo.</p>`;
+  }
+  async function liberarPerfil(v){
+    try{await sbPatch('cave_pessoas_testes',TESTE.id,{liberado:v});TESTE.liberado=v;renderPerfil()}catch(e){console.error(e);alert('Não foi possível salvar.');renderPerfil()}
   }
 
   init();

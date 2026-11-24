@@ -2572,6 +2572,7 @@ function renderConsGrid(a){
         <div class="avatar">${initials(c.nome)}</div>
         <div><div class="cons-nm">${c.nome}</div><div class="cons-sub">Meta: ${metaStr} · ${c.horas}h/dia</div></div>
         <div class="cons-funis">${fps}</div>
+        <button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="event.stopPropagation();window.location.href='perfil-consultor.html?uid=${sessao.id}&id=${id}'">👤 Perfil</button>
         <button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="event.stopPropagation();abrirAcessoPessoa('consultor','${id}','${c.nome.replace(/'/g,"\\'")}')">🔑 Acesso</button>
       </div>
       <div class="cons-body">
