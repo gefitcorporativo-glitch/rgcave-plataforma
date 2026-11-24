@@ -93,9 +93,12 @@ select.fi-sel:focus{outline:none;border-color:var(--or-t)}
 .cons-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:16px}
 .cons-card{background:var(--s1);border:1px solid var(--bd);border-radius:10px;overflow:hidden;transition:border-color .15s}
 .cons-card:hover{border-color:var(--bdo)}
-.cons-head{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.cons-head .btn-gh{margin-left:0!important}
-.cons-head .cons-funis{flex:1 1 100%;margin-left:0}
+.cons-head{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.cons-head>.avatar{flex:none}
+.cons-head>.cons-id{flex:1 1 0;min-width:0}
+.cons-head>.cons-funis{flex:1 1 100%;margin-left:0}
+.cons-acts{flex:1 1 100%;display:flex;gap:6px;justify-content:flex-end}
+.cons-acts .btn-gh{margin:0!important;flex:none}
 .avatar{width:34px;height:34px;border-radius:50%;background:var(--or-d);border:1.5px solid var(--bdo);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--or-t);flex-shrink:0}
 .cons-nm{font-weight:600;font-size:14px}.cons-sub{font-size:11px;color:var(--td)}
 .cons-funis{display:flex;gap:3px;margin-left:auto;flex-wrap:wrap}
@@ -2572,10 +2575,10 @@ function renderConsGrid(a){
     return`<div class="cons-card" onclick="abrirDetalheConsultora('${id}','${c.nome.replace(/'/g,"\\'")}')" style="cursor:pointer">
       <div class="cons-head">
         <div class="avatar">${initials(c.nome)}</div>
-        <div><div class="cons-nm">${c.nome}</div><div class="cons-sub">Meta: ${metaStr} · ${c.horas}h/dia</div></div>
+        <div class="cons-id"><div class="cons-nm">${c.nome}</div><div class="cons-sub">Meta: ${metaStr} · ${c.horas}h/dia</div></div>
         <div class="cons-funis">${fps}</div>
-        <button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="event.stopPropagation();window.location.href='perfil-consultor.html?uid=${sessao.id}&id=${id}'">👤 Perfil</button>
-        <button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="event.stopPropagation();abrirAcessoPessoa('consultor','${id}','${c.nome.replace(/'/g,"\\'")}')">🔑 Acesso</button>
+        <div class="cons-acts"><button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="event.stopPropagation();window.location.href='perfil-consultor.html?uid=${sessao.id}&id=${id}'">👤 Perfil</button>
+        <button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="event.stopPropagation();abrirAcessoPessoa('consultor','${id}','${c.nome.replace(/'/g,"\\'")}')">🔑 Acesso</button></div>
       </div>
       <div class="cons-body">
         <!-- RESULTADO -->
@@ -2645,9 +2648,9 @@ function renderTreinadoresGrid(a){
     return `<div class="cons-card" style="cursor:default">
       <div class="cons-head">
         <div class="avatar">${initials(t.nome)}</div>
-        <div><div class="cons-nm">${t.nome}</div><div class="cons-sub">${hor?'🕒 '+hor:'Time técnico'}</div></div>
-        <button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="window.location.href='perfil-treinador.html?uid=${sessao.id}&id=${id}'">👤 Perfil</button>
-        <button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="abrirAcessoPessoa('treinador','${id}','${nm}')">🔑 Acesso</button>
+        <div class="cons-id"><div class="cons-nm">${t.nome}</div><div class="cons-sub">${hor?'🕒 '+hor:'Time técnico'}</div></div>
+        <div class="cons-acts"><button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="window.location.href='perfil-treinador.html?uid=${sessao.id}&id=${id}'">👤 Perfil</button>
+        <button class="btn-gh btn-sm" style="flex-shrink:0;font-size:11px;padding:3px 10px;margin-left:6px" onclick="abrirAcessoPessoa('treinador','${id}','${nm}')">🔑 Acesso</button></div>
       </div>
       ${pills?`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px">${pills}</div>`:''}
       <div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px">
