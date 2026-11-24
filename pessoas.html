@@ -125,6 +125,19 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
 .linkbox{background:var(--surface2);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--ink2);overflow-wrap:anywhere;flex:1;min-width:200px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+textarea{width:100%;min-height:84px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;resize:vertical}
+textarea:focus{border-color:var(--navy);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--navy) 25%,transparent)}
+.ficha{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:14px;margin-bottom:16px}
+.ficha h3{margin:0}
+.rot{display:grid;gap:12px}.rot .bl{border-left:4px solid var(--navy);padding:4px 0 4px 14px}
+.rot .bl h4{margin:0 0 2px;font-size:16px}.rot .tm{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.rot label{display:flex;gap:8px;align-items:flex-start;margin:6px 0;color:var(--ink)}.rot label input{margin-top:4px;flex:none}
+.rot .say{background:var(--surface2);border-radius:10px;padding:8px 12px;font-size:14px;color:var(--ink2);margin:6px 0}
+.rot .alerta{background:var(--lime-soft);border-radius:10px;padding:8px 12px;font-size:13px}.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.acoes{display:flex;gap:8px;flex-wrap:wrap}.acoes .cta{margin:0;padding:8px 14px;font-size:14px}
+.frm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.frm .full{grid-column:1/-1}
+@media(max-width:640px){.frm{grid-template-columns:1fr}}
+[hidden]{display:none!important}
 </style>
 
 </head><body>
@@ -134,6 +147,7 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3
     <button class="tab" role="tab" data-v="visao">Visão geral</button>
     <button class="tab" role="tab" data-v="teste">Teste do candidato</button>
     <button class="tab" role="tab" data-v="painel">Painel do gestor</button>
+    <button class="tab" role="tab" data-v="cand">Candidatos</button>
   </nav>
 </div></header>
 
@@ -196,6 +210,23 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3
   </div>
 </section>
 
+<!-- CANDIDATOS -->
+<section id="v-cand" hidden>
+  <div id="cand-conteudo">
+    <div class="toolbar">
+      <h2 style="margin-right:auto">Candidatos</h2>
+      <select id="c-fst" style="width:auto" aria-label="Filtrar por situação"></select>
+      <select id="c-far" style="width:auto" aria-label="Filtrar por área"></select>
+      <button class="cta ghost" id="c-rotbtn" type="button" style="margin:0">📋 Roteiro da entrevista</button>
+      <button class="cta" id="c-novo" type="button" style="margin:0">+ Novo candidato</button>
+    </div>
+    <p class="small" id="c-aviso" hidden></p>
+    <div class="ficha" id="c-rot" hidden></div>
+    <div class="ficha" id="c-form" hidden></div>
+    <div class="grid2"><div class="list" id="c-lista"></div><div id="c-detalhe"></div></div>
+  </div>
+</section>
+
 </main>
 
 <script>
@@ -247,6 +278,8 @@ const QS=new URLSearchParams(location.search);
 const ACADEMIA_ID=QS.get('a')||ACADEMIA_PADRAO;
 // Teste de colaborador atual (enviado pelo perfil do treinador ou consultor): fica ligado à pessoa e fora da lista de candidatos.
 const COL=['treinador','consultor'].includes(QS.get('col'))?QS.get('col'):null, COL_ID=QS.get('pid')||null, COL_NOME=QS.get('n')||'';
+const CID=QS.get('cid')||null, CAN=QS.get('n')||'', CAR=QS.get('ar')||'';
+const AREAS=['Vendas','Recepção','Marketing','Sucesso do cliente','Treinador(a)','Estagiário(a)','Liderança','Outra'];
 const COL_CARGO=COL==='consultor'?'Equipe atual · Consultor(a)':'Equipe atual · Treinador(a)';
 const HD={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
 async function sbGet(t,p){const r=await fetch(`${SB_URL}/rest/v1/${t}?${p}`,{headers:HD});if(!r.ok)throw new Error(await r.text());return r.json()}
@@ -269,18 +302,21 @@ $('#profiles').innerHTML=ORD.map(k=>`<div class="pcard" style="--pc:${P[k].cor}"
 /* navegação */
 const cand=location.hash==='#candidato'||new URLSearchParams(location.search).get('c')==='1';
 if(cand){document.body.classList.add('cand')}
+let nextV=null;
 function show(v){
-  ['visao','teste','painel'].forEach(x=>$('#v-'+x).hidden=(x!==v));
+  if(v==='cand'&&!gestor){nextV='cand';v='painel'}
+  ['visao','teste','painel','cand'].forEach(x=>$('#v-'+x).hidden=(x!==v));
   $$('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===v));
   window.scrollTo(0,0);
   if(v==='teste')renderTeste();
   if(v==='painel')renderPainel();
+  if(v==='cand')renderCand();
 }
 $$('.tab').forEach(t=>t.onclick=()=>show(t.dataset.v));
 $$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 
 /* teste do candidato */
-let st={fase:'intro',i:0,nome:COL?COL_NOME:'',cargo:COL?COL_CARGO:'Recepção',ans:{},ordem:{}};
+let st={fase:'intro',i:0,nome:COL?COL_NOME:CAN,cargo:COL?COL_CARGO:(AREAS.includes(CAR)?CAR:'Recepção'),ans:{},ordem:{}};
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function renderTeste(){
   const b=$('#t-box');
@@ -292,7 +328,7 @@ function renderTeste(){
     :`<div><span class="eyebrow">Processo seletivo</span><h2 style="margin-top:6px">Como você agiria na nossa academia?</h2></div>
     <p style="color:var(--ink2)">São 12 situações do dia a dia. Não existe resposta certa ou errada: escolha a atitude que mais parece com a sua. Leva cerca de 5 minutos.</p>
     <div class="field"><label for="f-nome">Seu nome</label><input type="text" id="f-nome" value="${st.nome.replace(/"/g,'&quot;')}" autocomplete="name"></div>
-    <div class="field"><label for="f-cargo">Vaga ou área</label><select id="f-cargo">${['Recepção','Vendas','Instrutor(a)','Coordenação','Outra / equipe atual'].map(c=>`<option${c===st.cargo?' selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="field"><label for="f-cargo">Vaga ou área</label><select id="f-cargo">${AREAS.map(c=>`<option${c===st.cargo?' selected':''}>${c}</option>`).join('')}</select></div>
     <label class="check"><input type="checkbox" id="f-ok"><span>Concordo em fornecer minhas respostas para fins de processo seletivo, e que elas sejam guardadas pela academia pelo tempo necessário para esse processo (LGPD).</span></label>`;
     b.innerHTML+=`<button class="cta" id="ini" disabled>Começar</button>`;
     const chk=()=>{$('#ini').disabled=!($('#f-nome').value.trim()&&$('#f-ok').checked)};
@@ -323,7 +359,7 @@ function calc(ans){
 async function finalizar(){
   const r=calc(st.ans);const btn=$('#prox');btn.disabled=true;btn.textContent='Enviando...';
   try{
-    await sbPost('cave_pessoas_testes',Object.assign({academia_id:ACADEMIA_ID,nome:st.nome,cargo:st.cargo,sc:r.sc,cons:r.cons,respostas:st.ans},COL?{pessoa_tipo:COL,pessoa_id:COL_ID}:{}));
+    await sbPost('cave_pessoas_testes',Object.assign({academia_id:ACADEMIA_ID,nome:st.nome,cargo:st.cargo,sc:r.sc,cons:r.cons,respostas:st.ans},COL?{pessoa_tipo:COL,pessoa_id:COL_ID}:(CID?{candidato_id:CID}:{})));
     st.fase='fim';renderTeste();
   }catch(e){console.error(e);btn.disabled=false;btn.textContent='Finalizar';
     if(!$('#errt')){const d=document.createElement('p');d.id='errt';d.style.color='var(--d)';d.textContent='Não foi possível enviar agora. Verifique a internet e tente novamente.';$('#t-box').appendChild(d)}}
@@ -345,12 +381,12 @@ async function renderPainel(){
   $('#limpar').hidden=true;
   rel(l.find(x=>x.id===sel));
 }
-function rel(c){
+function rel(c,alvo){
   const t=Object.values(c.sc).reduce((a,b)=>a+b,0);
   const r=ORD.slice().sort((a,b)=>c.sc[b]-c.sc[a]);const p=r[0],s=r[1];
-  const area={'Recepção':'rec','Vendas':'ven','Instrutor(a)':'tec','Coordenação':'lid'}[c.cargo];
+  const area={'Recepção':'rec','Vendas':'ven','Instrutor(a)':'tec','Treinador(a)':'tec','Coordenação':'lid','Liderança':'lid'}[c.cargo];
   const rows=[['rec','Recepção'],['ven','Vendas'],['tec','Técnica'],['lid','Liderança']];
-  $('#relatorio').innerHTML=`<div class="rep">
+  $(alvo||'#relatorio').innerHTML=`<div class="rep">
    <div><span class="eyebrow">Relatório do gestor · uso interno</span><h2 style="margin-top:4px">${c.nome}</h2><p style="color:var(--ink2)">${c.cargo}${c.data?' · '+c.data:''} ${c.ex?'· dados de exemplo':''}</p></div>
    <div><span class="badge">Predominante: ${P[p].nome} ${Math.round(c.sc[p]/t*100)}%</span> <span class="badge">Secundário: ${P[s].nome} ${Math.round(c.sc[s]/t*100)}%</span> <span class="badge">Consistência: ${Math.round(c.cons*100)}%</span></div>
    <div class="bars">${ORD.map(k=>`<div class="bar" style="--pc:${P[k].cor}"><span>${P[k].nome}</span><span class="t"><i style="width:${c.sc[k]/t*100}%"></i></span><b>${Math.round(c.sc[k]/t*100)}%</b></div>`).join('')}</div>
@@ -367,7 +403,127 @@ function loginGate(){
 $('#g-form').onsubmit=async ev=>{ev.preventDefault();const e=$('#g-email').value.trim().toLowerCase(),s=$('#g-senha').value;const er=$('#g-err');er.textContent='';
   try{const r=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(e)}&senha_hash=eq.${encodeURIComponent(s)}&ativo=eq.true&select=id,nome,role`);
     if(!r.length||!['admin','gestor'].includes(r[0].role)){er.textContent='E-mail ou senha incorretos, ou sem acesso de gestão.';return}
-    gestor=r[0];try{sessionStorage.setItem('gf_pessoas_gestor',JSON.stringify(gestor))}catch(x){}renderPainel()}catch(x){er.textContent='Não foi possível entrar agora. Tente de novo.'}};
+    gestor=r[0];try{sessionStorage.setItem('gf_pessoas_gestor',JSON.stringify(gestor))}catch(x){}if(nextV){const v=nextV;nextV=null;show(v)}else renderPainel()}catch(x){er.textContent='Não foi possível entrar agora. Tente de novo.'}};
+
+/* candidatos (processo seletivo) */
+const STATUS=[['novo','Novo'],['teste','Teste enviado'],['entrevista','Entrevista'],['aprovado','Aprovado'],['reprovado','Reprovado'],['banco','Banco de talentos']];
+const stNome=k=>(STATUS.find(x=>x[0]===k)||[0,k])[1];
+const AC=encodeURIComponent(ACADEMIA_ID);
+async function sbPatch(t,q,b){const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:'PATCH',headers:{...HD,'Prefer':'return=minimal'},body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text())}
+async function sbDel(t,q){const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:'DELETE',headers:HD});if(!r.ok)throw new Error(await r.text())}
+const esc=t=>String(t??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+let cands=[],cTestes=[],cSel=null,cEdit=null,cSemTabela=false;
+function igUser(v){return String(v||'').trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i,'').replace(/[\/?#].*$/,'').replace(/^@+/,'').replace(/\s+/g,'')}
+function linkCand(c){const base=location.href.split('#')[0].split('?')[0];return base+'?a='+encodeURIComponent(ACADEMIA_ID)+'&c=1&cid='+encodeURIComponent(c.id)+'&n='+encodeURIComponent(c.nome)+'&ar='+encodeURIComponent(c.area||'')}
+function testesDe(c){return cTestes.filter(t=>t.candidato_id===c.id)}
+function perfilTxt(t){const tot=Object.values(t.sc).reduce((a,b)=>a+b,0)||1;const top=ORD.slice().sort((a,b)=>t.sc[b]-t.sc[a])[0];return P[top].nome+' '+Math.round(t.sc[top]/tot*100)+'%'}
+async function carregarCand(){
+  cSemTabela=false;
+  try{cands=await sbGet('cave_candidatos',`academia_id=eq.${AC}&select=*&order=created_at.desc`)}catch(e){cands=[];cSemTabela=true}
+  try{cTestes=(await sbGet('cave_pessoas_testes','pessoa_tipo=is.null&select=*&order=created_at.desc')).map(r=>({...r,cons:Number(r.cons)}))}catch(e){cTestes=[]}
+}
+function optsFiltro(){
+  const a=$('#c-fst'),b=$('#c-far');
+  if(!a.options.length){a.innerHTML='<option value="">Todas as situações</option>'+STATUS.map(([k,n])=>`<option value="${k}">${n}</option>`).join('');b.innerHTML='<option value="">Todas as áreas</option>'+AREAS.map(x=>`<option>${x}</option>`).join('');a.onchange=b.onchange=drawCand}
+}
+async function renderCand(){
+  optsFiltro();await carregarCand();
+  const av=$('#c-aviso');
+  if(cSemTabela){av.hidden=false;av.textContent='A tabela de candidatos ainda não existe. Rode o arquivo cave-candidatos.sql no Supabase do Hub (projeto plataformas) e recarregue esta página.'}else av.hidden=true;
+  drawCand();
+}
+function drawCand(){
+  const fs=$('#c-fst').value,fa=$('#c-far').value;
+  const l=cands.filter(c=>(!fs||c.status===fs)&&(!fa||c.area===fa));
+  if(cSel&&!cands.find(c=>c.id===cSel))cSel=null;
+  $('#c-lista').innerHTML=l.length?l.map(c=>{const t=testesDe(c)[0];
+    return `<button class="row" data-id="${c.id}" aria-pressed="${c.id===cSel}"><span class="n">${esc(c.nome)}<span class="pill${c.status==='aprovado'?' real':''}">${stNome(c.status)}</span></span><span class="s">${esc(c.area||'Sem área')}${c.idade?' · '+c.idade+' anos':''}${c.instagram?' · @'+esc(c.instagram):''} · ${t?'DISC: '+perfilTxt(t):'sem DISC'}</span></button>`}).join(''):`<p class="small">${cSemTabela?'':'Nenhum candidato nesta seleção. Use "+ Novo candidato".'}</p>`;
+  $$('#c-lista .row').forEach(r=>r.onclick=()=>{cSel=r.dataset.id;cEdit=null;$('#c-form').hidden=true;drawCand();if(!$('#c-rot').hidden)drawRot()});
+  drawDet();
+}
+function drawForm(c){
+  const f=$('#c-form');f.hidden=false;cEdit=c?c.id:'novo';
+  f.innerHTML=`<h3>${c?'Editar candidato':'Novo candidato'}</h3><div class="frm">
+   <div class="field"><label for="cf-nome">Nome</label><input type="text" id="cf-nome" value="${esc(c?.nome)}" autocomplete="off"></div>
+   <div class="field"><label for="cf-idade">Idade</label><input type="text" id="cf-idade" inputmode="numeric" value="${c?.idade??''}"></div>
+   <div class="field"><label for="cf-area">Área da vaga</label><select id="cf-area">${AREAS.map(a=>`<option${a===(c?.area||'')?' selected':''}>${a}</option>`).join('')}</select></div>
+   <div class="field"><label for="cf-ig">Instagram (@)</label><input type="text" id="cf-ig" placeholder="@usuario" value="${c?.instagram?'@'+esc(c.instagram):''}" autocomplete="off"></div>
+   <div class="field full"><label for="cf-obs">Observações</label><textarea id="cf-obs">${esc(c?.observacoes)}</textarea></div></div>
+   <p class="small" id="cf-err" style="color:var(--d)" hidden></p>
+   <div class="acoes"><button class="cta" id="cf-salvar" type="button">Salvar</button><button class="cta ghost" id="cf-cancelar" type="button">Cancelar</button></div>`;
+  $('#cf-cancelar').onclick=()=>{f.hidden=true;cEdit=null};
+  $('#cf-salvar').onclick=async()=>{
+    const nome=$('#cf-nome').value.trim(),er=$('#cf-err');er.hidden=true;
+    if(!nome){er.textContent='Informe o nome.';er.hidden=false;return}
+    const idade=parseInt($('#cf-idade').value,10);
+    const body={nome,idade:isNaN(idade)?null:idade,area:$('#cf-area').value,instagram:igUser($('#cf-ig').value)||null,observacoes:$('#cf-obs').value.trim()||null,updated_at:new Date().toISOString()};
+    try{
+      if(c){await sbPatch('cave_candidatos',`id=eq.${c.id}`,body)}
+      else{body.academia_id=ACADEMIA_ID;body.criado_por=gestor?.nome||null;const r=await fetch(`${SB_URL}/rest/v1/cave_candidatos`,{method:'POST',headers:{...HD,'Prefer':'return=representation'},body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());const j=await r.json();cSel=j[0]?.id||null}
+      f.hidden=true;cEdit=null;await renderCand()
+    }catch(e){console.error(e);er.textContent='Não foi possível salvar. Confira se o SQL cave-candidatos.sql já foi rodado.';er.hidden=false}
+  };
+  $('#cf-nome').focus();
+}
+function drawDet(){
+  const d=$('#c-detalhe'),c=cands.find(x=>x.id===cSel);
+  if(!c){d.innerHTML=cands.length?'<p class="small">Selecione um candidato na lista.</p>':'';return}
+  const ts=testesDe(c),livres=cTestes.filter(t=>!t.candidato_id);
+  d.innerHTML=`<div class="ficha">
+    <div><span class="eyebrow">Ficha do candidato</span><h2 style="margin-top:4px">${esc(c.nome)}</h2></div>
+    <div class="chips"><span class="badge">${esc(c.area||'Sem área')}</span>${c.idade?`<span class="badge">${c.idade} anos</span>`:''}${c.instagram?`<a class="badge" href="https://instagram.com/${encodeURIComponent(c.instagram)}" target="_blank" rel="noopener">@${esc(c.instagram)}</a>`:''}<span class="small">Cadastro em ${(c.created_at||'').slice(0,10)}</span></div>
+    <div class="field"><label for="cd-st">Situação do processo</label><select id="cd-st">${STATUS.map(([k,n])=>`<option value="${k}"${k===c.status?' selected':''}>${n}</option>`).join('')}</select></div>
+    <div class="field"><label for="cd-obs">Observações</label><textarea id="cd-obs">${esc(c.observacoes)}</textarea></div>
+    <div class="acoes"><button class="cta" id="cd-obs-s" type="button">Salvar observações</button><button class="cta ghost" id="cd-ed" type="button">Editar dados</button><button class="cta ghost" id="cd-rot" type="button">📋 Roteiro da entrevista</button><button class="cta ghost" id="cd-del" type="button">Excluir</button></div>
+    <div><h3>Teste de perfil (DISC)</h3><p class="small">Envie o link pessoal. Quando ela responder, o resultado aparece aqui sozinho.</p>
+      <div class="toolbar" style="margin:8px 0 0"><div class="linkbox">${esc(linkCand(c))}</div><button class="cta ghost" id="cd-copy" type="button" style="margin:0">Copiar link</button></div></div>
+    ${ts.length?'':`<div><p class="small">Ainda sem resposta${livres.length?'. Se ela já fez o teste por outro link, vincule a resposta:':'.'}</p>${livres.length?`<div class="toolbar" style="margin:6px 0 0"><select id="cd-vinc" style="flex:1">${livres.map(t=>`<option value="${t.id}">${esc(t.nome)} · ${esc(t.cargo)} · ${(t.created_at||'').slice(0,10)}</option>`).join('')}</select><button class="cta ghost" id="cd-vinc-b" type="button" style="margin:0">Vincular</button></div>`:''}</div>`}
+  </div><div id="c-rel"></div>`;
+  $('#cd-st').onchange=async e=>{try{await sbPatch('cave_candidatos',`id=eq.${c.id}`,{status:e.target.value,updated_at:new Date().toISOString()});c.status=e.target.value;drawCand()}catch(x){alert('Não foi possível salvar a situação.')}};
+  $('#cd-obs-s').onclick=async()=>{try{await sbPatch('cave_candidatos',`id=eq.${c.id}`,{observacoes:$('#cd-obs').value.trim()||null,updated_at:new Date().toISOString()});c.observacoes=$('#cd-obs').value.trim()||null;$('#cd-obs-s').textContent='Salvo';setTimeout(()=>{const b=$('#cd-obs-s');if(b)b.textContent='Salvar observações'},1500)}catch(x){alert('Não foi possível salvar.')}};
+  $('#cd-ed').onclick=()=>{drawForm(c);window.scrollTo(0,0)};
+  $('#cd-rot').onclick=()=>{drawRot();window.scrollTo(0,0)};
+  $('#cd-del').onclick=async()=>{if(!confirm('Excluir este candidato? As respostas do teste continuam guardadas, mas sem vínculo.'))return;try{await sbPatch('cave_pessoas_testes',`candidato_id=eq.${c.id}`,{candidato_id:null});await sbDel('cave_candidatos',`id=eq.${c.id}`);cSel=null;await renderCand()}catch(x){alert('Não foi possível excluir.')}};
+  $('#cd-copy').onclick=async()=>{const b=$('#cd-copy');try{await navigator.clipboard.writeText(linkCand(c));b.textContent='Link copiado'}catch(x){b.textContent='Selecione e copie'}setTimeout(()=>{b.textContent='Copiar link'},2000)};
+  const vb=$('#cd-vinc-b');if(vb)vb.onclick=async()=>{try{await sbPatch('cave_pessoas_testes',`id=eq.${$('#cd-vinc').value}`,{candidato_id:c.id});await renderCand()}catch(x){alert('Não foi possível vincular.')}};
+  if(ts.length){const t=ts[0];rel({id:t.id,nome:c.nome,cargo:c.area||t.cargo,ex:false,sc:t.sc,cons:t.cons,data:(t.created_at||'').slice(0,10)},'#c-rel')}
+}
+$('#c-novo').onclick=()=>{drawForm(null);window.scrollTo(0,0)};
+
+/* roteiro da entrevista por videochamada (10 a 15 min) */
+const ROT_AREA={
+ 'Vendas':'Como você se sente puxando conversa com quem não conhece e ouvindo um "não"? Me dê um exemplo.',
+ 'Recepção':'Conte uma situação em que você precisou receber bem alguém irritado ou com pressa. O que fez?',
+ 'Treinador(a)':'Como você explicaria um exercício para alguém que nunca treinou e está com medo?',
+ 'Marketing':'Você já criou ou postou conteúdo (foto, vídeo, texto)? Mostre ou descreva o que mais gostou de fazer.',
+ 'Sucesso do cliente':'Como você acompanharia alguém que está sumindo da rotina, sem ser inconveniente?',
+ 'Estagiário(a)':'O que você quer aprender aqui em 3 meses para sentir que valeu a pena?',
+ 'Liderança':'Conte uma vez em que você precisou orientar ou cobrar alguém. Como foi e o que você faria diferente?',
+ 'Outra':'Que parte desta vaga você acha que faria melhor que a maioria das pessoas?'};
+function roteiroBlocos(area,c){
+  const esp=area&&ROT_AREA[area]?[[area,ROT_AREA[area]]]:Object.entries(ROT_AREA);
+  return [
+   {t:'0:00 a 1:00',n:'Abertura',say:'Apresente-se, diga que a conversa leva de 10 a 15 minutos, que no fim ela responde um teste curto e que hoje não há devolutiva.',q:['Você consegue falar agora, em local tranquilo? A câmera está funcionando bem?']},
+   {t:'1:00 a 3:30',n:'Momento atual',q:['Me conta rapidinho quem é você e o que está fazendo hoje (trabalho, estudo, projetos).','Em que momento você está: começando carreira, trocando de área, buscando uma nova oportunidade?','O que te chamou a atenção em trabalhar numa academia e na RG Cave?','Você está numa fase de aprender coisas novas? O que gostaria de aprender nos próximos 12 meses?']},
+   {t:'3:30 a 7:30',n:'Contribuição e jeito de trabalhar',q:['Como você acha que pode contribuir com a nossa equipe e com os alunos?','Conte uma situação em que você ajudou ou atendeu bem alguém e deu resultado (pode ser de trabalho, estudo ou voluntariado).','O que as pessoas costumam elogiar em você? E o que você sabe que precisa melhorar?','Como você reage quando recebe uma correção ou feedback?'].concat(esp.map(([a,q])=>(area?'':'['+a+'] ')+q))},
+   {t:'7:30 a 9:30',n:'Rotina e disponibilidade',q:['Quais dias e horários você teria disponibilidade para trabalhar aqui?','Tem outro trabalho ou estudo que ocupa parte da semana? Como é o seu deslocamento até a academia?','Que tipo de ambiente de trabalho faz você render melhor?']},
+   {t:'9:30 a 11:00',n:'Próximo passo (explique com clareza)',say:'Se ela avançar, entramos em contato. O próximo passo seria um treinamento de teste de, no mínimo, 5 dias seguidos e, no máximo, 10 dias corridos (cerca de 2 semanas), com poucas horas por dia. Ainda não é contratação.',q:['Você teria disponibilidade para fazer esse treinamento de teste? Em quais horários?','Ficou alguma dúvida sobre a vaga ou sobre o processo?'],alerta:'Antes de convidar para o treinamento de teste, alinhe com seu contador ou advogado como ele será enquadrado (estágio, contrato de experiência etc.). Prática sem registro nem remuneração pode gerar vínculo trabalhista.'},
+   {t:'11:00 a 15:00',n:'Teste de perfil ao vivo (DISC)',say:'Envie o link pessoal agora. Peça para ela silenciar o microfone, manter a câmera ligada e responder no celular, enquanto você aguarda. Leva cerca de 5 minutos. Não comente resultado nem faça devolutiva.',q:['Enviei o link no chat, é só abrir e responder. Pode silenciar o microfone, eu aguardo aqui.'],link:true},
+   {t:'Encerramento',n:'Despedida',say:'Agradeça, diga que a equipe avalia e que entram em contato com quem avançar, e informe o prazo que você pode cumprir.',q:['Obrigado pelo seu tempo. Retornamos até [informe o prazo] para quem avançar.']}
+  ];
+}
+function drawRot(){
+  const f=$('#c-rot'),c=cands.find(x=>x.id===cSel);f.hidden=false;
+  const bl=roteiroBlocos(c?.area||'',c);
+  f.innerHTML=`<div><span class="eyebrow">Videochamada · 10 a 15 minutos</span><h3 style="margin-top:4px">Roteiro da entrevista${c?' · '+esc(c.nome):''}</h3><p class="small">${c?'Pergunta da área: '+esc(c.area||'geral')+'.':'Selecione um candidato para ver só a pergunta da área dele. As anotações vão no campo Observações da ficha.'}</p></div>
+   <div class="rot">${bl.map((b,i)=>`<div class="bl"><span class="tm">${b.t}</span><h4>${b.n}</h4>${b.say?`<div class="say">${esc(b.say)}</div>`:''}${b.q.map((q,j)=>`<label><input type="checkbox"><span>${esc(q)}</span></label>`).join('')}${b.link&&c?`<div class="toolbar" style="margin:6px 0 0"><div class="linkbox">${esc(linkCand(c))}</div><button class="cta ghost" type="button" data-rcopy style="margin:0">Copiar link do teste</button></div>`:''}${b.alerta?`<div class="alerta">${esc(b.alerta)}</div>`:''}</div>`).join('')}
+   <p class="small">Não pergunte sobre gravidez, estado civil, filhos, religião, saúde ou orientação sexual. Foque em experiência, disponibilidade e atitude.</p></div>
+   <div class="acoes"><button class="cta ghost" id="rot-copy" type="button">Copiar roteiro</button><button class="cta ghost" id="rot-fechar" type="button">Fechar</button></div>`;
+  $('#rot-fechar').onclick=()=>{f.hidden=true};
+  $('#rot-copy').onclick=async()=>{const t=bl.map(b=>b.t+' | '+b.n+(b.say?'\n'+b.say:'')+'\n'+b.q.map(q=>'- '+q).join('\n')).join('\n\n');const bt=$('#rot-copy');try{await navigator.clipboard.writeText(t);bt.textContent='Roteiro copiado'}catch(x){bt.textContent='Não foi possível copiar'}setTimeout(()=>{bt.textContent='Copiar roteiro'},2000)};
+  const rc=f.querySelector('[data-rcopy]');if(rc)rc.onclick=async()=>{try{await navigator.clipboard.writeText(linkCand(c));rc.textContent='Link copiado'}catch(x){rc.textContent='Selecione e copie'}setTimeout(()=>{rc.textContent='Copiar link do teste'},2000)};
+}
+$('#c-rotbtn').onclick=()=>{const f=$('#c-rot');if(!f.hidden){f.hidden=true;return}drawRot();window.scrollTo(0,0)};
 
 show(cand?'teste':'visao');
 </script>
