@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script src="gefit-auth.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hub de Gestão | RG Cave</title>
@@ -1559,6 +1560,7 @@ async function doCadastro(){
   if(!email||!email.includes('@')){err.textContent='Informe um e-mail válido.';err.classList.add('show');return}
   if(senha.length<6){err.textContent='Senha com no mínimo 6 caracteres.';err.classList.add('show');return}
   if(senha!==senha2){err.textContent='As senhas não coincidem.';err.classList.add('show');return}
+  err.textContent='Cadastro de nova academia é feito pela equipe GeFit.';err.classList.add('show');return; // Segurança Onda 1
   const btn=document.getElementById('btn-cadastrar');btn.disabled=true;btn.textContent='Criando conta...';
   try{
     const exist=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(email)}&select=id`);
@@ -1581,7 +1583,7 @@ async function doLogin(){
   if(!email||!senha){err.textContent='Preencha e-mail e senha.';err.classList.add('show');return}
   const btn=document.getElementById('btn-login');btn.disabled=true;btn.textContent='Verificando...';
   try{
-    const res=await sbGet('cave_gestores',`email=eq.${encodeURIComponent(email)}&senha_hash=eq.${encodeURIComponent(senha)}&ativo=eq.true&select=id,nome,email,academia_id,role,consultora_id,modulos_ativos`);
+    const g=await gefitLogin('cave_',email,senha); const res=g?[g]:[]; // senha conferida no banco
     if(!res||!res.length){err.textContent='E-mail ou senha incorretos.';err.classList.add('show');btn.disabled=false;btn.textContent='Entrar';return}
     sessao=res[0];
     sessionStorage.setItem('qg90_sessao_roi',JSON.stringify(sessao));
@@ -2745,7 +2747,7 @@ async function abrirAcessoPessoa(tipo,pessoaId,pessoaNome){
         </div>
         <div id="acesso-ret-status" style="font-size:12.5px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:14px;color:var(--td)">Área do Treinador: verificando...</div>
         <div style="font-size:12px;color:var(--td);margin-bottom:6px">Senha atual</div>
-        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:10px 14px;font-family:monospace;color:var(--gr);margin-bottom:14px">${login.senha_hash}</div>
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:10px 14px;font-size:13px;color:var(--td);margin-bottom:14px">🔒 Protegida. A senha não é exibida. Gere uma senha temporária e envie na mensagem; a pessoa troca no primeiro acesso.</div>
         <div style="background:var(--or-d);border:1px solid var(--bdo);border-radius:8px;padding:12px;margin-bottom:16px">
           <div style="font-size:12.5px;font-weight:600;margin-bottom:8px">📨 Mensagem pronta com o acesso</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -2754,7 +2756,7 @@ async function abrirAcessoPessoa(tipo,pessoaId,pessoaNome){
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:16px">
-          <input class="fi" id="nova-senha-input" placeholder="Nova senha (mínimo 8 caracteres)" style="flex:1">
+          <input class="fi" id="nova-senha-input" placeholder="Nova senha (mínimo 8 caracteres)" style="flex:1"><button class="btn-gh btn-sm" type="button" onclick="document.getElementById('nova-senha-input').value=gefitSenhaTemporaria()">Gerar temporária</button>
           <button class="btn-or" onclick="resetSenha('${login.id}')">Salvar</button>
         </div>
         <div class="divider"></div>
@@ -3107,9 +3109,9 @@ function openAcesso(acId2){
 
     <div class="divider"></div>
     <div style="font-size:12px;color:var(--td);margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:1px">Senha atual</div>
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:10px 14px;font-size:15px;font-family:monospace;color:var(--gr);letter-spacing:1px;margin-bottom:10px">${g.senha_hash}</div>
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:10px 14px;font-size:13px;color:var(--td);margin-bottom:14px">🔒 Protegida. A senha não é exibida. Gere uma senha temporária e envie na mensagem; a pessoa troca no primeiro acesso.</div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
-      <input class="fi" id="nova-senha-input" placeholder="Nova senha" style="flex:1">
+      <input class="fi" id="nova-senha-input" placeholder="Nova senha" style="flex:1"><button class="btn-gh btn-sm" type="button" onclick="document.getElementById('nova-senha-input').value=gefitSenhaTemporaria()">Gerar temporária</button>
       <button class="btn-or" onclick="resetSenha('${g.id}')">Salvar</button>
     </div>
 
@@ -3307,10 +3309,10 @@ function msgAcesso(){
   const acad=((db&&db.acs&&db.acs[a.academia_id])||{}).nome||document.title.split(/[·|]/)[0].trim();
   const mods=(a.modulos_ativos||[]).map(m=>(MODULOS_QG90.find(x=>x.key===m)||{}).label).filter(Boolean);
   const primeiro=(a.nomePessoa||a.nome||'').trim().split(/\s+/)[0];
-  let t=`Olá, ${primeiro}! 👋\nAqui está o seu acesso à plataforma da ${acad}:\n\n🔗 Link: ${base}\n📧 E-mail: ${a.email}\n🔑 Senha: ${a.senha_hash}\n`;
+  let t=`Olá, ${primeiro}! 👋\nAqui está o seu acesso à plataforma da ${acad}:\n\n🔗 Link: ${base}\n📧 E-mail: ${a.email}\n🔑 Senha temporária: ${a.senha_temp||"(gere uma senha temporária no painel antes de enviar)"}\n⚠️ Troque a senha no primeiro acesso.\n`;
   if(mods.length&&!(a.tipo==='treinador'&&typeof AT_MODULOS!=='undefined'))t+=`\n✅ Liberado para você: ${mods.join(', ')}\n`;
   if(a.tipo==='treinador'&&typeof AT_MODULOS!=='undefined'){
-    t=`Olá, ${primeiro}! 👋\nAqui está o seu acesso à Área do Treinador da ${acad} (planner, carteira de alunos, diário e revisão de treino):\n\n🔗 Link: ${base}retencao/\n📧 E-mail: ${a.email}\n🔑 Senha: ${a.senha_hash}\n`;
+    t=`Olá, ${primeiro}! 👋\nAqui está o seu acesso à Área do Treinador da ${acad} (planner, carteira de alunos, diário e revisão de treino):\n\n🔗 Link: ${base}retencao/\n📧 E-mail: ${a.email}\n🔑 Senha temporária: ${a.senha_temp||"(gere uma senha temporária no painel antes de enviar)"}\n⚠️ Troque a senha no primeiro acesso.\n`;
     if(mods.length)t+=`\n🧭 O mesmo login também abre a plataforma (${mods.join(', ')}): ${base}\n`;
   }
   t+=`\n📲 Dica: salve o link nos favoritos do celular para abrir rápido.`;
@@ -3341,7 +3343,7 @@ async function resetSenha(gId){
     toast('Senha atualizada'+extra);
     // atualiza cache
     const g=Object.values(gestoresDB).find(g=>g.id===gId);
-    if(g)g.senha_hash=nova;
+    if(acessoAberto&&acessoAberto.id===gId)acessoAberto.senha_temp=nova; // só em memória
     if(acessoAberto&&acessoAberto.id===gId){const a=acessoAberto;await abrirAcessoPessoa(a.tipo,a.pessoaId,a.nomePessoa);}
     else closeM('m-acesso');
   }catch(e){toast('Erro ao salvar',true);console.error(e)}
@@ -5260,8 +5262,8 @@ async function atStatusAcesso(login){
 }
 async function sincronizarAcessoRet(){
   const a=acessoAberto;if(!a)return;
-  if(String(a.senha_hash||'').length<8){toast('A Área do Treinador exige senha de 8 caracteres ou mais. Defina uma nova senha abaixo.',true);return}
-  const r=await retSync({action:'garantir_usuario',nome:a.nomePessoa||a.nome,email:a.email,senha:a.senha_hash,tipo:a.tipo});
+  if(String(a.senha_temp||'').length<8){toast('A Área do Treinador exige senha de 8 caracteres ou mais. Defina uma nova senha abaixo.',true);return}
+  const r=await retSync({action:'garantir_usuario',nome:a.nomePessoa||a.nome,email:a.email,senha:a.senha_temp,tipo:a.tipo});
   toast(r.error?'⚠️ '+r.error:(r.skip?'Conecte-se à Área do Treinador como gestor(a) primeiro.':'✅ '+(r.message||'Sincronizado')),!!(r.error||r.skip));
   atStatusAcesso(a);
 }
